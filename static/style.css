@@ -36,6 +36,8 @@
   --left-pane: 61ch;
   --rule: #2f3348;
   --gutter: 2ch;
+  --copy-button-width: 8ch;
+  --hanging-indent: 6ch;
   color-scheme: dark;
 }
 
@@ -240,6 +242,29 @@ body:has(.landing) .wordmark { display: none; }
 .copy-button:focus-visible {
   outline: 2px solid var(--pip);
   outline-offset: 2px;
+}
+
+@media (max-width: 44rem) {
+  .session pre { font-size: .875rem; line-height: 1.5; white-space: pre-wrap; }
+
+  .session .line {
+    display: block;
+    padding-left: var(--hanging-indent);
+    text-indent: calc(-1 * var(--hanging-indent));
+  }
+
+  .copyable pre {
+    padding-right: var(--copy-button-width);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .copyable .word { display: inline-block; }
+
+  .copy-button {
+    top: 1px;
+    padding-block: calc(var(--line) / 2);
+  }
 }
 
 .table-scroll { overflow-x: auto; margin-block: var(--line); }

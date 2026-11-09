@@ -46,25 +46,24 @@
              (str highlighted (render-token code start (ref next)))))))
 
 (defn render-token (code start current)
-  (local text
-    (escape-html (subs code start (:stop current))))
-  (if (empty? (:class current))
-    text
-    (str "<span class=\"" (:class current) "\">" text "</span>")))
+  (let (text (escape-html (subs code start (:stop current))))
+    (if (empty? (:class current))
+      text
+      (str "<span class=\"" (:class current) "\">" text "</span>"))))
 
 (defn next-token (code start)
-  (local rest (after code start))
-  (cond
-    ((starts-with? rest ";")
-     (->token (str "comment") (line-end code start)))
-    ((starts-with? rest "\"")
-     (->token (str "string")
-              (string-end code (+ start 1))))
-    ((or (starts-with? rest "(") (starts-with? rest ")"))
-     (->token (str "paren") (+ start 1)))
-    ((starts-with-whitespace? rest)
-     (->token (str "") (whitespace-end code start)))
-    (else (word-token code start))))
+  (let (rest (after code start))
+    (cond
+      ((starts-with? rest ";")
+       (->token (str "comment") (line-end code start)))
+      ((starts-with? rest "\"")
+       (->token (str "string")
+                (string-end code (+ start 1))))
+      ((or (starts-with? rest "(") (starts-with? rest ")"))
+       (->token (str "paren") (+ start 1)))
+      ((starts-with-whitespace? rest)
+       (->token (str "") (whitespace-end code start)))
+      (else (word-token code start)))))
 
 (defn line-end (code start)
   (match (find-from code "\n" start)
@@ -80,8 +79,8 @@
        (recur code (after-escaped-char code stop))))))
 
 (defn word-token (code start)
-  (local end (word-end code start))
-  (->token (word-class (subs code start end)) end))
+  (let (end (word-end code start))
+    (->token (word-class (subs code start end)) end)))
 
 (defn word-class (word)
   (cond

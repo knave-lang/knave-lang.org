@@ -6,13 +6,12 @@
 (export render-markdown)
 
 (defn render-markdown (source)
-  (local blocks (parse-blocks source))
-  (render-blocks (ref blocks)))
+  (let (blocks (parse-blocks source))
+    (render-blocks (ref blocks))))
 
 (defn render-blocks (blocks)
-  (local rendered
-    (collect (map (iter blocks) render-block)))
-  (join (ref rendered) "\n"))
+  (let (rendered (collect (map (iter blocks) render-block)))
+    (join (ref rendered) "\n")))
 
 (defn render-block (current)
   (match current
@@ -26,13 +25,14 @@
     ((table header rows) (render-table header rows))))
 
 (defn render-heading (level text)
-  (local anchor (slug text))
-  (str "<h" level " id=\"" anchor "\" aria-labelledby=\""
-       anchor "-title\">" "<a class=\"anchor\" href=\"#"
-       anchor "\" aria-label=\"Link to this section\">#</a>"
-       "<span id=\"" anchor "-title\">"
-       (render-inlines text)
-       "</span>" "</h" level ">"))
+  (let (anchor (slug text))
+    (str "<h" level " id=\"" anchor "\" aria-labelledby=\""
+         anchor "-title\">" "<a class=\"anchor\" href=\"#"
+         anchor
+         "\" aria-label=\"Link to this section\">#</a>"
+         "<span id=\"" anchor "-title\">"
+         (render-inlines text)
+         "</span>" "</h" level ">")))
 
 (defn render-code (language code)
   (str "<pre><code class=\"language-"

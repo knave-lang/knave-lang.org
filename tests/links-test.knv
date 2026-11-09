@@ -5,14 +5,13 @@
   (->site-page (str path) (str html)))
 
 (defn broken-in (html)
-  (local site
-    (->site-files (vec (str "index.html")
-                       (str "docs/index.html")
-                       (str "style.css"))
-                  (vec (page-at "index.html" html)
-                       (page-at "docs/index.html"
-                                "<h2 id=\"types\">Types</h2>"))))
-  (broken-links (ref site)))
+  (let (site (->site-files (vec (str "index.html")
+                                (str "docs/index.html")
+                                (str "style.css"))
+                           (vec (page-at "index.html" html)
+                                (page-at "docs/index.html"
+                                         "<h2 id=\"types\">Types</h2>"))))
+    (broken-links (ref site))))
 
 (deftest accepts-a-link-to-a-directory-index
   (assert (empty? (broken-in "<a href=\"/docs/\">x</a>"))))

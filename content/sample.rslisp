@@ -1,14 +1,11 @@
-(defstruct book
-  :title string
-  :year i64)
+(defstruct rogue
+  :name str
+  :tricks (vec str))
 
-(defn titles-after (books year)
-  (collect (map (filter (iter books)
-                        (fn (b) (> (:year b) year)))
-                (fn (b) (as-str (:title b))))))
+(defn scheme (rogue)
+  (str (:name rogue) " runs a racket with guile"))
 
 (defn main ()
-  (local shelf
-    (vec (->book (str "Dune") 1965)
-         (->book (str "Neuromancer") 1984)))
-  (println (len (titles-after shelf 1970))))
+  (local tricks (vec "marked cards" "loaded dice"))
+  (local knave (->rogue :name "Knave" :tricks tricks))
+  (println (scheme knave)))

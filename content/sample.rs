@@ -1,12 +1,17 @@
-struct Book {
-    title: String,
-    year: i64,
+struct Rogue<'a> {
+    name: &'a str,
+    tricks: Vec<&'a str>,
 }
 
-fn titles_after(books: &[Book], year: i64) -> Vec<&str> {
-    books
-        .iter()
-        .filter(|b: &&Book| b.year > year)
-        .map(|b: &Book| b.title.as_str())
-        .collect::<Vec<_>>()
+fn scheme(rogue: &Rogue<'_>) -> String {
+    format!("{} runs a racket with guile", rogue.name)
+}
+
+fn main() {
+    let tricks = vec!["marked cards", "loaded dice"];
+    let knave = Rogue {
+        name: "Knave",
+        tricks,
+    };
+    println!("{}", scheme(&knave))
 }

@@ -111,9 +111,9 @@ code, pre { font-family: var(--mono); font-size: .875em; }
   .card { animation: none; }
 }
 
-.card figcaption { color: var(--muted); font-size: .9375rem; }
+.card pre { margin: 0; overflow-x: auto; line-height: 1.55; }
 
-.card pre { margin: .375rem 0 0; overflow-x: auto; line-height: 1.55; }
+.card .emitted { color: var(--muted); }
 
 .fold { margin: 1.25rem 0; border-top: 2px dashed var(--pip); }
 

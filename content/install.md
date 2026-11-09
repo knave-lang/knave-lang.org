@@ -18,21 +18,12 @@ This installs the compiler with the `rustc` and `rustfmt` that its CI tests agai
 nix profile install github:knave-lang/knave
 ```
 
-To download a prebuilt binary instead of building it, run `cachix use rslisp` first.
+## Start a project
 
-## Run a program
-
-Save this as `hello.rslisp`:
-
-```lisp
-(defn main ()
-  (println (str "hello" " " "world")))
-```
-
-Then run it:
+Create a project and run it:
 
 ```sh
-knave run hello.rslisp
+knave new hello
+cd hello
+knave run
 ```
-
-Run `knave` alone to start the prompt, and `knave --help` to list the commands.

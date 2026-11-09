@@ -143,7 +143,7 @@ body:has(.landing) .wordmark { display: none; }
 
 @media (width < 64rem) {
   .session > * {
-    padding: var(--line) 1ch;
+    padding: var(--box-padding);
     border: 1px solid var(--rule);
   }
 }
@@ -178,9 +178,9 @@ body:has(.landing) .wordmark { display: none; }
   }
 }
 
-.command { margin: 0 0 var(--line); color: var(--bright); }
+.command { margin: 0 0 1lh; color: var(--dim); }
 
-.command::before { content: "$ "; color: var(--dim); }
+.command::before { content: "$ "; }
 
 .site-footer {
   display: flex;

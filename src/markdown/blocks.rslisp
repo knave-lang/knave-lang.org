@@ -124,7 +124,9 @@
 
 (defn parse-table (source-lines index)
   (local end (run-end source-lines index table-row?))
-  (local first-body-row (+ index 2))
+  (local after-delimiter (+ index 2))
+  (local first-body-row
+    (if (< after-delimiter end) after-delimiter end))
   (->parsed (block/table (table-cells (as-str (at source-lines index)))
                          (collect (map (iter (lines-between source-lines
                                                             first-body-row

@@ -48,3 +48,7 @@
 (deftest highlights-a-lisp-code-block
   (assert (contains? (as-str (render-markdown "```lisp\n:key\n```"))
                      "<span class=\"keyword\">:key</span>")))
+
+(deftest renders-a-table-with-only-a-header
+  (assert (contains? (as-str (render-markdown "| just one row"))
+                     "<th>just one row</th>")))

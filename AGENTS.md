@@ -5,7 +5,7 @@
 ```sh
 knave build && target/knave/knave-site/knave-site
 knave test .
-knave fmt src tests content
+knave fmt .
 python3 -m http.server -d public
 ```
 

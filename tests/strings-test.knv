@@ -1,5 +1,7 @@
 (use prelude/test assert deftest)
-(use strings fnv1a-digest in-line-spans)
+
+(use strings after before first-char? fnv1a-digest
+             in-line-spans leading-count slug)
 
 (deftest hashes-empty-text-to-the-fnv1a-offset-basis
   (assert (= (fnv1a-digest "") "14695981039346656037")))
@@ -10,3 +12,39 @@
 (deftest puts-each-line-in-its-own-span
   (assert (= (in-line-spans "one\n\ntwo")
              "<span class=\"line\">one\n</span><span class=\"line\">\n</span><span class=\"line\">two</span>")))
+
+(deftest takes-the-text-after-a-byte-offset
+  (assert (= (after "héllo" 3) "llo")))
+
+(deftest takes-nothing-after-the-final-offset
+  (assert (= (after "abc" 3) "")))
+
+(deftest stops-before-the-first-separator
+  (assert (= (before "a?b?c" "?") "a")))
+
+(deftest keeps-text-without-the-separator
+  (assert (= (before "abc" "?") "abc")))
+
+(deftest counts-only-the-leading-marks
+  (assert (= (leading-count "##a#" (char "#")) 2)))
+
+(deftest counts-no-marks-when-text-starts-differently
+  (assert (= (leading-count "a##" (char "#")) 0)))
+
+(deftest tests-the-first-character
+  (assert (first-char? "1a" digit?)))
+
+(deftest ignores-characters-after-the-first
+  (assert (not (first-char? "a1" digit?))))
+
+(deftest finds-no-first-character-in-empty-text
+  (assert (not (first-char? "" digit?))))
+
+(deftest lowercases-and-hyphenates-a-slug
+  (assert (= (slug "Hello Big World") "hello-big-world")))
+
+(deftest drops-punctuation-from-a-slug
+  (assert (= (slug "What's new-ish?") "whats-new-ish")))
+
+(deftest keeps-non-ascii-letters-in-a-slug
+  (assert (= (slug "Café Noël") "café-noël")))

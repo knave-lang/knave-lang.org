@@ -38,3 +38,11 @@
 (deftest states-the-body-length
   (assert (= (response-head "200 OK" "text/plain" 5)
              "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 5\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n")))
+
+(deftest ignores-a-fragment
+  (assert (= (request-file "GET /a.css#top HTTP/1.1")
+             (some (str "a.css")))))
+
+(deftest stops-at-a-fragment-before-a-query
+  (assert (= (request-file "GET /a.css#top?x=1 HTTP/1.1")
+             (some (str "a.css")))))

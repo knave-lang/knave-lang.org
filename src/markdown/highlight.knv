@@ -1,5 +1,5 @@
 (use strings after contains? escape-html find-from
-             starts-with?)
+             first-char? starts-with?)
 
 (export highlight)
 
@@ -14,10 +14,6 @@
   (rust "{0}[{1}..].find([' ', '\\n', '\\t', '\\r', '(', ')', '\"', ';']).map_or({0}.len(), |offset| offset + {1})"
     (fn ((ref str) usize) usize)))
 
-(def whitespace-end
-  (rust "{0}[{1}..].find(|c: char| !matches!(c, ' ' | '\\n' | '\\t' | '\\r')).map_or({0}.len(), |offset| offset + {1})"
-    (fn ((ref str) usize) usize)))
-
 (def next-string-stop
   (rust "{0}[{1}..].find(['\\\\', '\"']).map(|offset| offset + {1})"
     (fn ((ref str) usize) (option usize))))
@@ -25,14 +21,6 @@
 (def after-escaped-char
   (rust "{1} + 1 + {0}[{1} + 1..].chars().next().map_or(0, char::len_utf8)"
     (fn ((ref str) usize) usize)))
-
-(def starts-with-whitespace?
-  (rust "{0}.starts_with([' ', '\\n', '\\t', '\\r'])"
-    (fn ((ref str)) bool)))
-
-(def starts-with-digit?
-  (rust "{0}.starts_with(|c: char| c.is_ascii_digit())"
-    (fn ((ref str)) bool)))
 
 (defn highlight (code)
   (highlight-from code 0 (str "")))
@@ -61,9 +49,19 @@
                 (string-end code (+ start 1))))
       ((or (starts-with? rest "(") (starts-with? rest ")"))
        (->token (str "paren") (+ start 1)))
-      ((starts-with-whitespace? rest)
+      ((first-char? rest code-whitespace?)
        (->token (str "") (whitespace-end code start)))
       (else (word-token code start)))))
+
+(defn code-whitespace? (c)
+  (or (= c (char " "))
+      (= c (char "\n"))
+      (= c (char "\t"))
+      (= c (char "\r"))))
+
+(defn whitespace-end (code start)
+  (+ start
+     (count (take-while (chars (after code start)) code-whitespace?))))
 
 (defn line-end (code start)
   (match (find-from code "\n" start)
@@ -85,7 +83,7 @@
 (defn word-class (word)
   (cond
     ((starts-with? word ":") (str "keyword"))
-    ((starts-with-digit? word) (str "number"))
+    ((first-char? word digit?) (str "number"))
     ((definer? word) (str "definer"))
     ((special-form? word) (str "special"))
     (else (str ""))))

@@ -1,8 +1,8 @@
 (use src/strings after contains? ends-with? find-from owned
                  starts-with?)
 
-(export ->site-files ->site-page broken-links site-files
-        site-page)
+(export ->site-files ->site-page broken-links index-of
+        site-files site-page)
 
 (defstruct site-page
   :path string

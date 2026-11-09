@@ -1,0 +1,33 @@
+(use prelude/test assert deftest)
+(use src/http content-type request-file response-head)
+
+(deftest serves-the-root-index
+  (assert (= (request-file "GET / HTTP/1.1")
+             (some (str "index.html")))))
+
+(deftest serves-a-directory-index
+  (assert (= (request-file "GET /docs/types/ HTTP/1.1")
+             (some (str "docs/types/index.html")))))
+
+(deftest ignores-a-query-string
+  (assert (= (request-file "GET /style.css?v=1 HTTP/1.1")
+             (some (str "style.css")))))
+
+(deftest refuses-a-path-above-the-root
+  (assert (= (request-file "GET /../secret HTTP/1.1") none)))
+
+(deftest refuses-other-methods
+  (assert (= (request-file "POST / HTTP/1.1") none)))
+
+(deftest refuses-a-malformed-request
+  (assert (= (request-file "") none)))
+
+(deftest names-the-html-content-type
+  (assert (= (content-type "index.html") "text/html; charset=utf-8")))
+
+(deftest falls-back-to-a-binary-content-type
+  (assert (= (content-type "archive.zip") "application/octet-stream")))
+
+(deftest states-the-body-length
+  (assert (= (response-head "200 OK" "text/plain" 5)
+             "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 5\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n")))

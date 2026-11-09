@@ -6,7 +6,7 @@
 knave build && target/knave/knave-site/knave-site
 knave test .
 knave fmt .
-python3 -m http.server -d public
+target/knave/knave-site/knave-site serve
 ```
 
 **Put tests in `tests/`, NEVER in `src/`.**

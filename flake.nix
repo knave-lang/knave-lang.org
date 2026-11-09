@@ -16,10 +16,7 @@
         in
         {
           default = pkgs.mkShell {
-            packages = [
-              knave.packages.${system}.default
-              pkgs.python3
-            ];
+            packages = [ knave.packages.${system}.default ];
             KNAVE_DOCS = "${knave}/docs/language.md";
             KNAVE_REV = knave.rev;
           };

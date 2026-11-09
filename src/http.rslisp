@@ -1,0 +1,54 @@
+(use src/links index-of)
+
+(use src/strings after contains? ends-with? find-from owned
+                 starts-with?)
+
+(export content-type request-file response-head)
+
+(def get-prefix "GET ")
+
+(def parent-segment "..")
+
+(def request-file-target
+  (rust "{0}.split(['?', '#']).next().unwrap_or_default()"
+    (fn ((ref str)) (ref str))))
+
+(defn request-file (request-line)
+  (if (starts-with? request-line get-prefix)
+    (file-for-request-target request-line)
+    none))
+
+(defn file-for-request-target (request-line)
+  (local target-start (len get-prefix))
+  (match (find-from request-line " " target-start)
+    (none none)
+    ((some target-end)
+     (file-for-url (request-file-target
+                     (subs request-line target-start target-end))))))
+
+(defn file-for-url (url-path)
+  (if (safe-url? url-path)
+    (some (file-below-root (after url-path 1)))
+    none))
+
+(defn safe-url? (url-path)
+  (and (starts-with? url-path "/")
+       (not (contains? url-path parent-segment))))
+
+(defn file-below-root (relative)
+  (if (or (empty? relative) (ends-with? relative "/"))
+    (index-of relative)
+    (owned relative)))
+
+(defn content-type (file)
+  (cond
+    ((ends-with? file ".html") "text/html; charset=utf-8")
+    ((ends-with? file ".css") "text/css; charset=utf-8")
+    ((ends-with? file ".svg") "image/svg+xml")
+    (else "application/octet-stream")))
+
+(defn response-head (status file-type body-length)
+  (str "HTTP/1.1 " status "\r\n" "Content-Type: " file-type
+       "\r\n" "Content-Length: " body-length "\r\n"
+       "Cache-Control: no-store\r\n"
+       "Connection: close\r\n\r\n"))

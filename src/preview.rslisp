@@ -1,0 +1,121 @@
+(use src/files directory? read-bytes)
+(use src/http content-type request-file response-head)
+(use src/links index-of)
+(use src/strings owned)
+
+(export serve-preview)
+
+(deftype tcp-listener (rust "std::net::TcpListener"))
+
+(deftype tcp-stream (rust "std::net::TcpStream"))
+
+(defstruct response
+  :status string
+  :file-type string
+  :body (vec u8))
+
+(def preview-address "127.0.0.1:8000")
+
+(def output-root "public")
+
+(def bind-listener
+  (rust "std::net::TcpListener::bind({0})"
+    (fn ((ref str))
+      (result tcp-listener io-error))))
+
+(def accept-connection
+  (rust "{0}.accept().map(|(stream, _)| stream)"
+    (fn ((ref tcp-listener))
+      (result tcp-stream io-error))))
+
+(def read-request-line
+  (rust "std::io::BufRead::lines(std::io::BufReader::new({0})).next().transpose().map(Option::unwrap_or_default)"
+    (fn ((ref tcp-stream))
+      (result string io-error))))
+
+(def write-text
+  (rust "std::io::Write::write_all(&mut &*{0}, {1}.as_bytes())"
+    (fn ((ref tcp-stream) (ref str))
+      (result unit io-error))))
+
+(def write-body
+  (rust "std::io::Write::write_all(&mut &*{0}, {1})"
+    (fn ((ref tcp-stream) (ref (slice u8)))
+      (result unit io-error))))
+
+(def text-bytes
+  (rust "{0}.as_bytes().to_vec()"
+    (fn ((ref str)) (vec u8))))
+
+(defn serve-preview ()
+  (local listener (try (bind-listener preview-address)))
+  (println (str "Previewing " output-root " at http://"
+                preview-address "/"))
+  (accept-connections (ref listener)))
+
+(type accept-connections
+  (fn ((ref tcp-listener))
+    (result unit io-error)))
+
+(defn accept-connections (listener)
+  (match (answer-next-request listener)
+    ((err problem)
+     (eprintln (str "preview request failed: " problem)))
+    ((ok _) (do)))
+  (recur listener))
+
+(type answer-next-request
+  (fn ((ref tcp-listener))
+    (result unit io-error)))
+
+(defn answer-next-request (listener)
+  (local stream (try (accept-connection listener)))
+  (local request-line
+    (try (read-request-line (ref stream))))
+  (send-response (ref stream)
+                 (ref (response-for (as-str request-line)))))
+
+(type send-response
+  (fn ((ref tcp-stream) (ref response))
+    (result unit io-error)))
+
+(defn send-response (stream answer)
+  (local head
+    (response-head (as-str (:status answer))
+                   (as-str (:file-type answer))
+                   (len (:body answer))))
+  (try (write-text stream (as-str head)))
+  (write-body stream (ref (:body answer))))
+
+(type response-for
+  (fn ((ref str)) response))
+
+(defn response-for (request-line)
+  (match (request-file request-line)
+    (none (not-found))
+    ((some file)
+     (file-response (as-str (directory-index (as-str file)))))))
+
+(defn directory-index (file)
+  (if (directory? (as-str (str output-root "/" file)))
+    (index-of (as-str (str file "/")))
+    (owned file)))
+
+(type file-response
+  (fn ((ref str)) response))
+
+(defn file-response (file)
+  (local full-path (str output-root "/" file))
+  (match (read-bytes (as-str full-path))
+    ((err _) (not-found))
+    ((ok body)
+     (->response (str "200 OK")
+                 (str (content-type file))
+                 body))))
+
+(type not-found (fn () response))
+
+(defn not-found ()
+  (->response (str "404 Not Found")
+              (str "text/plain; charset=utf-8")
+              (text-bytes "Not found\n")))

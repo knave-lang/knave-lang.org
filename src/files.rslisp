@@ -1,5 +1,6 @@
-(export copy-directory-files environment-variable failure
-        files-under read-file remove-directory write-index)
+(export copy-directory-files directory? environment-variable
+        failure files-under read-bytes read-file
+        remove-directory write-index)
 
 (def index-file-name "index.html")
 
@@ -39,6 +40,11 @@
 (def directory?
   (rust "std::path::Path::new({0}).is_dir()"
     (fn ((ref str)) bool)))
+
+(def read-bytes
+  (rust "std::fs::read({0})"
+    (fn ((ref str))
+      (result (vec u8) io-error))))
 
 (def failure
   (rust "std::io::Error::other({0})" (fn (string) io-error)))

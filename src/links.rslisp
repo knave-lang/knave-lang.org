@@ -2,7 +2,7 @@
                  starts-with?)
 
 (export ->site-files ->site-page broken-links index-of
-        site-files site-page)
+        site-files)
 
 (defstruct site-page
   :file string

@@ -1,9 +1,7 @@
 (use src/files copy-directory-files failure files-under
                read-file remove-directory write-index)
 
-(use src/links ->site-files ->site-page broken-links
-               site-page)
-
+(use src/links ->site-files ->site-page broken-links)
 (use src/markdown/highlight highlight)
 (use src/markdown/html render-markdown)
 (use src/strings ends-with? escape-html join owned)

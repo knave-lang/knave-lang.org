@@ -7,7 +7,7 @@
 (use src/strings ends-with? escape-html join owned)
 (use src/template fill)
 
-(export build-site)
+(export build-site output-directory)
 
 (def output-directory "public")
 

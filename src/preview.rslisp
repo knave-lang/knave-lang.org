@@ -1,7 +1,7 @@
 (use src/files directory? read-bytes)
 (use src/http content-type request-file response-head)
 (use src/links index-of)
-(use src/site build-site)
+(use src/site build-site output-directory)
 (use src/strings owned)
 (use src/watch source-fingerprint)
 
@@ -17,8 +17,6 @@
   :body (vec u8))
 
 (def preview-address "127.0.0.1:8000")
-
-(def output-root "public")
 
 (def poll-milliseconds 50)
 
@@ -77,7 +75,7 @@
   (try (accept-without-waiting (ref listener)))
   (local fingerprint (try (source-fingerprint)))
   (report-build (build-site))
-  (println (str "Previewing " output-root " at http://"
+  (println (str "Previewing " output-directory " at http://"
                 preview-address "/"))
   (run-preview (ref listener) fingerprint))
 
@@ -136,12 +134,12 @@
      (file-response (as-str (directory-index (as-str file)))))))
 
 (defn directory-index (file)
-  (if (directory? (as-str (str output-root "/" file)))
+  (if (directory? (as-str (str output-directory "/" file)))
     (index-of (as-str (str file "/")))
     (owned file)))
 
 (defn file-response (file)
-  (local full-path (str output-root "/" file))
+  (local full-path (str output-directory "/" file))
   (match (read-bytes (as-str full-path))
     ((err _) (not-found))
     ((ok body)

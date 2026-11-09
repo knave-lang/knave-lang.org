@@ -1,15 +1,15 @@
-(use src/discovery ->page canonical-url llms-links
-                   sitemap-entries)
+(use discovery ->page canonical-url llms-links
+               sitemap-entries)
 
-(use src/files copy-directory-files failure files-under
-               read-file remove-directory write-file
-               write-index)
+(use files copy-directory-files failure files-under
+           read-file remove-directory write-file
+           write-index)
 
-(use src/links ->site-files ->site-page broken-links)
-(use src/markdown/highlight highlight)
-(use src/markdown/html render-markdown)
-(use src/strings ends-with? escape-html join owned)
-(use src/template fill)
+(use links ->site-files ->site-page broken-links)
+(use markdown/highlight highlight)
+(use markdown/html render-markdown)
+(use strings ends-with? escape-html join owned)
+(use template fill)
 
 (export build-site output-directory)
 

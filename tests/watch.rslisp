@@ -1,6 +1,6 @@
 (use prelude/test assert deftest)
-(use src/strings contains?)
-(use src/watch directory-fingerprint)
+(use strings contains?)
+(use watch directory-fingerprint)
 
 (defn fixtures-fingerprint ()
   (unwrap-ok (directory-fingerprint "tests/fixtures")))

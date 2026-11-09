@@ -1,7 +1,7 @@
 (use prelude/test assert deftest)
 
-(use src/discovery ->page canonical-url llms-links
-                   sitemap-entries)
+(use discovery ->page canonical-url llms-links
+               sitemap-entries)
 
 (defn fake-pages ()
   (vec (->page (str "/")

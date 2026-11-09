@@ -1,4 +1,4 @@
-(use src/strings replace-all)
+(use strings replace-all)
 
 (export fill)
 

@@ -1,4 +1,4 @@
-(use src/files files-under)
+(use files files-under)
 
 (export directory-fingerprint source-fingerprint)
 

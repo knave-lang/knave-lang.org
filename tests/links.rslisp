@@ -1,5 +1,5 @@
 (use prelude/test assert deftest)
-(use src/links ->site-files ->site-page broken-links)
+(use links ->site-files ->site-page broken-links)
 
 (defn page-at (path html)
   (->site-page (str path) (str html)))

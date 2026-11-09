@@ -1,5 +1,5 @@
 (use prelude/test assert deftest)
-(use src/markdown/highlight highlight)
+(use markdown/highlight highlight)
 
 (deftest colors-a-definition
   (assert (= (highlight "(defn add)")

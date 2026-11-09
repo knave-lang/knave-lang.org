@@ -27,11 +27,12 @@
 
 (defn render-heading (level text)
   (local anchor (slug text))
-  (str "<h" level " id=\"" anchor
-       "\"><a class=\"anchor\" href=\"#" anchor
-       "\" aria-label=\"Link to this section\">#</a>"
+  (str "<h" level " id=\"" anchor "\" aria-labelledby=\""
+       anchor "-title\">" "<a class=\"anchor\" href=\"#"
+       anchor "\" aria-label=\"Link to this section\">#</a>"
+       "<span id=\"" anchor "-title\">"
        (render-inlines text)
-       "</h" level ">"))
+       "</span>" "</h" level ">"))
 
 (defn render-code (language code)
   (str "<pre><code class=\"language-"

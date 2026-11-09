@@ -1,5 +1,5 @@
-(export copy-directory-files environment-variable read-file
-        remove-directory write-index)
+(export copy-directory-files environment-variable failure
+        files-under read-file remove-directory write-index)
 
 (def index-file-name "index.html")
 
@@ -36,6 +36,13 @@
     (fn ((ref str))
       (result (vec string) io-error))))
 
+(def directory?
+  (rust "std::path::Path::new({0}).is_dir()"
+    (fn ((ref str)) bool)))
+
+(def failure
+  (rust "std::io::Error::other({0})" (fn (string) io-error)))
+
 (defn write-index (directory html)
   (try (create-directories directory))
   (write-file (as-str (str directory "/" index-file-name))
@@ -53,3 +60,30 @@
       (try (copy-file (as-str (str source "/" name))
                       (as-str (str target "/" name))))
       (recur source target names (+ position 1)))))
+
+(type files-under
+  (fn ((ref str))
+    (result (vec string) io-error)))
+
+(defn files-under (root)
+  (collect-files root
+                 (vec (str ""))
+                 (vec)))
+
+(type collect-files
+  (fn ((ref str) (vec string) (vec string))
+    (result (vec string) io-error)))
+
+(defn collect-files (root pending found)
+  (match (pop! pending)
+    (none (ok found))
+    ((some directory)
+     (local names
+       (try (file-names (as-str (str root "/" directory)))))
+     (for-each (iter names)
+               (fn (name)
+                 (local path (str directory name))
+                 (if (directory? (as-str (str root "/" path)))
+                   (push! pending (str path "/"))
+                   (push! found path))))
+     (recur root pending found))))

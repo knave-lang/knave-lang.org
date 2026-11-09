@@ -193,10 +193,6 @@ body:has(.landing) .wordmark { display: none; }
 
 .site-footer p { margin: 0; }
 
-.site-footer a { text-decoration: none; }
-
-.site-footer a:hover { text-decoration: underline; }
-
 .prose { padding-block: var(--line) calc(2 * var(--line)); }
 
 .prose > * { max-width: var(--measure); }

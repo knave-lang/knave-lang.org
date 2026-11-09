@@ -10,7 +10,3 @@ knave test .
 knave fmt .
 knave build && target/knave/knave-site/knave-site serve
 ```
-
-`main.rslisp` at the repository root is a temporary symlink to `src/main.rslisp`, because `knave test` does not read `project.rslisp` yet. Knave needs an upstream fix for this.
-
-**If the pinned Knave release reads `project.rslisp` in `knave test`, delete `main.rslisp`.** Then remove the `:entry` key from `project.rslisp` and the `src/` prefix from every `use`.

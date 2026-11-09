@@ -1,2 +1,1 @@
-(project knave-site
-  :entry "main.rslisp")
+(project knave-site :entry "main.rslisp")

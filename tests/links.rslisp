@@ -39,3 +39,7 @@
 (deftest reports-a-missing-fragment
   (assert (= (broken-in "<a href=\"/docs/#absent\">x</a>")
              (vec (str "index.html: /docs/#absent")))))
+
+(deftest reports-a-relative-link
+  (assert (= (broken-in "<a href=\"missing/\">x</a>")
+             (vec (str "index.html: missing/")))))

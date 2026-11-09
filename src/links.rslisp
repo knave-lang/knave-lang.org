@@ -42,10 +42,15 @@
         (recur html value-end hrefs))))))
 
 (defn broken-link? (site page href)
-  (and (internal? href)
-       (not (resolves? site page href))))
+  (cond
+    ((external? href) false)
+    ((rooted? href) (not (resolves? site page href)))
+    (else true)))
 
-(defn internal? (href)
+(defn external? (href)
+  (or (contains? href "://") (starts-with? href "mailto:")))
+
+(defn rooted? (href)
   (or (starts-with? href "/") (starts-with? href "#")))
 
 (defn resolves? (site page href)

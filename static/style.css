@@ -203,7 +203,7 @@ h1:hover > .anchor, h2:hover > .anchor, h3:hover > .anchor, .anchor:focus-visibl
 
 .definer, .special { color: var(--pip); font-weight: 600; }
 
-.paren { color: #8a90b4; }
+.paren { color: #6a7096; }
 
 @media (max-width: 54rem) {
   .table { grid-template-columns: minmax(0, 1fr); }

@@ -1,4 +1,4 @@
-(use src/discovery ->page canonical-url llms-links page
+(use src/discovery ->page canonical-url llms-links
                    sitemap-entries)
 
 (use src/files copy-directory-files failure files-under

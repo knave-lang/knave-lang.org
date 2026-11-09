@@ -1,8 +1,5 @@
-(use src/docs build-doc-pages doc-page)
-
-(use src/files copy-directory-files environment-variable
-               failure files-under read-file
-               remove-directory write-index)
+(use src/files copy-directory-files failure files-under
+               read-file remove-directory write-index)
 
 (use src/links ->site-files ->site-page broken-links
                site-page)
@@ -27,7 +24,6 @@
   (local layout (try (read-file "templates/layout.html")))
   (try (write-landing (as-str layout)))
   (try (write-install (as-str layout)))
-  (try (write-docs (as-str layout)))
   (check-links))
 
 (defn in-layout (layout title content)
@@ -61,30 +57,6 @@
          "</main>"))
   (write-index (as-str (str output-directory "/install"))
                (as-str (in-layout layout "Install Knave" (as-str content)))))
-
-(defn write-docs (layout)
-  (local reference-path
-    (try (environment-variable "KNAVE_DOCS")))
-  (local source
-    (try (read-file (as-str reference-path))))
-  (local revision (try (environment-variable "KNAVE_REV")))
-  (local template (try (read-file "templates/docs.html")))
-  (local pages
-    (build-doc-pages (as-str source)
-                     (as-str revision)
-                     (as-str template)))
-  (write-pages layout (ref pages) 0))
-
-(defn write-pages (layout pages position)
-  (if (>= position (len pages))
-    (ok (do))
-    (let (page (at pages position))
-      (try (write-index (as-str (str output-directory "/" (:directory page)))
-                        (as-str (in-layout layout
-                                           (as-str (str (:page-title page)
-                                                        " | Knave reference"))
-                                           (as-str (:document page))))))
-      (recur layout pages (+ position 1)))))
 
 (defn check-links ()
   (local paths (try (files-under output-directory)))

@@ -3,7 +3,7 @@
 (use src/markdown/inlines render-inlines)
 (use src/strings contains? escape-html join slug)
 
-(export render-blocks render-markdown)
+(export render-markdown)
 
 (defn render-markdown (source)
   (local blocks (parse-blocks source))

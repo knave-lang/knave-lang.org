@@ -35,4 +35,4 @@ Then run it:
 knave run hello.rslisp
 ```
 
-Run `knave` alone to start the prompt, and `knave --help` to list the commands. The [reference](/docs/) describes the language.
+Run `knave` alone to start the prompt, and `knave --help` to list the commands.

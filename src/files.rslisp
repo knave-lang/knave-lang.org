@@ -1,16 +1,10 @@
-(export copy-directory-files directory? environment-variable
-        failure files-under read-bytes read-file
-        remove-directory write-index)
+(export copy-directory-files directory? failure files-under
+        read-bytes read-file remove-directory write-index)
 
 (def index-file-name "index.html")
 
 (def read-file
   (rust "std::fs::read_to_string({0}).map_err(|error| std::io::Error::new(error.kind(), String::from({0}) + \": \" + &error.to_string()))"
-    (fn ((ref str))
-      (result string io-error))))
-
-(def environment-variable
-  (rust "std::env::var({0}).map_err(|error| std::io::Error::other(String::from({0}) + \": \" + &error.to_string()))"
     (fn ((ref str))
       (result string io-error))))
 

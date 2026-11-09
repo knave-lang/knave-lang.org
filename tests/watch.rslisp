@@ -7,7 +7,7 @@
 
 (deftest names-each-file-in-the-fingerprint
   (assert (contains? (as-str (fixtures-fingerprint))
-                     "tests/fixtures/reference.md@")))
+                     "tests/fixtures/sample.md@")))
 
 (deftest repeats-the-fingerprint-for-unchanged-files
   (assert (= (fixtures-fingerprint) (fixtures-fingerprint))))

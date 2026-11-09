@@ -18,11 +18,18 @@
 html { -webkit-text-size-adjust: 100%; }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   margin: 0;
   background: var(--page);
   color: var(--ink);
   font: 1.0625rem/1.6 var(--sans);
 }
+
+body > main { flex: 1; }
+
+.landing { display: grid; }
 
 a { color: var(--back); text-underline-offset: .15em; }
 
@@ -116,25 +123,6 @@ code, pre { font-family: var(--mono); font-size: .875em; }
 .card .emitted { color: var(--muted); }
 
 .fold { margin: 1.25rem 0; border-top: 2px dashed var(--pip); }
-
-.values {
-  padding: clamp(3rem, 7vw, 6rem) clamp(1rem, 4vw, 3rem);
-  background: var(--stock);
-}
-
-.values h2 {
-  margin: 0 auto 1.5rem;
-  max-width: 62rem;
-  color: var(--muted);
-  font: 400 1.0625rem/1.4 var(--sans);
-}
-
-.values ul { max-width: 62rem; margin: 0 auto; padding: 0; list-style: none; }
-
-.values li {
-  padding: .5rem 0;
-  font: clamp(1.625rem, 3.6vw, 2.75rem)/1.2 var(--serif);
-}
 
 .site-footer {
   display: flex;

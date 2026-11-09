@@ -23,7 +23,8 @@
   --string: #8fd6b4;
   --number: #e8b36b;
   --line: 1.6875rem;
-  --column: 80ch;
+  --measure: 80ch;
+  --column: 134ch;
   --gutter: 2ch;
   color-scheme: dark;
 }
@@ -91,6 +92,8 @@ h1 {
   line-height: calc(2 * var(--line));
 }
 
+.pitch { max-width: var(--measure); }
+
 .pitch p { margin: 0 0 var(--line); }
 
 .button {
@@ -104,11 +107,24 @@ h1 {
 
 .button:hover { background: var(--bright); color: var(--screen); }
 
-.pitch .caution { color: var(--dim); }
+.caution { max-width: var(--measure); margin: 0; color: var(--dim); }
 
-.session { margin: calc(2 * var(--line)) 0 0; }
+.session {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--line) 2ch;
+  margin: var(--line) 0;
+}
 
-.session pre { margin: 0 0 var(--line); overflow-x: auto; }
+.pane { min-width: 0; }
+
+.pane pre { margin: 0; overflow-x: auto; }
+
+@media (min-width: 79rem) {
+  .session { grid-template-columns: max-content minmax(0, 1fr); }
+
+  .pane + .pane { padding-left: 2ch; border-left: 1px solid var(--dim); }
+}
 
 .command { margin: 0; color: var(--bright); }
 
@@ -128,6 +144,8 @@ h1 {
 .site-footer a { color: inherit; }
 
 .prose { padding-block: var(--line) calc(2 * var(--line)); }
+
+.prose > * { max-width: var(--measure); }
 
 .prose h2, .prose h3, .prose h4 {
   margin: calc(2 * var(--line)) 0 var(--line);

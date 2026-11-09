@@ -31,9 +31,12 @@
   --type: 1.125rem;
   --line: calc(var(--type) * 1.5);
   --measure: 80ch;
-  --column: calc(136ch + 2px);
+  --column: calc(139ch + 2px);
   --box-padding: var(--type);
-  --left-pane: 61ch;
+  --code-type: var(--type);
+  --code-ch: calc(var(--code-type) / 2);
+  --left-pane: calc(64 * var(--code-ch));
+  --pane-gap: calc(1.5 * var(--code-ch));
   --rule: #2f3348;
   --gutter: 2ch;
   --copy-button-width: 8ch;
@@ -144,16 +147,20 @@ body:has(.landing) .wordmark { display: none; }
 .session pre { margin: 0; overflow-x: auto; }
 
 @media (min-width: 64rem) {
-  :root:has(.landing) { --type: min(1.125rem, (100vw - 1.5rem) / 70); }
+  :root { --code-type: min(var(--type), (100vw - 6rem) / 67.5); }
 
   .columns {
     grid-template-columns: var(--left-pane) minmax(0, 1fr);
-    column-gap: 1.5ch;
+    column-gap: var(--pane-gap);
   }
 
-  .columns > * + * { padding-left: 1.5ch; }
+  .columns > * + * { padding-left: var(--pane-gap); }
 
-  .session { padding: 0 var(--box-padding); }
+  .session {
+    padding: 0 var(--box-padding);
+    font-size: var(--code-type);
+    line-height: 1.5;
+  }
 
   .session > * { padding-block: var(--line); }
 

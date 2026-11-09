@@ -15,22 +15,23 @@
 
 * { box-sizing: border-box; }
 
-html {
-  -webkit-text-size-adjust: 100%;
-  background: var(--back-deep);
-}
+html { -webkit-text-size-adjust: 100%; }
+
+html, body { background: var(--back-deep); }
 
 body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   margin: 0;
-  background: var(--page);
   color: var(--ink);
   font: 1.0625rem/1.6 var(--sans);
 }
 
-body > main { flex: 1; }
+body > main {
+  flex: 1;
+  background: var(--page);
+}
 
 .landing { display: grid; }
 

@@ -28,10 +28,11 @@
   --pip: #ff6b7d;
   --string: #8fd6b4;
   --number: #e8b36b;
-  --line: 1.6875rem;
+  --type: 1.125rem;
+  --line: calc(var(--type) * 1.5);
   --measure: 80ch;
   --column: calc(136ch + 2px);
-  --box-padding: 1.125rem;
+  --box-padding: var(--type);
   --left-pane: 61ch;
   --rule: #2f3348;
   --gutter: 2ch;
@@ -55,7 +56,7 @@ body {
   margin: 0;
   background: var(--screen);
   color: var(--text);
-  font: 1.125rem/var(--line) Iosevka, ui-monospace, monospace;
+  font: var(--type)/var(--line) Iosevka, ui-monospace, monospace;
   font-variant-ligatures: none;
 }
 
@@ -130,7 +131,7 @@ body:has(.landing) .wordmark { display: none; }
 
 .columns > * { min-width: 0; }
 
-.intro p { margin: 0; }
+.intro p { max-width: var(--measure); margin: 0; }
 
 .caution { color: var(--dim); }
 
@@ -142,7 +143,9 @@ body:has(.landing) .wordmark { display: none; }
 
 .session pre { margin: 0; overflow-x: auto; }
 
-@media (min-width: 80rem) {
+@media (min-width: 64rem) {
+  :root:has(.landing) { --type: min(1.125rem, (100vw - 1.5rem) / 70); }
+
   .columns {
     grid-template-columns: var(--left-pane) minmax(0, 1fr);
     column-gap: 1.5ch;

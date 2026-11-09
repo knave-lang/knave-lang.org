@@ -1,0 +1,14 @@
+(defstruct book
+  :title string
+  :year i64)
+
+(defn titles-after (books year)
+  (collect (map (filter (iter books)
+                        (fn (b) (> (:year b) year)))
+                (fn (b) (as-str (:title b))))))
+
+(defn main ()
+  (local shelf
+    (vec (->book (str "Dune") 1965)
+         (->book (str "Neuromancer") 1984)))
+  (println (len (titles-after shelf 1970))))

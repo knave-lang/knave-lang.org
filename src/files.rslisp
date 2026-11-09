@@ -46,7 +46,8 @@
 
 (defn write-index (directory html)
   (try (create-directories directory))
-  (write-file (as-str (str directory index-file-name)) html))
+  (write-file (as-str (str directory "/" index-file-name))
+              html))
 
 (defn copy-directory-files (source target)
   (try (create-directories target))

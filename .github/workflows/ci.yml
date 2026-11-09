@@ -19,7 +19,7 @@ jobs:
       - name: Check that the landing sample matches the emitted Rust
         run: |
           nix develop -c bash -c '
-            knave emit content/sample.rslisp |
+            knave emit content/sample.knv |
               sed "/^mod rt/,\$d; /^#\[derive/d; /restore_default_sigpipe/d" |
               sed -e :a -e "/^\n*\$/{\$d;N;ba" -e "}" |
               diff - content/sample.rs'

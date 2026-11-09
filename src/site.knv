@@ -74,8 +74,7 @@
 
 (defn landing-page ()
   (local template (try (read-file "templates/landing.html")))
-  (local knave-sample
-    (try (read-file "content/sample.rslisp")))
+  (local knave-sample (try (read-file "content/sample.knv")))
   (local rust-sample (try (read-file "content/sample.rs")))
   (local with-knave
     (fill (as-str template)

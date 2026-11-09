@@ -6,7 +6,10 @@
                write-index)
 
 (use src/links ->site-files ->site-page broken-links)
-(use src/markdown/highlight highlight)
+
+(use src/markdown/highlight highlight
+                            highlight-inferred-rust)
+
 (use src/markdown/html render-markdown)
 
 (use src/strings ends-with? escape-html join owned
@@ -84,7 +87,7 @@
   (local content
     (fill (as-str with-knave)
           "rust-sample"
-          (as-str (escape-html (trim (as-str rust-sample))))))
+          (as-str (highlight-inferred-rust (trim (as-str rust-sample))))))
   (ok (->page (owned "/")
               (owned "Knave: Lisp with type and ownership inference for Rust")
               (owned landing-description)

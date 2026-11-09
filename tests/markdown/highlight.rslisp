@@ -1,5 +1,7 @@
 (use prelude/test assert deftest)
-(use src/markdown/highlight highlight)
+
+(use src/markdown/highlight highlight
+                            highlight-inferred-rust)
 
 (deftest colors-a-definition
   (assert (= (highlight "(defn add)")
@@ -19,3 +21,26 @@
 
 (deftest accepts-non-ascii-words
   (assert (= (highlight "café") "café")))
+
+(deftest marks-an-inferred-reference-type-and-lifetime
+  (assert (= (highlight-inferred-rust "&Rogue<'_>")
+             "<span class=\"inferred\">&amp;Rogue</span><span class=\"inferred\">&lt;'_&gt;</span>")))
+
+(deftest marks-only-the-lifetime-of-a-declared-field-type
+  (assert (= (highlight-inferred-rust "&'a str")
+             "<span class=\"inferred\">&amp;'a</span> str")))
+
+(deftest marks-only-the-ampersand-of-a-borrowed-value
+  (assert (= (highlight-inferred-rust "&knave")
+             "<span class=\"inferred\">&amp;</span>knave")))
+
+(deftest marks-an-inferred-return-type
+  (assert (= (highlight-inferred-rust "-> String {")
+             "<span class=\"inferred\">-&gt; String</span> {")))
+
+(deftest leaves-declared-generics-plain
+  (assert (= (highlight-inferred-rust "Vec<u8>") "Vec&lt;u8&gt;")))
+
+(deftest colors-rust-strings-without-marking-their-contents
+  (assert (= (highlight-inferred-rust "\"&x\"")
+             "<span class=\"string\">&quot;&amp;x&quot;</span>")))

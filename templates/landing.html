@@ -2,20 +2,17 @@
   <h1>A Lisp that compiles to readable Rust</h1>
   <div class="columns intro">
     <p>Knave infers most types and ownership for you. The Rust it emits is the Rust you would have written, with no clones or allocations you did not ask for.</p>
-    <div>
-      <p class="actions">
-        <a class="button" href="/install/">Install Knave</a>
-      </p>
-      <p class="caution">Knave is experimental. The syntax, the prelude and the command line can change in any commit.</p>
-    </div>
+    <p class="caution">Knave is experimental. The syntax, the prelude and the command line can change in any commit.</p>
   </div>
   <figure class="columns session" aria-label="A Knave program beside the Rust it compiles to">
     <div>
       <p class="command"><code>cat main.knv</code></p>
       <pre><code>{{knave-sample}}</code></pre>
+      <p class="command"><code>knave run main.knv</code></p>
+      <pre><code>Knave runs a racket with guile and marked cards</code></pre>
     </div>
     <div>
-      <p class="command"><code>knave emit main.knv</code></p>
+      <p class="command"><code>knave emit main.knv</code> <span class="comment"># <span class="inferred">amber</span> is inferred</span></p>
       <pre class="emitted"><code>{{rust-sample}}</code></pre>
     </div>
   </figure>

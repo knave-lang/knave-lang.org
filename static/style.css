@@ -104,24 +104,13 @@ h1 {
 
 .intro p { margin: 0; }
 
-.intro .actions { margin-bottom: var(--line); }
-
-.button {
-  display: inline-block;
-  padding-inline: 1ch;
-  background: var(--text);
-  color: var(--screen);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.button:hover { background: var(--bright); color: var(--screen); }
-
 .caution { color: var(--dim); }
 
 .session { margin: calc(2 * var(--line)) 0 0; }
 
 .session pre { margin: 0; overflow-x: auto; }
+
+.session pre + .command { margin-top: var(--line); }
 
 @media (min-width: 79rem) {
   .columns { grid-template-columns: var(--left-pane) minmax(0, 1fr); }
@@ -146,7 +135,9 @@ h1 {
 
 .site-footer p { margin: 0; }
 
-.site-footer a { color: inherit; }
+.site-header a, .site-footer a { text-decoration: none; }
+
+.site-header a:hover, .site-footer a:hover { text-decoration: underline; }
 
 .prose { padding-block: var(--line) calc(2 * var(--line)); }
 
@@ -200,7 +191,7 @@ h1 {
 
 .keyword { color: var(--link); }
 
-.number { color: var(--number); }
+.number, .inferred { color: var(--number); }
 
 .definer, .special { color: var(--pip); }
 

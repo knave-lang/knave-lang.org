@@ -21,7 +21,6 @@
 
 :root {
   --screen: #12141f;
-  --raised: #1b1e2e;
   --text: #c8cdea;
   --bright: #f4f5fd;
   --dim: #868cb0;
@@ -211,12 +210,33 @@ body:has(.landing) .wordmark { display: none; }
 
 .prose h4 .anchor::before { content: "###"; }
 
-.prose :not(pre) > code { color: var(--string); }
+.prose :not(pre) > code { color: var(--bright); }
 
 .prose pre {
   overflow-x: auto;
   padding: calc(var(--line) / 2) 2ch;
-  background: var(--raised);
+  border: 1px solid var(--rule);
+}
+
+.copyable { position: relative; }
+
+.copy-button {
+  position: absolute;
+  top: calc(var(--line) / 2 + 1px);
+  right: 1px;
+  padding: 0 2ch;
+  border: 0;
+  background: var(--screen);
+  color: var(--dim);
+  font: inherit;
+  cursor: pointer;
+}
+
+.copy-button:hover { color: var(--bright); }
+
+.copy-button:focus-visible {
+  outline: 2px solid var(--pip);
+  outline-offset: 2px;
 }
 
 .table-scroll { overflow-x: auto; margin-block: var(--line); }

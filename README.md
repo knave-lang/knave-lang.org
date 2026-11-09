@@ -8,7 +8,7 @@ Run `direnv allow` once to load the [Nix](https://nixos.org/download/) dev shell
 knave build && target/knave/knave-site/knave-site
 knave test .
 knave fmt .
-target/knave/knave-site/knave-site serve
+knave build && target/knave/knave-site/knave-site serve
 ```
 
 `main.rslisp` at the repository root is a temporary symlink to `src/main.rslisp`, because `knave test` does not read `project.rslisp` yet. Knave needs an upstream fix for this.

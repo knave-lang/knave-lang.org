@@ -6,7 +6,7 @@
 knave build && target/knave/knave-site/knave-site
 knave test .
 knave fmt .
-target/knave/knave-site/knave-site serve
+knave build && target/knave/knave-site/knave-site serve
 ```
 
 **Put tests in `tests/`, NEVER in `src/`.**

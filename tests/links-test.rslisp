@@ -23,6 +23,13 @@
 (deftest accepts-a-link-to-a-listed-asset
   (assert (empty? (broken-in "<link href=\"/style.css\">"))))
 
+(deftest accepts-a-listed-asset-with-a-query
+  (assert (empty? (broken-in "<link href=\"/style.css?v=abc\">"))))
+
+(deftest reports-a-missing-asset-with-a-query
+  (assert (= (broken-in "<link href=\"/missing.css?v=abc\">")
+             (vec (str "index.html: /missing.css?v=abc")))))
+
 (deftest accepts-a-fragment-that-exists
   (assert (empty? (broken-in "<a href=\"/docs/#types\">x</a>"))))
 

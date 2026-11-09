@@ -59,10 +59,14 @@
      (local target (target-file site page (subs href 0 hash)))
      (holds-id? site target (after href (+ hash 1))))))
 
+(def without-query
+  (rust "{0}.split('?').next().unwrap_or_default()"
+    (fn ((ref str)) (ref str))))
+
 (defn target-file (site page path)
   (if (empty? path)
     (owned (as-str (:file page)))
-    (listed-or-index site (after path 1))))
+    (listed-or-index site (after (without-query path) 1))))
 
 (defn listed-or-index (site relative)
   (if (file-listed? site relative)

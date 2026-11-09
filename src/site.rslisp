@@ -90,9 +90,9 @@
 (defn install-page ()
   (local source (try (read-file "content/install.md")))
   (local content
-    (str "<main class=\"prose\">"
+    (str "<main><div class=\"prose\">"
          (render-markdown (as-str source))
-         "</main>"))
+         "</div></main>"))
   (ok (->page (owned "/install/")
               (owned "Install Knave")
               (owned install-description)

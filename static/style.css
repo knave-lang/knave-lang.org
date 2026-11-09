@@ -245,7 +245,9 @@ body:has(.landing) .wordmark { display: none; }
 }
 
 @media (max-width: 44rem) {
-  .session pre { font-size: .875rem; line-height: 1.5; white-space: pre-wrap; }
+  .session pre, .command { font-size: .875rem; line-height: 1.5; }
+
+  .session pre { white-space: pre-wrap; }
 
   .session .line {
     display: block;

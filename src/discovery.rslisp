@@ -1,0 +1,36 @@
+(use src/strings join)
+
+(export ->page canonical-url llms-links page
+        sitemap-entries)
+
+(defstruct page
+  :path string
+  :title string
+  :description string
+  :content string)
+
+(def site-origin "https://knave-lang.org")
+
+(defn canonical-url (path) (str site-origin path))
+
+(defn sitemap-entries (pages)
+  (join-lines (map (iter pages) sitemap-entry)))
+
+(defn sitemap-entry (page)
+  (str "  <url><loc>"
+       (canonical-url (as-str (:path page)))
+       "</loc></url>"))
+
+(defn llms-links (pages)
+  (join-lines (map (iter pages) llms-link)))
+
+(defn llms-link (page)
+  (str "- ["
+       (:title page)
+       "]("
+       (canonical-url (as-str (:path page)))
+       "): "
+       (:description page)))
+
+(defn join-lines (lines)
+  (join (ref (collect lines)) "\n"))

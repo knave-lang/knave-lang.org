@@ -25,6 +25,13 @@
 (deftest names-the-html-content-type
   (assert (= (content-type "index.html") "text/html; charset=utf-8")))
 
+(deftest names-the-xml-content-type
+  (assert (= (content-type "sitemap.xml")
+             "application/xml; charset=utf-8")))
+
+(deftest names-the-text-content-type
+  (assert (= (content-type "robots.txt") "text/plain; charset=utf-8")))
+
 (deftest falls-back-to-a-binary-content-type
   (assert (= (content-type "archive.zip") "application/octet-stream")))
 

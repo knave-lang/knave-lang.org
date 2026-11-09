@@ -27,7 +27,7 @@
 
 (deftest renders-a-heading-with-its-anchor
   (assert (= (render-markdown "## 8.1 Call sites")
-             "<h2 id=\"81-call-sites\"><a class=\"anchor\" href=\"#81-call-sites\" aria-hidden=\"true\">#</a>8.1 Call sites</h2>")))
+             "<h2 id=\"81-call-sites\"><a class=\"anchor\" href=\"#81-call-sites\" aria-label=\"Link to this section\">#</a>8.1 Call sites</h2>")))
 
 (deftest renders-a-bullet-list
   (assert (= (render-markdown "- one\n- *two*")

@@ -29,7 +29,7 @@
   (local anchor (slug text))
   (str "<h" level " id=\"" anchor
        "\"><a class=\"anchor\" href=\"#" anchor
-       "\" aria-hidden=\"true\">#</a>"
+       "\" aria-label=\"Link to this section\">#</a>"
        (render-inlines text)
        "</h" level ">"))
 

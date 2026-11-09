@@ -11,3 +11,8 @@
 
 (deftest repeats-the-fingerprint-for-unchanged-files
   (assert (= (fixtures-fingerprint) (fixtures-fingerprint))))
+
+(deftest joins-the-fingerprints-of-every-directory
+  (assert (= (unwrap-ok (source-fingerprint (ref (vec (str "tests/fixtures")
+                                                      (str "tests/fixtures")))))
+             (str (fixtures-fingerprint) (fixtures-fingerprint)))))

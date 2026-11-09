@@ -8,7 +8,10 @@
 (use links ->site-files ->site-page broken-links)
 (use markdown/highlight highlight)
 (use markdown/html render-markdown)
-(use strings ends-with? escape-html join owned)
+
+(use strings ends-with? escape-html in-line-spans join
+             owned)
+
 (use template fill)
 
 (export build-site output-directory)
@@ -77,11 +80,12 @@
   (local with-knave
     (fill (as-str template)
           "knave-sample"
-          (as-str (highlight (trim (as-str knave-sample))))))
+          (as-str (in-line-spans (as-str (highlight (trim (as-str
+                                                            knave-sample))))))))
   (local content
     (fill (as-str with-knave)
           "rust-sample"
-          (as-str (escape-html (trim (as-str rust-sample))))))
+          (as-str (in-line-spans (as-str (escape-html (trim (as-str rust-sample))))))))
   (ok (->page (owned "/")
               (owned "Knave: Lisp with type and ownership inference that compiles to Rust")
               (owned landing-description)

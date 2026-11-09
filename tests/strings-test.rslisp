@@ -1,0 +1,6 @@
+(use prelude/test assert deftest)
+(use strings in-line-spans)
+
+(deftest puts-each-line-in-its-own-span
+  (assert (= (in-line-spans "one\n\ntwo")
+             "<span class=\"line\">one\n</span><span class=\"line\">\n</span><span class=\"line\">two</span>")))

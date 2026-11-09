@@ -1,5 +1,6 @@
 (export after contains? ends-with? escape-html find-from
-        join owned replace-all slug starts-with?)
+        in-line-spans join owned replace-all slug
+        starts-with?)
 
 (def starts-with?
   (rust "{0}.starts_with({1})"
@@ -48,3 +49,8 @@
       (replace-all ">" "&gt;")
       (as-str)
       (replace-all "\"" "&quot;")))
+
+(defn in-line-spans (text)
+  (str "<span class=\"line\">"
+       (replace-all text "\n" "\n</span><span class=\"line\">")
+       "</span>"))

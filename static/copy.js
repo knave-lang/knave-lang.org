@@ -12,10 +12,26 @@ class CopyButton {
   }
 
   attach() {
+    this.#keepWordsWhole();
     const frame = document.createElement("div");
     frame.className = "copyable";
     this.#codeBlock.replaceWith(frame);
     frame.append(this.#codeBlock, this.#element);
+  }
+
+  #keepWordsWhole() {
+    const code = this.#codeBlock.firstElementChild;
+    const pieces = code.textContent.split(/(\s+)/);
+    code.replaceChildren(
+      ...pieces.map((piece) => (piece.trim() ? this.#wholeWord(piece) : piece)),
+    );
+  }
+
+  #wholeWord(text) {
+    const word = document.createElement("span");
+    word.className = "word";
+    word.textContent = text;
+    return word;
   }
 
   #createElement() {

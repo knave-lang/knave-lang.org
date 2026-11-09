@@ -19,12 +19,12 @@
     none))
 
 (defn file-for-request-target (request-line)
-  (local target-start (len get-prefix))
-  (match (find-from request-line " " target-start)
-    (none none)
-    ((some target-end)
-     (file-for-url (request-file-target
-                     (subs request-line target-start target-end))))))
+  (let (target-start (len get-prefix))
+    (match (find-from request-line " " target-start)
+      (none none)
+      ((some target-end)
+       (file-for-url (request-file-target
+                       (subs request-line target-start target-end)))))))
 
 (defn file-for-url (url-path)
   (if (safe-url? url-path)

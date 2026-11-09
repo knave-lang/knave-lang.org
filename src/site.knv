@@ -29,22 +29,20 @@
 (defn build-site ()
   (try (remove-directory output-directory))
   (try (copy-directory-files static-directory output-directory))
-  (local pages
-    (vec (try (landing-page))
-         (try (install-page))))
-  (local layout (try (layout-with-stylesheet-version)))
-  (try (write-pages (as-str layout) (ref pages) 0))
-  (try (write-discovery-files (ref pages)))
-  (check-links))
+  (let (pages (vec (try (landing-page))
+                   (try (install-page)))
+        layout (try (layout-with-stylesheet-version)))
+    (try (write-pages (as-str layout) (ref pages) 0))
+    (try (write-discovery-files (ref pages)))
+    (check-links)))
 
 (defn layout-with-stylesheet-version ()
-  (local layout (try (read-file "templates/layout.html")))
-  (local stylesheet-path (str static-directory "/style.css"))
-  (local stylesheet
-    (try (read-file (as-str stylesheet-path))))
-  (ok (fill (as-str layout)
-            "stylesheet-version"
-            (as-str (fnv1a-digest (as-str stylesheet))))))
+  (let (layout (try (read-file "templates/layout.html"))
+        stylesheet-path (str static-directory "/style.css")
+        stylesheet (try (read-file (as-str stylesheet-path))))
+    (ok (fill (as-str layout)
+              "stylesheet-version"
+              (as-str (fnv1a-digest (as-str stylesheet)))))))
 
 (defn write-pages (layout pages position)
   (if (>= position (len pages))
@@ -75,51 +73,46 @@
                        (as-str (llms-links pages))))
 
 (defn write-from-template (file-name placeholder value)
-  (local template-path (str "templates/" file-name))
-  (local template
-    (try (read-file (as-str template-path))))
-  (write-file (as-str (str output-directory "/" file-name))
-              (as-str (fill (as-str template) placeholder value))))
+  (let (template-path (str "templates/" file-name)
+        template (try (read-file (as-str template-path))))
+    (write-file (as-str (str output-directory "/" file-name))
+                (as-str (fill (as-str template) placeholder value)))))
 
 (defn landing-page ()
-  (local template (try (read-file "templates/landing.html")))
-  (local knave-sample
-    (try (read-file "content/sample.rslisp")))
-  (local rust-sample (try (read-file "content/sample.rs")))
-  (local with-knave
-    (fill (as-str template)
-          "knave-sample"
-          (as-str (in-line-spans (as-str (highlight (trim (as-str
-                                                            knave-sample))))))))
-  (local content
-    (fill (as-str with-knave)
-          "rust-sample"
-          (as-str (in-line-spans (as-str (escape-html (trim (as-str rust-sample))))))))
-  (ok (->page (owned "/")
-              (owned "Knave: Lisp with type and ownership inference that compiles to Rust")
-              (owned landing-description)
-              content)))
+  (let (template (try (read-file "templates/landing.html"))
+        knave-sample (try (read-file "content/sample.knv"))
+        rust-sample (try (read-file "content/sample.rs"))
+        with-knave (fill (as-str template)
+                         "knave-sample"
+                         (as-str (in-line-spans (as-str (highlight (trim (as-str
+                                                                           knave-sample)))))))
+        content (fill (as-str with-knave)
+                      "rust-sample"
+                      (as-str (in-line-spans (as-str (escape-html (trim (as-str rust-sample))))))))
+    (ok (->page (owned "/")
+                (owned "Knave: Lisp with type and ownership inference that compiles to Rust")
+                (owned landing-description)
+                content))))
 
 (defn install-page ()
-  (local source (try (read-file "content/install.md")))
-  (local content
-    (str "<main><div class=\"prose\">"
-         (render-markdown (as-str source))
-         "</div></main>"))
-  (ok (->page (owned "/install/")
-              (owned "Install Knave")
-              (owned install-description)
-              content)))
+  (let (source (try (read-file "content/install.md"))
+        content (str "<main><div class=\"prose\">"
+                     (render-markdown (as-str source))
+                     "</div></main>"))
+    (ok (->page (owned "/install/")
+                (owned "Install Knave")
+                (owned install-description)
+                content))))
 
 (defn check-links ()
-  (local paths (try (files-under output-directory)))
-  (local pages
-    (try (read-pages (ref paths) 0 (vec))))
-  (local site (->site-files paths pages))
-  (local broken (broken-links (ref site)))
-  (if (empty? broken)
-    (ok (do))
-    (err (failure (str "broken internal links:\n" (join (ref broken) "\n"))))))
+  (let (paths (try (files-under output-directory))
+        pages (try (read-pages (ref paths) 0 (vec)))
+        site (->site-files paths pages)
+        broken (broken-links (ref site)))
+    (if (empty? broken)
+      (ok (do))
+      (err (failure (str "broken internal links:\n"
+                         (join (ref broken) "\n")))))))
 
 (defn read-pages (paths position pages)
   (if (>= position (len paths))

@@ -71,13 +71,13 @@
     (fn ((ref str)) (vec u8))))
 
 (defn serve-preview ()
-  (local listener (try (bind-listener preview-address)))
-  (try (accept-without-waiting (ref listener)))
-  (local fingerprint (try (source-fingerprint)))
-  (report-build (build-site))
-  (println (str "Previewing " output-directory " at http://"
-                preview-address "/"))
-  (run-preview (ref listener) fingerprint))
+  (let (listener (try (bind-listener preview-address)))
+    (try (accept-without-waiting (ref listener)))
+    (let (fingerprint (try (source-fingerprint)))
+      (report-build (build-site))
+      (println (str "Previewing " output-directory
+                    " at http://" preview-address "/"))
+      (run-preview (ref listener) fingerprint))))
 
 (defn run-preview (listener fingerprint)
   (answer-waiting-connections listener)
@@ -113,19 +113,18 @@
 (defn answer-connection (stream)
   (try (wait-for-reads stream))
   (try (limit-read-wait stream request-wait-milliseconds))
-  (local request-line (try (read-request-line stream)))
-  (if (empty? request-line)
-    (ok (do))
-    (send-response stream
-                   (ref (response-for (as-str request-line))))))
+  (let (request-line (try (read-request-line stream)))
+    (if (empty? request-line)
+      (ok (do))
+      (send-response stream
+                     (ref (response-for (as-str request-line)))))))
 
 (defn send-response (stream answer)
-  (local head
-    (response-head (as-str (:status answer))
-                   (as-str (:file-type answer))
-                   (len (:body answer))))
-  (try (write-text stream (as-str head)))
-  (write-body stream (ref (:body answer))))
+  (let (head (response-head (as-str (:status answer))
+                            (as-str (:file-type answer))
+                            (len (:body answer))))
+    (try (write-text stream (as-str head)))
+    (write-body stream (ref (:body answer)))))
 
 (defn response-for (request-line)
   (match (request-file request-line)
@@ -139,13 +138,13 @@
     (owned file)))
 
 (defn file-response (file)
-  (local full-path (str output-directory "/" file))
-  (match (read-bytes (as-str full-path))
-    ((err _) (not-found))
-    ((ok body)
-     (->response (str "200 OK")
-                 (str (content-type file))
-                 body))))
+  (let (full-path (str output-directory "/" file))
+    (match (read-bytes (as-str full-path))
+      ((err _) (not-found))
+      ((ok body)
+       (->response (str "200 OK")
+                   (str (content-type file))
+                   body)))))
 
 (defn not-found ()
   (->response (str "404 Not Found")

@@ -7,15 +7,15 @@
     (fn ((ref str)) (result u128 io-error))))
 
 (defn source-fingerprint ()
-  (local content (try (directory-fingerprint "content")))
-  (local templates (try (directory-fingerprint "templates")))
-  (local static-files (try (directory-fingerprint "static")))
-  (ok (str content templates static-files)))
+  (let (content (try (directory-fingerprint "content"))
+        templates (try (directory-fingerprint "templates"))
+        static-files (try (directory-fingerprint "static")))
+    (ok (str content templates static-files))))
 
 (defn directory-fingerprint (directory)
-  (local files (try (files-under directory)))
-  (sort! files)
-  (append-file-stamps directory (ref files) 0 (str "")))
+  (let (files (try (files-under directory)))
+    (sort! files)
+    (append-file-stamps directory (ref files) 0 (str ""))))
 
 (defn append-file-stamps (directory files position stamps)
   (if (>= position (len files))

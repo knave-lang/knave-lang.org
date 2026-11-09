@@ -50,9 +50,13 @@ class CopyButton {
 class CodeBlocks {
   static addCopyButtons() {
     if (!navigator.clipboard) return;
-    document
-      .querySelectorAll(".prose pre")
+    [...document.querySelectorAll(".prose pre")]
+      .filter(CodeBlocks.#isSingleCommand)
       .forEach((codeBlock) => new CopyButton(codeBlock).attach());
+  }
+
+  static #isSingleCommand(codeBlock) {
+    return !codeBlock.textContent.trim().includes("\n");
   }
 }
 

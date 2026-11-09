@@ -73,11 +73,19 @@
 (defn serve-preview ()
   (let (listener (try (bind-listener preview-address)))
     (try (accept-without-waiting (ref listener)))
-    (let (fingerprint (try (source-fingerprint)))
+    (let (fingerprint (try (current-fingerprint)))
       (report-build (build-site))
       (println (str "Previewing " output-directory
                     " at http://" preview-address "/"))
       (run-preview (ref listener) fingerprint))))
+
+(defn current-fingerprint ()
+  (source-fingerprint (ref (watched-directories))))
+
+(defn watched-directories ()
+  (vec (str "content")
+       (str "templates")
+       (str "static")))
 
 (defn run-preview (listener fingerprint)
   (answer-waiting-connections listener)
@@ -85,7 +93,7 @@
   (recur listener (rebuild-if-changed fingerprint)))
 
 (defn rebuild-if-changed (fingerprint)
-  (match (source-fingerprint)
+  (match (current-fingerprint)
     ((err _) fingerprint)
     ((ok current)
      (if (= current fingerprint)

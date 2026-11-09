@@ -1,16 +1,22 @@
 (use files files-under)
 
-(export directory-fingerprint source-fingerprint)
+(export source-fingerprint)
 
 (def modified-nanos
   (rust "std::fs::metadata({0}).and_then(|found| found.modified()).map(|modified| modified.duration_since(std::time::UNIX_EPOCH).map_or(0, |elapsed| elapsed.as_nanos()))"
     (fn ((ref str)) (result u128 io-error))))
 
-(defn source-fingerprint ()
-  (let (content (try (directory-fingerprint "content"))
-        templates (try (directory-fingerprint "templates"))
-        static-files (try (directory-fingerprint "static")))
-    (ok (str content templates static-files))))
+(defn source-fingerprint (directories)
+  (append-directory-fingerprints directories 0 (str "")))
+
+(defn append-directory-fingerprints (directories position fingerprints)
+  (if (>= position (len directories))
+    (ok fingerprints)
+    (let (directory (as-str (at directories position))
+          fingerprint (try (directory-fingerprint directory)))
+      (recur directories
+             (+ position 1)
+             (str fingerprints fingerprint)))))
 
 (defn directory-fingerprint (directory)
   (let (files (try (files-under directory)))

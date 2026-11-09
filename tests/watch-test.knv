@@ -1,9 +1,9 @@
 (use prelude/test assert deftest)
 (use strings contains?)
-(use watch directory-fingerprint)
+(use watch source-fingerprint)
 
 (defn fixtures-fingerprint ()
-  (unwrap-ok (directory-fingerprint "tests/fixtures")))
+  (unwrap-ok (source-fingerprint (ref (vec (str "tests/fixtures"))))))
 
 (deftest names-each-file-in-the-fingerprint
   (assert (contains? (as-str (fixtures-fingerprint))

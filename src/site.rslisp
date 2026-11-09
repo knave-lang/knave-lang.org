@@ -5,15 +5,13 @@
                read-file remove-directory write-file
                write-index)
 
-(use src/links ->site-files ->site-page broken-links
-               site-page)
-
+(use src/links ->site-files ->site-page broken-links)
 (use src/markdown/highlight highlight)
 (use src/markdown/html render-markdown)
 (use src/strings ends-with? escape-html join owned)
 (use src/template fill)
 
-(export build-site)
+(export build-site output-directory)
 
 (def output-directory "public")
 

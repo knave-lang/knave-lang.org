@@ -38,6 +38,8 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+.site-header a:focus-visible, .site-footer a:focus-visible { outline-color: var(--stock); }
+
 code, pre { font-family: var(--mono); font-size: .875em; }
 
 .site-header {
@@ -201,7 +203,7 @@ h1:hover > .anchor, h2:hover > .anchor, h3:hover > .anchor, .anchor:focus-visibl
 
 .definer, .special { color: var(--pip); font-weight: 600; }
 
-.paren { color: #8a90b4; }
+.paren { color: #6a7096; }
 
 @media (max-width: 54rem) {
   .table { grid-template-columns: minmax(0, 1fr); }

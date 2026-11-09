@@ -28,13 +28,16 @@
   --pip: #ff6b7d;
   --string: #8fd6b4;
   --number: #e8b36b;
-  --line: 1.6875rem;
+  --type: 1.125rem;
+  --line: calc(var(--type) * 1.5);
   --measure: 80ch;
   --column: calc(139ch + 2px);
-  --box-padding: 1.125rem;
+  --box-padding: var(--type);
   --left-pane: 64ch;
   --rule: #2f3348;
   --gutter: 2ch;
+  --copy-button-width: 8ch;
+  --hanging-indent: 6ch;
   color-scheme: dark;
 }
 
@@ -53,7 +56,7 @@ body {
   margin: 0;
   background: var(--screen);
   color: var(--text);
-  font: 1.125rem/var(--line) Iosevka, ui-monospace, monospace;
+  font: var(--type)/var(--line) Iosevka, ui-monospace, monospace;
   font-variant-ligatures: none;
 }
 
@@ -128,7 +131,7 @@ body:has(.landing) .wordmark { display: none; }
 
 .columns > * { min-width: 0; }
 
-.intro p { margin: 0; }
+.intro p { max-width: var(--measure); margin: 0; }
 
 .caution { color: var(--dim); }
 
@@ -140,7 +143,9 @@ body:has(.landing) .wordmark { display: none; }
 
 .session pre { margin: 0; overflow-x: auto; }
 
-@media (min-width: 81rem) {
+@media (min-width: 64rem) {
+  :root:has(.landing) { --type: min(1.125rem, (100vw - 1.5rem) / 71.5); }
+
   .columns {
     grid-template-columns: var(--left-pane) minmax(0, 1fr);
     column-gap: 1.5ch;
@@ -237,6 +242,31 @@ body:has(.landing) .wordmark { display: none; }
 .copy-button:focus-visible {
   outline: 2px solid var(--pip);
   outline-offset: 2px;
+}
+
+@media (max-width: 44rem) {
+  .session pre, .command { font-size: .875rem; line-height: 1.5; }
+
+  .session pre { white-space: pre-wrap; }
+
+  .session .line {
+    display: block;
+    padding-left: var(--hanging-indent);
+    text-indent: calc(-1 * var(--hanging-indent));
+  }
+
+  .copyable pre {
+    padding-right: var(--copy-button-width);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .copyable .word { display: inline-block; }
+
+  .copy-button {
+    top: 1px;
+    padding-block: calc(var(--line) / 2);
+  }
 }
 
 .table-scroll { overflow-x: auto; margin-block: var(--line); }

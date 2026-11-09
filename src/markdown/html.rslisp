@@ -1,7 +1,7 @@
 (use src/markdown/blocks block parse-blocks)
 (use src/markdown/highlight highlight)
 (use src/markdown/inlines render-inlines)
-(use src/strings contains? escape-html join slug)
+(use src/strings escape-html join slug)
 
 (export render-markdown)
 
@@ -41,7 +41,7 @@
        "</code></pre>"))
 
 (defn highlighted-code (language code)
-  (if (contains? "lisp clojure" language)
+  (if (or (= language "lisp") (= language "clojure"))
     (highlight code)
     (escape-html code)))
 

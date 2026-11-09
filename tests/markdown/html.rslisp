@@ -52,3 +52,7 @@
 (deftest renders-a-table-with-only-a-header
   (assert (contains? (as-str (render-markdown "| just one row"))
                      "<th>just one row</th>")))
+
+(deftest leaves-an-untagged-code-block-plain
+  (assert (not (contains? (as-str (render-markdown "```\n:key\n```"))
+                          "<span"))))

@@ -7,29 +7,26 @@
     (fn ((ref str)) (result u128 io-error))))
 
 (defn fingerprint-directories (directories)
-  (join-results directories directory-fingerprint 0 (str "")))
+  (join-results directories directory-fingerprint))
 
 (defn directory-fingerprint (directory)
   (let (files (try (files-under directory)))
     (sort! files)
     (join-results (ref files)
-                  (fn (file) (file-stamp directory file))
-                  0
-                  (str ""))))
+                  (fn (file) (file-stamp directory file)))))
 
 (defn file-stamp (directory file)
   (let (full-path (str directory "/" file)
         modified (try (modified-nanos (as-str full-path))))
     (ok (str full-path "@" modified "\n"))))
 
-(type join-results
-  (fn ((ref (slice string))
-       (fn ((ref str))
-         (result string io-error))
-       usize string)
-    (result string io-error)))
+(defn join-results (items produce)
+  (join-from items produce 0 (str "")))
 
-(defn join-results (items produce position joined)
+(type join-from
+  (fn (_ (fn (_) (result _ _)) _ _) _))
+
+(defn join-from (items produce position joined)
   (if (>= position (len items))
     (ok joined)
     (let (produced (try (produce (as-str (at items position)))))

@@ -30,9 +30,9 @@
   --number: #e8b36b;
   --line: 1.6875rem;
   --measure: 80ch;
-  --column: calc(136ch + 2px);
+  --column: calc(139ch + 2px);
   --box-padding: 1.125rem;
-  --left-pane: 61ch;
+  --left-pane: 64ch;
   --rule: #2f3348;
   --gutter: 2ch;
   color-scheme: dark;
@@ -140,7 +140,7 @@ body:has(.landing) .wordmark { display: none; }
 
 .session pre { margin: 0; overflow-x: auto; }
 
-@media (min-width: 80rem) {
+@media (min-width: 81rem) {
   .columns {
     grid-template-columns: var(--left-pane) minmax(0, 1fr);
     column-gap: 1.5ch;

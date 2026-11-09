@@ -6,7 +6,7 @@ Run `direnv allow` once to load the [Nix](https://nixos.org/download/) dev shell
 
 ```sh
 knave build && target/knave/knave-site/knave-site
-knave test .
-knave fmt .
+knave test
+knave fmt
 knave build && target/knave/knave-site/knave-site serve
 ```

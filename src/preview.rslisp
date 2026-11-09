@@ -1,9 +1,9 @@
-(use src/files directory? read-bytes)
-(use src/http content-type request-file response-head)
-(use src/links index-of)
-(use src/site build-site output-directory)
-(use src/strings owned)
-(use src/watch source-fingerprint)
+(use files directory? read-bytes)
+(use http content-type request-file response-head)
+(use links index-of)
+(use site build-site output-directory)
+(use strings owned)
+(use watch source-fingerprint)
 
 (export serve-preview)
 

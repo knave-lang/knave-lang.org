@@ -1,4 +1,4 @@
-(use src/strings after escape-html find-from starts-with?)
+(use strings after escape-html find-from starts-with?)
 
 (export render-inlines)
 

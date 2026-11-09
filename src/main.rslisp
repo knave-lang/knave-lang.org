@@ -1,6 +1,6 @@
-(use src/files failure)
-(use src/preview serve-preview)
-(use src/site build-site)
+(use files failure)
+(use preview serve-preview)
+(use site build-site)
 
 (def usage "usage: knave-site [serve]")
 

@@ -1,6 +1,6 @@
 (use prelude/test assert deftest)
-(use src/markdown/html render-markdown)
-(use src/strings contains?)
+(use markdown/html render-markdown)
+(use strings contains?)
 
 (deftest separates-blocks-at-blank-lines
   (assert (= (render-markdown "one\ntwo\n\nthree\n")

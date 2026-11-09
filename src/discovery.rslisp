@@ -1,4 +1,4 @@
-(use src/strings join)
+(use strings join)
 
 (export ->page canonical-url llms-links page
         sitemap-entries)

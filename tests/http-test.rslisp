@@ -1,5 +1,5 @@
 (use prelude/test assert deftest)
-(use src/http content-type request-file response-head)
+(use http content-type request-file response-head)
 
 (deftest serves-the-root-index
   (assert (= (request-file "GET / HTTP/1.1")

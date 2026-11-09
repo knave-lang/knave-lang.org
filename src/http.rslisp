@@ -1,7 +1,7 @@
-(use src/links index-of)
+(use links index-of)
 
-(use src/strings after contains? ends-with? find-from owned
-                 starts-with?)
+(use strings after contains? ends-with? find-from owned
+             starts-with?)
 
 (export content-type request-file response-head)
 

@@ -31,12 +31,11 @@
   --type: 1.125rem;
   --line: calc(var(--type) * 1.5);
   --measure: 80ch;
-  --column: calc(139ch + 2px);
-  --box-padding: var(--type);
+  --column: calc(144ch + 2px);
   --code-type: var(--type);
   --code-ch: calc(var(--code-type) / 2);
-  --left-pane: calc(64 * var(--code-ch));
-  --pane-gap: calc(1.5 * var(--code-ch));
+  --box-padding: var(--code-type);
+  --left-pane: calc(68 * var(--code-ch));
   --rule: #2f3348;
   --gutter: 2ch;
   --copy-button-width: 8ch;
@@ -147,14 +146,16 @@ body:has(.landing) .wordmark { display: none; }
 .session pre { margin: 0; overflow-x: auto; }
 
 @media (min-width: 64rem) {
-  :root { --code-type: min(var(--type), (100vw - 6rem) / 67.5); }
+  :root { --code-type: min(var(--type), (100cqw - 2px) / 72); }
+
+  .landing { container-type: inline-size; }
 
   .columns {
     grid-template-columns: var(--left-pane) minmax(0, 1fr);
-    column-gap: var(--pane-gap);
+    column-gap: var(--box-padding);
   }
 
-  .columns > * + * { padding-left: var(--pane-gap); }
+  .columns > * + * { padding-left: var(--box-padding); }
 
   .session {
     padding: 0 var(--box-padding);

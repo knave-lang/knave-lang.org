@@ -20,14 +20,12 @@
         modified (try (modified-nanos (as-str full-path))))
     (ok (str full-path "@" modified "\n"))))
 
+(type join-results
+  (fn (_ (fn (_) (result _ _))) _))
+
 (defn join-results (items produce)
-  (join-from items produce 0 (str "")))
-
-(type join-from
-  (fn (_ (fn (_) (result _ _)) _ _) _))
-
-(defn join-from (items produce position joined)
-  (if (>= position (len items))
-    (ok joined)
-    (let (produced (try (produce (as-str (at items position)))))
-      (recur items produce (+ position 1) (str joined produced)))))
+  (reduce (iter items)
+          (ok (str ""))
+          (fn (joined item)
+            (ok (str (try joined)
+                     (try (produce (as-str item))))))))

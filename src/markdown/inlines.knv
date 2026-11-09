@@ -1,4 +1,5 @@
-(use strings after escape-html find-from starts-with?)
+(use strings after escape-html find-from leading-count owned
+             starts-with?)
 
 (export render-inlines)
 
@@ -9,13 +10,6 @@
 (def next-delimiter
   (rust "{0}[{1}..].find(['`', '*', '[', '\\\\']).map(|offset| offset + {1})"
     (fn ((ref str) usize) (option usize))))
-
-(def backtick-run-length
-  (rust "{0}[{1}..].bytes().take_while(|byte| *byte == b'`').count()"
-    (fn ((ref str) usize) usize)))
-
-(def backticks
-  (rust "\"`\".repeat({0})" (fn (usize) string)))
 
 (def ascii-punctuation-at?
   (rust "{0}.as_bytes().get({1}).is_some_and(u8::is_ascii_punctuation)"
@@ -53,11 +47,11 @@
       (->span (str "\\") escaped))))
 
 (defn render-code (text at)
-  (let (run (backtick-run-length text at)
-        fence (backticks run)
-        content-start (+ at run))
-    (match (find-from text (as-str fence) content-start)
-      (none (->span fence content-start))
+  (let (run (leading-count (after text at) (char "`"))
+        content-start (+ at run)
+        fence (subs text at content-start))
+    (match (find-from text fence content-start)
+      (none (->span (owned fence) content-start))
       ((some close)
        (->span (str "<code>"
                     (escape-html (trim (subs text content-start close)))

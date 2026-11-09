@@ -19,3 +19,6 @@
 
 (deftest accepts-non-ascii-words
   (assert (= (highlight "café") "café")))
+
+(deftest keeps-whitespace-before-a-non-ascii-word
+  (assert (= (highlight " \t\r\ncafé") " \t\r\ncafé")))

@@ -1,6 +1,7 @@
-(export after contains? ends-with? escape-html find-from
-        fnv1a-digest in-line-spans join owned replace-all
-        slug starts-with?)
+(export after before contains? ends-with? escape-html
+        find-from first-char? fnv1a-digest in-line-spans
+        join leading-count owned replace-all slug
+        starts-with?)
 
 (def fnv1a-digest
   (rust "{0}.bytes().fold(0xcbf29ce484222325_u64, |hash, byte| (hash ^ u64::from(byte)).wrapping_mul(0x100000001b3)).to_string()"
@@ -18,10 +19,6 @@
   (rust "{0}.contains({1})"
     (fn ((ref str) (ref str)) bool)))
 
-(def after
-  (rust "&{0}[{1}..]"
-    (fn ((ref str) usize) (ref str))))
-
 (def find-from
   (rust "{0}[{2}..].find({1}).map(|offset| offset + {2})"
     (fn ((ref str) (ref str) usize)
@@ -32,18 +29,46 @@
     (fn ((ref str) (ref str) (ref str))
       string)))
 
-(def owned
-  (rust "{0}.to_string()"
-    (fn ((ref str)) string)))
-
 (def join
   (rust "{0}.join({1})"
     (fn ((ref (slice string)) (ref str))
       string)))
 
-(def slug
-  (rust "{0}.to_lowercase().chars().filter(|c| c.is_alphanumeric() || matches!(c, ' ' | '-')).collect::<String>().replace(' ', \"-\")"
-    (fn ((ref str)) string)))
+(def chars-to-string
+  (rust "{0}.collect::<String>()"
+    (fn ((iterator char)) string)))
+
+(defn after (text start)
+  (subs text start (len text)))
+
+(type before
+  (fn ((ref str) (ref str)) (ref str)))
+
+(defn before (text separator)
+  (match (find-from text separator 0)
+    (none text)
+    ((some found) (subs text 0 found))))
+
+(type owned (fn ((ref str)) string))
+
+(defn owned (text) (str text))
+
+(defn leading-count (text mark)
+  (count (take-while (chars text)
+                     (fn (c) (= c mark)))))
+
+(defn first-char? (text test)
+  (any? (take (chars text) 1) test))
+
+(defn slug (text)
+  (let (lowered (lower-case text)
+        kept (chars-to-string (filter (chars (as-str lowered)) slug-char?)))
+    (replace-all (as-str kept) " " "-")))
+
+(defn slug-char? (c)
+  (or (alphanumeric? c)
+      (= c (char " "))
+      (= c (char "-"))))
 
 (defn escape-html (text)
   (-> (replace-all text "&" "&amp;")

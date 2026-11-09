@@ -31,3 +31,6 @@
 
 (deftest keeps-a-backslash-before-a-letter
   (assert (= (render-inlines "a\\b") "a\\b")))
+
+(deftest keeps-an-unclosed-backtick-run
+  (assert (= (render-inlines "`` a") "`` a")))

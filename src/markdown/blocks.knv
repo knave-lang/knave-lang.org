@@ -1,5 +1,5 @@
-(use strings after find-from join owned replace-all
-             starts-with?)
+(use strings after find-from join leading-count owned
+             replace-all starts-with?)
 
 (export block parse-blocks)
 
@@ -31,10 +31,6 @@
   (rust "{0}[{1}..{2}].to_vec()"
     (fn ((ref (slice string)) usize usize)
       (vec string))))
-
-(def heading-level
-  (rust "{0}.bytes().take_while(|byte| *byte == b'#').count()"
-    (fn ((ref str)) usize)))
 
 (def without-outer-pipes
   (rust "{0}.trim().trim_start_matches('|').trim_end_matches('|')"
@@ -68,6 +64,9 @@
   (empty? (trim line)))
 
 (defn fence? (line) (starts-with? line fence-marker))
+
+(defn heading-level (line)
+  (leading-count line (char "#")))
 
 (defn heading? (line)
   (let (level (heading-level line))

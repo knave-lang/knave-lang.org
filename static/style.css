@@ -137,13 +137,16 @@ body:has(.landing) .wordmark { display: none; }
 
 .caution { color: var(--dim); }
 
-.session {
-  margin: calc(var(--line) * 4 / 3) 0 0;
-  padding: var(--line) 1ch;
-  border: 1px solid var(--rule);
-}
+.session { margin: calc(var(--line) * 4 / 3) 0 0; }
 
 .session pre { margin: 0; overflow-x: auto; }
+
+@media (width < 64rem) {
+  .session > * {
+    padding: var(--box-padding);
+    border: 1px solid var(--rule);
+  }
+}
 
 @media (min-width: 64rem) {
   :root { --code-type: min(var(--type), (100cqw - 2px) / 72); }
@@ -159,6 +162,7 @@ body:has(.landing) .wordmark { display: none; }
 
   .session {
     padding: 0 var(--box-padding);
+    border: 1px solid var(--rule);
     font-size: var(--code-type);
     line-height: 1.5;
   }
@@ -174,9 +178,9 @@ body:has(.landing) .wordmark { display: none; }
   }
 }
 
-.command { margin: 0 0 var(--line); color: var(--bright); }
+.command { margin: 0 0 1lh; color: var(--dim); }
 
-.command::before { content: "$ "; color: var(--dim); }
+.command::before { content: "$ "; }
 
 .site-footer {
   display: flex;

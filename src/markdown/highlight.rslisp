@@ -1,0 +1,104 @@
+(use strings after contains? escape-html find-from
+             starts-with?)
+
+(export highlight)
+
+(defstruct token
+  :class string
+  :end usize)
+
+(def special-forms
+  " fn local let if cond match do loop recur use export type try when unless and or not struct enum impl trait ")
+
+(def word-end
+  (rust "{0}[{1}..].find([' ', '\\n', '\\t', '\\r', '(', ')', '\"', ';']).map_or({0}.len(), |offset| offset + {1})"
+    (fn ((ref str) usize) usize)))
+
+(def whitespace-end
+  (rust "{0}[{1}..].find(|c: char| !matches!(c, ' ' | '\\n' | '\\t' | '\\r')).map_or({0}.len(), |offset| offset + {1})"
+    (fn ((ref str) usize) usize)))
+
+(def next-string-stop
+  (rust "{0}[{1}..].find(['\\\\', '\"']).map(|offset| offset + {1})"
+    (fn ((ref str) usize) (option usize))))
+
+(def after-escaped-char
+  (rust "{1} + 1 + {0}[{1} + 1..].chars().next().map_or(0, char::len_utf8)"
+    (fn ((ref str) usize) usize)))
+
+(def starts-with-whitespace?
+  (rust "{0}.starts_with([' ', '\\n', '\\t', '\\r'])"
+    (fn ((ref str)) bool)))
+
+(def starts-with-digit?
+  (rust "{0}.starts_with(|c: char| c.is_ascii_digit())"
+    (fn ((ref str)) bool)))
+
+(defn highlight (code)
+  (highlight-from code 0 (str "")))
+
+(defn highlight-from (code start highlighted)
+  (if (>= start (len code))
+    highlighted
+    (let (next (next-token code start))
+      (recur code
+             (:end next)
+             (str highlighted (render-token code start (ref next)))))))
+
+(type render-token
+  (fn ((ref str) usize (ref token))
+    string))
+
+(defn render-token (code start current)
+  (local text
+    (escape-html (subs code start (:end current))))
+  (if (empty? (:class current))
+    text
+    (str "<span class=\"" (:class current) "\">" text "</span>")))
+
+(type next-token
+  (fn ((ref str) usize) token))
+
+(defn next-token (code start)
+  (local rest (after code start))
+  (cond
+    ((starts-with? rest ";")
+     (->token (str "comment") (line-end code start)))
+    ((starts-with? rest "\"")
+     (->token (str "string")
+              (string-end code (+ start 1))))
+    ((or (starts-with? rest "(") (starts-with? rest ")"))
+     (->token (str "paren") (+ start 1)))
+    ((starts-with-whitespace? rest)
+     (->token (str "") (whitespace-end code start)))
+    (else (word-token code start))))
+
+(defn line-end (code start)
+  (match (find-from code "\n" start)
+    (none (len code))
+    ((some newline) newline)))
+
+(defn string-end (code start)
+  (match (next-string-stop code start)
+    (none (len code))
+    ((some stop)
+     (if (starts-with? (after code stop) "\"")
+       (+ stop 1)
+       (recur code (after-escaped-char code stop))))))
+
+(defn word-token (code start)
+  (local end (word-end code start))
+  (->token (word-class (subs code start end)) end))
+
+(defn word-class (word)
+  (cond
+    ((starts-with? word ":") (str "keyword"))
+    ((starts-with-digit? word) (str "number"))
+    ((definer? word) (str "definer"))
+    ((special-form? word) (str "special"))
+    (else (str ""))))
+
+(defn definer? (word) (starts-with? word "def"))
+
+(defn special-form? (word)
+  (contains? special-forms (as-str (str " " word " "))))

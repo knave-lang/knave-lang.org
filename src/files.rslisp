@@ -1,0 +1,55 @@
+(export copy-directory-files environment-variable read-file
+        remove-directory write-index)
+
+(def index-file-name "index.html")
+
+(def read-file
+  (rust "std::fs::read_to_string({0}).map_err(|error| std::io::Error::new(error.kind(), String::from({0}) + \": \" + &error.to_string()))"
+    (fn ((ref str))
+      (result string io-error))))
+
+(def environment-variable
+  (rust "std::env::var({0}).map_err(|error| std::io::Error::other(String::from({0}) + \": \" + &error.to_string()))"
+    (fn ((ref str))
+      (result string io-error))))
+
+(def remove-directory
+  (rust "std::fs::remove_dir_all({0}).or_else(|error| (error.kind() == std::io::ErrorKind::NotFound).then_some(()).ok_or(error))"
+    (fn ((ref str)) (result unit io-error))))
+
+(def create-directories
+  (rust "std::fs::create_dir_all({0})"
+    (fn ((ref str)) (result unit io-error))))
+
+(def write-file
+  (rust "std::fs::write({0}, {1})"
+    (fn ((ref str) (ref str))
+      (result unit io-error))))
+
+(def copy-file
+  (rust "std::fs::copy({0}, {1}).map(drop)"
+    (fn ((ref str) (ref str))
+      (result unit io-error))))
+
+(def file-names
+  (rust "std::fs::read_dir({0}).and_then(|entries| entries.map(|entry| entry.map(|found| found.file_name().to_string_lossy().into_owned())).collect::<std::io::Result<Vec<String>>>())"
+    (fn ((ref str))
+      (result (vec string) io-error))))
+
+(defn write-index (directory html)
+  (try (create-directories directory))
+  (write-file (as-str (str directory "/" index-file-name))
+              html))
+
+(defn copy-directory-files (source target)
+  (try (create-directories target))
+  (local names (try (file-names source)))
+  (copy-named-files source target (ref names) 0))
+
+(defn copy-named-files (source target names position)
+  (if (>= position (len names))
+    (ok (do))
+    (let (name (as-str (at names position)))
+      (try (copy-file (as-str (str source "/" name))
+                      (as-str (str target "/" name))))
+      (recur source target names (+ position 1)))))

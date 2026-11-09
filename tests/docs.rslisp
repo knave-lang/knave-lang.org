@@ -1,0 +1,48 @@
+(use prelude/test assert deftest)
+(use docs build-doc-pages doc-page)
+(use files read-file)
+(use strings contains?)
+
+(def page-template "{{sidebar}}|{{pager}}|{{article}}")
+
+(defn fixture-pages ()
+  (local source
+    (unwrap-ok (read-file "tests/fixtures/reference.md")))
+  (build-doc-pages (as-str source) "abc123" page-template))
+
+(type page-body
+  (fn ((ref (vec doc-page)) usize)
+    (ref str)))
+
+(defn page-body (pages position)
+  (as-str (:body (at pages position))))
+
+(deftest builds-an-overview-and-one-page-per-section
+  (assert (= (len (fixture-pages)) 3)))
+
+(deftest places-each-section-under-its-slug
+  (local pages (fixture-pages))
+  (assert (= (:path (at pages 0)) "docs"))
+  (assert (= (:path (at pages 2)) "docs/second-part")))
+
+(deftest points-parent-links-at-the-pinned-revision
+  (local pages (fixture-pages))
+  (assert (contains? (page-body (ref pages) 0)
+                     "https://github.com/knave-lang/knave/blob/abc123/rfcs/0001-sample.md")))
+
+(deftest points-a-heading-link-at-the-page-that-holds-it
+  (local pages (fixture-pages))
+  (assert (contains? (page-body (ref pages) 1)
+                     "href=\"/docs/second-part/#a-detail\"")))
+
+(deftest marks-the-current-page-in-the-sidebar
+  (local pages (fixture-pages))
+  (assert (contains? (page-body (ref pages) 1)
+                     "<a href=\"/docs/first-part/\" aria-current=\"page\">First part</a>")))
+
+(deftest links-the-neighbouring-pages
+  (local pages (fixture-pages))
+  (assert (contains? (page-body (ref pages) 1)
+                     "<small>Previous</small>Overview"))
+  (assert (contains? (page-body (ref pages) 1)
+                     "<small>Next</small>Second part")))

@@ -1,0 +1,86 @@
+(use docs build-doc-pages doc-page)
+
+(use files copy-directory-files environment-variable
+           read-file remove-directory write-index)
+
+(use markdown/highlight highlight)
+(use markdown/html render-markdown)
+(use strings escape-html)
+(use template fill)
+
+(export build-site)
+
+(def output-directory "public")
+
+(def static-directory "static")
+
+(def site-description
+  "A small Lisp for humans and agents that infers types and ownership and compiles to readable Rust.")
+
+(defn build-site ()
+  (try (remove-directory output-directory))
+  (try (copy-directory-files static-directory output-directory))
+  (local layout (try (read-file "templates/layout.html")))
+  (try (write-landing (as-str layout)))
+  (try (write-install (as-str layout)))
+  (write-docs (as-str layout)))
+
+(defn in-layout (layout title content)
+  (local with-title
+    (fill layout "title" (as-str (escape-html title))))
+  (local with-description
+    (fill (as-str with-title) "description" site-description))
+  (fill (as-str with-description) "content" content))
+
+(defn write-landing (layout)
+  (local template (try (read-file "templates/landing.html")))
+  (local knave-sample
+    (try (read-file "content/sample.rslisp")))
+  (local rust-sample (try (read-file "content/sample.rs")))
+  (local with-knave
+    (fill (as-str template)
+          "knave-sample"
+          (as-str (highlight (trim (as-str knave-sample))))))
+  (local content
+    (fill (as-str with-knave)
+          "rust-sample"
+          (as-str (escape-html (trim (as-str rust-sample))))))
+  (write-index output-directory
+               (as-str (in-layout layout "Knave" (as-str content)))))
+
+(defn write-install (layout)
+  (local source (try (read-file "content/install.md")))
+  (local content
+    (str "<main class=\"prose\">"
+         (render-markdown (as-str source))
+         "</main>"))
+  (write-index (as-str (str output-directory "/install"))
+               (as-str (in-layout layout "Install Knave" (as-str content)))))
+
+(defn write-docs (layout)
+  (local reference-path
+    (try (environment-variable "KNAVE_DOCS")))
+  (local source
+    (try (read-file (as-str reference-path))))
+  (local revision (try (environment-variable "KNAVE_REV")))
+  (local template (try (read-file "templates/docs.html")))
+  (local pages
+    (build-doc-pages (as-str source)
+                     (as-str revision)
+                     (as-str template)))
+  (write-pages layout (ref pages) 0))
+
+(type write-pages
+  (fn ((ref str) (ref (vec doc-page)) usize)
+    (result unit io-error)))
+
+(defn write-pages (layout pages position)
+  (if (>= position (len pages))
+    (ok (do))
+    (let (page (at pages position))
+      (try (write-index (as-str (str output-directory "/" (:path page)))
+                        (as-str (in-layout layout
+                                           (as-str (str (:title page)
+                                                        " | Knave reference"))
+                                           (as-str (:body page))))))
+      (recur layout pages (+ position 1)))))

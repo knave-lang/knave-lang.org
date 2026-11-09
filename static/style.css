@@ -110,8 +110,6 @@ h1 {
 
 .session pre { margin: 0; overflow-x: auto; }
 
-.session pre + .command { margin-top: var(--line); }
-
 @media (min-width: 79rem) {
   .columns { grid-template-columns: var(--left-pane) minmax(0, 1fr); }
 
@@ -122,7 +120,7 @@ h1 {
 
 .command { margin: 0 0 var(--line); color: var(--bright); }
 
-.command::before { content: "$ "; color: var(--pip); }
+.command::before { content: "$ "; color: var(--dim); }
 
 .site-footer {
   display: flex;
@@ -135,9 +133,9 @@ h1 {
 
 .site-footer p { margin: 0; }
 
-.site-header a, .site-footer a { text-decoration: none; }
+.site-footer a { text-decoration: none; }
 
-.site-header a:hover, .site-footer a:hover { text-decoration: underline; }
+.site-footer a:hover { text-decoration: underline; }
 
 .prose { padding-block: var(--line) calc(2 * var(--line)); }
 
@@ -191,7 +189,7 @@ h1 {
 
 .keyword { color: var(--link); }
 
-.number, .inferred { color: var(--number); }
+.number { color: var(--number); }
 
 .definer, .special { color: var(--pip); }
 

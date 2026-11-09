@@ -38,6 +38,8 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+.site-header a:focus-visible, .site-footer a:focus-visible { outline-color: var(--stock); }
+
 code, pre { font-family: var(--mono); font-size: .875em; }
 
 .site-header {

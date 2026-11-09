@@ -25,6 +25,8 @@
   --line: 1.6875rem;
   --measure: 80ch;
   --column: 134ch;
+  --left-pane: 61ch;
+  --rule: #2f3348;
   --gutter: 2ch;
   color-scheme: dark;
 }
@@ -92,9 +94,17 @@ h1 {
   line-height: calc(2 * var(--line));
 }
 
-.pitch { max-width: var(--measure); }
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--line) 2ch;
+}
 
-.pitch p { margin: 0 0 var(--line); }
+.columns > * { min-width: 0; }
+
+.intro p { margin: 0; }
+
+.intro .actions { margin-bottom: var(--line); }
 
 .button {
   display: inline-block;
@@ -107,26 +117,21 @@ h1 {
 
 .button:hover { background: var(--bright); color: var(--screen); }
 
-.caution { max-width: var(--measure); margin: 0; color: var(--dim); }
+.caution { color: var(--dim); }
 
-.session {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--line) 2ch;
-  margin: var(--line) 0;
-}
+.session { margin: calc(2 * var(--line)) 0 0; }
 
-.pane { min-width: 0; }
-
-.pane pre { margin: 0; overflow-x: auto; }
+.session pre { margin: 0; overflow-x: auto; }
 
 @media (min-width: 79rem) {
-  .session { grid-template-columns: max-content minmax(0, 1fr); }
+  .columns { grid-template-columns: var(--left-pane) minmax(0, 1fr); }
 
-  .pane + .pane { padding-left: 2ch; border-left: 1px solid var(--dim); }
+  .columns > * + * { padding-left: 2ch; }
+
+  .session > * + * { box-shadow: -1px 0 0 var(--rule); }
 }
 
-.command { margin: 0; color: var(--bright); }
+.command { margin: 0 0 var(--line); color: var(--bright); }
 
 .command::before { content: "$ "; color: var(--pip); }
 

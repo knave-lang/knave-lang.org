@@ -8,7 +8,10 @@
 (use src/links ->site-files ->site-page broken-links)
 (use src/markdown/highlight highlight)
 (use src/markdown/html render-markdown)
-(use src/strings ends-with? escape-html join owned)
+
+(use src/strings ends-with? escape-html join owned
+                 replace-all)
+
 (use src/template fill)
 
 (export build-site output-directory)
@@ -77,7 +80,7 @@
   (local with-knave
     (fill (as-str template)
           "knave-sample"
-          (as-str (highlight (trim (as-str knave-sample))))))
+          (as-str (highlight (as-str (aligned-with-rust (trim (as-str knave-sample))))))))
   (local content
     (fill (as-str with-knave)
           "rust-sample"
@@ -86,6 +89,9 @@
               (owned "Knave: Lisp with type and ownership inference for Rust")
               (owned landing-description)
               content)))
+
+(defn aligned-with-rust (knave-source)
+  (replace-all knave-source "\n\n(defn" "\n\n\n(defn"))
 
 (defn install-page ()
   (local source (try (read-file "content/install.md")))

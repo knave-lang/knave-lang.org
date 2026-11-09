@@ -1,28 +1,31 @@
 (use files files-under)
 
-(export directory-fingerprint source-fingerprint)
+(export fingerprint-directories)
 
 (def modified-nanos
   (rust "std::fs::metadata({0}).and_then(|found| found.modified()).map(|modified| modified.duration_since(std::time::UNIX_EPOCH).map_or(0, |elapsed| elapsed.as_nanos()))"
     (fn ((ref str)) (result u128 io-error))))
 
-(defn source-fingerprint ()
-  (let (content (try (directory-fingerprint "content"))
-        templates (try (directory-fingerprint "templates"))
-        static-files (try (directory-fingerprint "static")))
-    (ok (str content templates static-files))))
+(defn fingerprint-directories (directories)
+  (join-results directories directory-fingerprint))
 
 (defn directory-fingerprint (directory)
   (let (files (try (files-under directory)))
     (sort! files)
-    (append-file-stamps directory (ref files) 0 (str ""))))
+    (join-results (ref files)
+                  (fn (file) (file-stamp directory file)))))
 
-(defn append-file-stamps (directory files position stamps)
-  (if (>= position (len files))
-    (ok stamps)
-    (let (file (as-str (at files position))
-          full-path (str directory "/" file)
-          modified (try (modified-nanos (as-str full-path))))
-      (recur directory files
-             (+ position 1)
-             (str stamps full-path "@" modified "\n")))))
+(defn file-stamp (directory file)
+  (let (full-path (str directory "/" file)
+        modified (try (modified-nanos (as-str full-path))))
+    (ok (str full-path "@" modified "\n"))))
+
+(type join-results
+  (fn (_ (fn (_) (result _ _))) _))
+
+(defn join-results (items produce)
+  (reduce (iter items)
+          (ok (str ""))
+          (fn (joined item)
+            (ok (str (try joined)
+                     (try (produce (as-str item))))))))

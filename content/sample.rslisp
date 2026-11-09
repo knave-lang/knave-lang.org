@@ -1,0 +1,12 @@
+(defstruct rogue
+  :name str
+  :tricks (vec str))
+
+(defn scheme (rogue)
+  (local trick (at (:tricks rogue) 0))
+  (str (:name rogue) " runs a racket with guile and " trick))
+
+(defn main ()
+  (local tricks (vec "marked cards" "loaded dice"))
+  (local knave (->rogue :name "Knave" :tricks tricks))
+  (println (scheme knave)))

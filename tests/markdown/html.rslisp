@@ -1,0 +1,58 @@
+(use prelude/test assert deftest)
+(use src/markdown/html render-markdown)
+(use src/strings contains?)
+
+(deftest separates-blocks-at-blank-lines
+  (assert (= (render-markdown "one\ntwo\n\nthree\n")
+             "<p>one two</p>\n<p>three</p>")))
+
+(deftest ends-a-paragraph-at-a-list
+  (assert (= (render-markdown "text\n- item\n")
+             "<p>text</p>\n<ul><li>item</li></ul>")))
+
+(deftest keeps-markup-inside-a-fence
+  (assert (= (render-markdown
+               "```text\n## not a heading\n\n- not a list\n```\n")
+             "<pre><code class=\"language-text\">## not a heading\n\n- not a list</code></pre>")))
+
+(deftest needs-a-space-after-heading-hashes
+  (assert (= (render-markdown "#hash\n") "<p>#hash</p>")))
+
+(deftest reads-a-dotted-word-as-a-paragraph
+  (assert (= (render-markdown "note. text") "<p>note. text</p>")))
+
+(deftest keeps-an-escaped-pipe-inside-a-table-cell
+  (assert (contains? (as-str (render-markdown "| A |\n| --- |\n| `a \\| b` |"))
+                     "<td><code>a | b</code></td>")))
+
+(deftest renders-a-heading-with-its-anchor
+  (assert (= (render-markdown "## 8.1 Call sites")
+             "<h2 id=\"81-call-sites\" aria-labelledby=\"81-call-sites-title\"><a class=\"anchor\" href=\"#81-call-sites\" aria-label=\"Link to this section\">#</a><span id=\"81-call-sites-title\">8.1 Call sites</span></h2>")))
+
+(deftest renders-a-bullet-list
+  (assert (= (render-markdown "- one\n- *two*")
+             "<ul><li>one</li><li><em>two</em></li></ul>")))
+
+(deftest renders-a-numbered-list
+  (assert (= (render-markdown "1. one\n2. two")
+             "<ol><li>one</li><li>two</li></ol>")))
+
+(deftest renders-a-table-without-its-delimiter-row
+  (assert (= (render-markdown "| A |\n| --- |\n| b |")
+             "<div class=\"table-scroll\"><table><thead><tr><th>A</th></tr></thead><tbody><tr><td>b</td></tr></tbody></table></div>")))
+
+(deftest escapes-a-plain-code-block
+  (assert (= (render-markdown "```text\n<a>\n```")
+             "<pre><code class=\"language-text\">&lt;a&gt;</code></pre>")))
+
+(deftest highlights-a-lisp-code-block
+  (assert (contains? (as-str (render-markdown "```lisp\n:key\n```"))
+                     "<span class=\"keyword\">:key</span>")))
+
+(deftest renders-a-table-with-only-a-header
+  (assert (contains? (as-str (render-markdown "| just one row"))
+                     "<th>just one row</th>")))
+
+(deftest leaves-an-untagged-code-block-plain
+  (assert (not (contains? (as-str (render-markdown "```\n:key\n```"))
+                          "<span"))))

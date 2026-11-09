@@ -1,0 +1,79 @@
+(use src/files copy-directory-files failure files-under
+               read-file remove-directory write-index)
+
+(use src/links ->site-files ->site-page broken-links)
+(use src/markdown/highlight highlight)
+(use src/markdown/html render-markdown)
+(use src/strings ends-with? escape-html join owned)
+(use src/template fill)
+
+(export build-site output-directory)
+
+(def output-directory "public")
+
+(def static-directory "static")
+
+(def site-description
+  "A small Lisp for humans and agents that infers types and ownership and compiles to readable Rust.")
+
+(defn build-site ()
+  (try (remove-directory output-directory))
+  (try (copy-directory-files static-directory output-directory))
+  (local layout (try (read-file "templates/layout.html")))
+  (try (write-landing (as-str layout)))
+  (try (write-install (as-str layout)))
+  (check-links))
+
+(defn in-layout (layout title content)
+  (local with-title
+    (fill layout "title" (as-str (escape-html title))))
+  (local with-description
+    (fill (as-str with-title) "description" site-description))
+  (fill (as-str with-description) "content" content))
+
+(defn write-landing (layout)
+  (local template (try (read-file "templates/landing.html")))
+  (local knave-sample
+    (try (read-file "content/sample.rslisp")))
+  (local rust-sample (try (read-file "content/sample.rs")))
+  (local with-knave
+    (fill (as-str template)
+          "knave-sample"
+          (as-str (highlight (trim (as-str knave-sample))))))
+  (local content
+    (fill (as-str with-knave)
+          "rust-sample"
+          (as-str (escape-html (trim (as-str rust-sample))))))
+  (write-index output-directory
+               (as-str (in-layout layout "Knave" (as-str content)))))
+
+(defn write-install (layout)
+  (local source (try (read-file "content/install.md")))
+  (local content
+    (str "<main class=\"prose\">"
+         (render-markdown (as-str source))
+         "</main>"))
+  (write-index (as-str (str output-directory "/install"))
+               (as-str (in-layout layout "Install Knave" (as-str content)))))
+
+(defn check-links ()
+  (local paths (try (files-under output-directory)))
+  (local pages
+    (try (read-pages (ref paths) 0 (vec))))
+  (local site (->site-files paths pages))
+  (local broken (broken-links (ref site)))
+  (if (empty? broken)
+    (ok (do))
+    (err (failure (str "broken internal links:\n" (join (ref broken) "\n"))))))
+
+(defn read-pages (paths position pages)
+  (if (>= position (len paths))
+    (ok pages)
+    (let (path (as-str (at paths position))
+          full-path (str output-directory "/" path))
+      (if (ends-with? path ".html")
+        (push! pages
+               (->site-page (owned path)
+                            (try (read-file (as-str full-path)))))
+        (do))
+      (recur paths (+ position 1) pages))))

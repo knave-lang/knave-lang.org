@@ -1,0 +1,50 @@
+(export after contains? ends-with? escape-html find-from
+        join owned replace-all slug starts-with?)
+
+(def starts-with?
+  (rust "{0}.starts_with({1})"
+    (fn ((ref str) (ref str)) bool)))
+
+(def ends-with?
+  (rust "{0}.ends_with({1})"
+    (fn ((ref str) (ref str)) bool)))
+
+(def contains?
+  (rust "{0}.contains({1})"
+    (fn ((ref str) (ref str)) bool)))
+
+(def after
+  (rust "&{0}[{1}..]"
+    (fn ((ref str) usize) (ref str))))
+
+(def find-from
+  (rust "{0}[{2}..].find({1}).map(|offset| offset + {2})"
+    (fn ((ref str) (ref str) usize)
+      (option usize))))
+
+(def replace-all
+  (rust "{0}.replace({1}, {2})"
+    (fn ((ref str) (ref str) (ref str))
+      string)))
+
+(def owned
+  (rust "{0}.to_string()"
+    (fn ((ref str)) string)))
+
+(def join
+  (rust "{0}.join({1})"
+    (fn ((ref (slice string)) (ref str))
+      string)))
+
+(def slug
+  (rust "{0}.to_lowercase().chars().filter(|c| c.is_alphanumeric() || matches!(c, ' ' | '-')).collect::<String>().replace(' ', \"-\")"
+    (fn ((ref str)) string)))
+
+(defn escape-html (text)
+  (-> (replace-all text "&" "&amp;")
+      (as-str)
+      (replace-all "<" "&lt;")
+      (as-str)
+      (replace-all ">" "&gt;")
+      (as-str)
+      (replace-all "\"" "&quot;")))

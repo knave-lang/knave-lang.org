@@ -1,0 +1,15 @@
+(use src/files failure)
+(use src/preview serve-preview)
+(use src/site build-site)
+
+(def usage "usage: knave-site [serve]")
+
+(defn main ()
+  (local arguments (command-line-args))
+  (cond
+    ((empty? arguments) (build-site))
+    ((serve-requested? (ref arguments)) (serve-preview))
+    (else (err (failure (str usage))))))
+
+(defn serve-requested? (arguments)
+  (= (as-str (at arguments 0)) "serve"))

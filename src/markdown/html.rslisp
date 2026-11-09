@@ -1,0 +1,78 @@
+(use src/markdown/blocks block parse-blocks)
+(use src/markdown/highlight highlight)
+(use src/markdown/inlines render-inlines)
+(use src/strings escape-html join slug)
+
+(export render-markdown)
+
+(defn render-markdown (source)
+  (local blocks (parse-blocks source))
+  (render-blocks (ref blocks)))
+
+(defn render-blocks (blocks)
+  (local rendered
+    (collect (map (iter blocks) render-block)))
+  (join (ref rendered) "\n"))
+
+(defn render-block (current)
+  (match current
+    ((heading level text) (render-heading level (as-str text)))
+    ((paragraph text)
+     (str "<p>" (render-inlines (as-str text)) "</p>"))
+    ((code-block language code)
+     (render-code (as-str language) (as-str code)))
+    ((bullet-list items) (render-list "ul" items))
+    ((numbered-list items) (render-list "ol" items))
+    ((table header rows) (render-table header rows))))
+
+(defn render-heading (level text)
+  (local anchor (slug text))
+  (str "<h" level " id=\"" anchor "\" aria-labelledby=\""
+       anchor "-title\">" "<a class=\"anchor\" href=\"#"
+       anchor "\" aria-label=\"Link to this section\">#</a>"
+       "<span id=\"" anchor "-title\">"
+       (render-inlines text)
+       "</span>" "</h" level ">"))
+
+(defn render-code (language code)
+  (str "<pre><code class=\"language-"
+       (escape-html language)
+       "\">"
+       (highlighted-code language code)
+       "</code></pre>"))
+
+(defn highlighted-code (language code)
+  (if (or (= language "lisp") (= language "clojure"))
+    (highlight code)
+    (escape-html code)))
+
+(defn render-list (tag items)
+  (str "<" tag ">"
+       (join (ref (collect (map (iter items) render-item)))
+             "")
+       "</" tag ">"))
+
+(defn render-item (item)
+  (str "<li>" (render-inlines (as-str item)) "</li>"))
+
+(defn render-table (header rows)
+  (str "<div class=\"table-scroll\"><table><thead>"
+       (render-row "th" header)
+       "</thead><tbody>"
+       (join (ref (collect (map (iter rows) render-body-row)))
+             "")
+       "</tbody></table></div>"))
+
+(defn render-body-row (row) (render-row "td" row))
+
+(defn render-row (tag cells)
+  (str "<tr>"
+       (join (ref (collect (map (iter cells)
+                                (fn (cell) (render-cell tag cell)))))
+             "")
+       "</tr>"))
+
+(defn render-cell (tag cell)
+  (str "<" tag ">"
+       (render-inlines (as-str cell))
+       "</" tag ">"))

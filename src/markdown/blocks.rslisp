@@ -1,0 +1,181 @@
+(use src/strings after find-from join owned replace-all
+                 starts-with?)
+
+(export block parse-blocks)
+
+(defenum block
+  (heading usize string)
+  (paragraph string)
+  (code-block string string)
+  (bullet-list (vec string))
+  (numbered-list (vec string))
+  (table (vec string) (vec (vec string))))
+
+(defstruct parsed
+  :block block
+  :next usize)
+
+(def fence-marker "```")
+
+(def bullet-marker "- ")
+
+(def numbered-marker ". ")
+
+(def escaped-pipe "\\|")
+
+(def pipe-placeholder "\u{E000}")
+
+(def max-heading-level 6)
+
+(def lines-between
+  (rust "{0}[{1}..{2}].to_vec()"
+    (fn ((ref (slice string)) usize usize)
+      (vec string))))
+
+(def heading-level
+  (rust "{0}.bytes().take_while(|byte| *byte == b'#').count()"
+    (fn ((ref str)) usize)))
+
+(def without-outer-pipes
+  (rust "{0}.trim().trim_start_matches('|').trim_end_matches('|')"
+    (fn ((ref str)) (ref str))))
+
+(defn parse-blocks (source)
+  (local source-lines
+    (collect (map (lines source) owned)))
+  (parse-from (ref source-lines) 0 (vec)))
+
+(defn parse-from (source-lines index blocks)
+  (cond
+    ((>= index (len source-lines)) blocks)
+    ((blank? (as-str (at source-lines index)))
+     (recur source-lines (+ index 1) blocks))
+    (else (match (parse-block source-lines index)
+            ((parsed next-block next-index)
+             (push! blocks next-block)
+             (recur source-lines next-index blocks))))))
+
+(defn parse-block (source-lines index)
+  (local line (as-str (at source-lines index)))
+  (cond
+    ((fence? line) (parse-fence source-lines index))
+    ((heading? line) (parse-heading line index))
+    ((table-row? line) (parse-table source-lines index))
+    ((bullet-item? line) (parse-bullets source-lines index))
+    ((numbered-item? line) (parse-numbered source-lines index))
+    (else (parse-paragraph source-lines index))))
+
+(defn blank? (line)
+  (empty? (trim line)))
+
+(defn fence? (line) (starts-with? line fence-marker))
+
+(defn heading? (line)
+  (local level (heading-level line))
+  (and (> level 0)
+       (<= level max-heading-level)
+       (starts-with? (after line level) " ")))
+
+(defn table-row? (line) (starts-with? line "|"))
+
+(defn bullet-item? (line) (starts-with? line bullet-marker))
+
+(defn numbered-item? (line)
+  (match (find-from line numbered-marker 0)
+    (none false)
+    ((some dot)
+     (and (> dot 0)
+          (every? (chars (subs line 0 dot)) digit?)))))
+
+(defn block-start? (line)
+  (or (fence? line)
+      (heading? line)
+      (table-row? line)
+      (bullet-item? line)
+      (numbered-item? line)))
+
+(defn run-end (source-lines start continues?)
+  (if (and (< start (len source-lines))
+           (continues? (as-str (at source-lines start))))
+    (recur source-lines (+ start 1) continues?)
+    start))
+
+(defn parse-fence (source-lines index)
+  (local content-start (+ index 1))
+  (local close
+    (run-end source-lines content-start not-fence?))
+  (local content
+    (lines-between source-lines content-start close))
+  (->parsed (block/code-block (fence-language (as-str (at source-lines index)))
+                              (join (ref content) "\n"))
+            (+ close 1)))
+
+(defn not-fence? (line)
+  (not (fence? line)))
+
+(defn fence-language (line)
+  (owned (trim (after line (len fence-marker)))))
+
+(defn parse-heading (line index)
+  (local level (heading-level line))
+  (->parsed (block/heading level
+                           (owned (trim (after line level))))
+            (+ index 1)))
+
+(defn parse-table (source-lines index)
+  (local end (run-end source-lines index table-row?))
+  (local after-delimiter (+ index 2))
+  (local first-body-row
+    (if (< after-delimiter end) after-delimiter end))
+  (->parsed (block/table (table-cells (as-str (at source-lines index)))
+                         (collect (map (iter (lines-between source-lines
+                                                            first-body-row
+                                                            end))
+                                       row-cells)))
+            end))
+
+(defn row-cells (row)
+  (table-cells (as-str row)))
+
+(defn table-cells (row)
+  (local protected
+    (replace-all row escaped-pipe pipe-placeholder))
+  (collect (map (split (without-outer-pipes (as-str protected)) "|")
+                cell-text)))
+
+(defn cell-text (cell)
+  (replace-all (trim cell) pipe-placeholder "|"))
+
+(defn parse-bullets (source-lines index)
+  (local end (run-end source-lines index bullet-item?))
+  (->parsed (block/bullet-list
+              (collect (map (iter (lines-between source-lines index end))
+                            bullet-text)))
+            end))
+
+(defn bullet-text (item)
+  (owned (after (as-str item) (len bullet-marker))))
+
+(defn parse-numbered (source-lines index)
+  (local end (run-end source-lines index numbered-item?))
+  (->parsed (block/numbered-list
+              (collect (map (iter (lines-between source-lines index end))
+                            numbered-text)))
+            end))
+
+(defn numbered-text (item)
+  (local text (as-str item))
+  (match (find-from text numbered-marker 0)
+    (none (owned text))
+    ((some dot)
+     (owned (after text (+ dot (len numbered-marker)))))))
+
+(defn parse-paragraph (source-lines index)
+  (local end
+    (run-end source-lines (+ index 1) paragraph-line?))
+  (->parsed (block/paragraph (join (ref (lines-between source-lines index end))
+                                   " "))
+            end))
+
+(defn paragraph-line? (line)
+  (not (or (blank? line) (block-start? line))))

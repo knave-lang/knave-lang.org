@@ -1,0 +1,6 @@
+(use src/strings replace-all)
+
+(export fill)
+
+(defn fill (template name value)
+  (replace-all template (as-str (str "{{" name "}}")) value))

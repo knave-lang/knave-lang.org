@@ -1,5 +1,5 @@
-(use strings after contains? escape-html find-from
-             starts-with?)
+(use src/strings after contains? escape-html find-from
+                 starts-with?)
 
 (export highlight)
 

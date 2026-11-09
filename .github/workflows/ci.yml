@@ -15,7 +15,7 @@ jobs:
       - name: Check formatting
         run: nix develop -c knave fmt --check src tests content
       - name: Run tests
-        run: nix develop -c knave test src
+        run: nix develop -c knave test .
       - name: Check that the landing sample matches the emitted Rust
         run: "! nix develop -c bash -c 'grep -vxFf <(knave emit content/sample.rslisp) content/sample.rs'"
       - name: Build the site

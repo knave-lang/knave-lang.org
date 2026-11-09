@@ -1,7 +1,7 @@
-(use markdown/blocks block parse-blocks)
-(use markdown/highlight highlight)
-(use markdown/inlines render-inlines)
-(use strings contains? escape-html join slug)
+(use src/markdown/blocks block parse-blocks)
+(use src/markdown/highlight highlight)
+(use src/markdown/inlines render-inlines)
+(use src/strings contains? escape-html join slug)
 
 (export render-blocks render-markdown)
 

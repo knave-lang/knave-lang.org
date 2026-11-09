@@ -1,5 +1,5 @@
 (use prelude/test assert deftest)
-(use template fill)
+(use src/template fill)
 
 (deftest fills-every-use-of-a-name
   (assert (= (fill "{{a}} and {{a}}" "a" "x") "x and x")))

@@ -1,1 +1,2 @@
-(project knave-site)
+(project knave-site
+  :entry "main.rslisp")

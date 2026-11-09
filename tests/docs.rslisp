@@ -1,7 +1,7 @@
 (use prelude/test assert deftest)
-(use docs build-doc-pages doc-page)
-(use files read-file)
-(use strings contains?)
+(use src/docs build-doc-pages doc-page)
+(use src/files read-file)
+(use src/strings contains?)
 
 (def page-template "{{sidebar}}|{{pager}}|{{article}}")
 

@@ -1,5 +1,5 @@
 (use prelude/test assert deftest)
-(use markdown/inlines render-inlines)
+(use src/markdown/inlines render-inlines)
 
 (deftest escapes-plain-text
   (assert (= (render-inlines "a < b & c") "a &lt; b &amp; c")))

@@ -1,5 +1,5 @@
-(use strings after find-from join owned replace-all
-             starts-with?)
+(use src/strings after find-from join owned replace-all
+                 starts-with?)
 
 (export block parse-blocks)
 

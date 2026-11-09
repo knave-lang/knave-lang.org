@@ -1,12 +1,12 @@
-(use docs build-doc-pages doc-page)
+(use src/docs build-doc-pages doc-page)
 
-(use files copy-directory-files environment-variable
-           read-file remove-directory write-index)
+(use src/files copy-directory-files environment-variable
+               read-file remove-directory write-index)
 
-(use markdown/highlight highlight)
-(use markdown/html render-markdown)
-(use strings escape-html)
-(use template fill)
+(use src/markdown/highlight highlight)
+(use src/markdown/html render-markdown)
+(use src/strings escape-html)
+(use src/template fill)
 
 (export build-site)
 

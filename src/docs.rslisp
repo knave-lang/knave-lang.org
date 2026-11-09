@@ -1,7 +1,7 @@
-(use markdown/blocks block parse-blocks)
-(use markdown/html render-blocks)
-(use strings escape-html join owned replace-all slug)
-(use template fill)
+(use src/markdown/blocks block parse-blocks)
+(use src/markdown/html render-blocks)
+(use src/strings escape-html join owned replace-all slug)
+(use src/template fill)
 
 (export build-doc-pages doc-page)
 

@@ -1,9 +1,12 @@
 (use prelude/test assert deftest)
 (use strings contains?)
-(use watch source-fingerprint)
+(use watch fingerprint-directories)
+
+(defn fingerprint-of (directories)
+  (unwrap-ok (fingerprint-directories (ref directories))))
 
 (defn fixtures-fingerprint ()
-  (unwrap-ok (source-fingerprint (ref (vec (str "tests/fixtures"))))))
+  (fingerprint-of (vec (str "tests/fixtures"))))
 
 (deftest names-each-file-in-the-fingerprint
   (assert (contains? (as-str (fixtures-fingerprint))
@@ -12,7 +15,9 @@
 (deftest repeats-the-fingerprint-for-unchanged-files
   (assert (= (fixtures-fingerprint) (fixtures-fingerprint))))
 
-(deftest joins-the-fingerprints-of-every-directory
-  (assert (= (unwrap-ok (source-fingerprint (ref (vec (str "tests/fixtures")
-                                                      (str "tests/fixtures")))))
-             (str (fixtures-fingerprint) (fixtures-fingerprint)))))
+(deftest names-files-from-every-directory
+  (let (fingerprint (fingerprint-of (vec (str "tests/fixtures")
+                                         (str "tests/other-fixtures"))))
+    (assert (and (contains? (as-str fingerprint) "tests/fixtures/sample.md@")
+                 (contains? (as-str fingerprint)
+                            "tests/other-fixtures/other.md@")))))

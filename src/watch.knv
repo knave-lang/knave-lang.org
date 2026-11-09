@@ -1,34 +1,36 @@
 (use files files-under)
 
-(export source-fingerprint)
+(export fingerprint-directories)
 
 (def modified-nanos
   (rust "std::fs::metadata({0}).and_then(|found| found.modified()).map(|modified| modified.duration_since(std::time::UNIX_EPOCH).map_or(0, |elapsed| elapsed.as_nanos()))"
     (fn ((ref str)) (result u128 io-error))))
 
-(defn source-fingerprint (directories)
-  (append-directory-fingerprints directories 0 (str "")))
-
-(defn append-directory-fingerprints (directories position fingerprints)
-  (if (>= position (len directories))
-    (ok fingerprints)
-    (let (directory (as-str (at directories position))
-          fingerprint (try (directory-fingerprint directory)))
-      (recur directories
-             (+ position 1)
-             (str fingerprints fingerprint)))))
+(defn fingerprint-directories (directories)
+  (join-results directories directory-fingerprint 0 (str "")))
 
 (defn directory-fingerprint (directory)
   (let (files (try (files-under directory)))
     (sort! files)
-    (append-file-stamps directory (ref files) 0 (str ""))))
+    (join-results (ref files)
+                  (fn (file) (file-stamp directory file))
+                  0
+                  (str ""))))
 
-(defn append-file-stamps (directory files position stamps)
-  (if (>= position (len files))
-    (ok stamps)
-    (let (file (as-str (at files position))
-          full-path (str directory "/" file)
-          modified (try (modified-nanos (as-str full-path))))
-      (recur directory files
-             (+ position 1)
-             (str stamps full-path "@" modified "\n")))))
+(defn file-stamp (directory file)
+  (let (full-path (str directory "/" file)
+        modified (try (modified-nanos (as-str full-path))))
+    (ok (str full-path "@" modified "\n"))))
+
+(type join-results
+  (fn ((ref (slice string))
+       (fn ((ref str))
+         (result string io-error))
+       usize string)
+    (result string io-error)))
+
+(defn join-results (items produce position joined)
+  (if (>= position (len items))
+    (ok joined)
+    (let (produced (try (produce (as-str (at items position)))))
+      (recur items produce (+ position 1) (str joined produced)))))

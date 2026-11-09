@@ -3,7 +3,7 @@
 (use links index-of)
 (use site build-site output-directory)
 (use strings owned)
-(use watch source-fingerprint)
+(use watch fingerprint-directories)
 
 (export serve-preview)
 
@@ -80,7 +80,7 @@
       (run-preview (ref listener) fingerprint))))
 
 (defn current-fingerprint ()
-  (source-fingerprint (ref (watched-directories))))
+  (fingerprint-directories (ref (watched-directories))))
 
 (defn watched-directories ()
   (vec (str "content")

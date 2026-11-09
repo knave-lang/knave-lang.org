@@ -21,10 +21,10 @@
 (def static-directory "static")
 
 (def landing-description
-  "A small Lisp for humans and agents with type inference and ownership inference that compiles to readable Rust.")
+  "Knave is a programming language for humans and agents. It is a small Lisp that infers types and ownership and compiles to readable Rust.")
 
 (def install-description
-  "Install the Knave compiler with Cargo or Nix, then create and run your first project.")
+  "Install the Knave programming language with Cargo or Nix, then create and run your first project.")
 
 (defn build-site ()
   (try (remove-directory output-directory))
@@ -90,7 +90,8 @@
                       "rust-sample"
                       (as-str (in-line-spans (as-str (escape-html (trim (as-str rust-sample))))))))
     (ok (->page (owned "/")
-                (owned "Knave: Lisp with type and ownership inference that compiles to Rust")
+                (owned
+                  "Knave programming language: a Lisp that compiles to Rust")
                 (owned landing-description)
                 content))))
 

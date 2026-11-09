@@ -45,10 +45,6 @@
     (collect (map (lines source) owned)))
   (parse-from (ref source-lines) 0 (vec)))
 
-(type parse-from
-  (fn ((ref (vec string)) usize (vec block))
-    (vec block)))
-
 (defn parse-from (source-lines index blocks)
   (cond
     ((>= index (len source-lines)) blocks)
@@ -58,9 +54,6 @@
             ((parsed next-block next-index)
              (push! blocks next-block)
              (recur source-lines next-index blocks))))))
-
-(type parse-block
-  (fn ((ref (vec string)) usize) parsed))
 
 (defn parse-block (source-lines index)
   (local line (as-str (at source-lines index)))

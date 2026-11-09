@@ -9,16 +9,10 @@
   (local blocks (parse-blocks source))
   (render-blocks (ref blocks)))
 
-(type render-blocks
-  (fn ((ref (slice block))) string))
-
 (defn render-blocks (blocks)
   (local rendered
     (collect (map (iter blocks) render-block)))
   (join (ref rendered) "\n"))
-
-(type render-block
-  (fn ((ref block)) string))
 
 (defn render-block (current)
   (match current

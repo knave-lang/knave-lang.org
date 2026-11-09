@@ -53,20 +53,12 @@
                 preview-address "/"))
   (accept-connections (ref listener)))
 
-(type accept-connections
-  (fn ((ref tcp-listener))
-    (result unit io-error)))
-
 (defn accept-connections (listener)
   (match (answer-next-request listener)
     ((err problem)
      (eprintln (str "preview request failed: " problem)))
     ((ok _) (do)))
   (recur listener))
-
-(type answer-next-request
-  (fn ((ref tcp-listener))
-    (result unit io-error)))
 
 (defn answer-next-request (listener)
   (local stream (try (accept-connection listener)))
@@ -75,10 +67,6 @@
   (send-response (ref stream)
                  (ref (response-for (as-str request-line)))))
 
-(type send-response
-  (fn ((ref tcp-stream) (ref response))
-    (result unit io-error)))
-
 (defn send-response (stream answer)
   (local head
     (response-head (as-str (:status answer))
@@ -86,9 +74,6 @@
                    (len (:body answer))))
   (try (write-text stream (as-str head)))
   (write-body stream (ref (:body answer))))
-
-(type response-for
-  (fn ((ref str)) response))
 
 (defn response-for (request-line)
   (match (request-file request-line)
@@ -101,9 +86,6 @@
     (index-of (as-str (str file "/")))
     (owned file)))
 
-(type file-response
-  (fn ((ref str)) response))
-
 (defn file-response (file)
   (local full-path (str output-root "/" file))
   (match (read-bytes (as-str full-path))
@@ -112,8 +94,6 @@
      (->response (str "200 OK")
                  (str (content-type file))
                  body))))
-
-(type not-found (fn () response))
 
 (defn not-found ()
   (->response (str "404 Not Found")

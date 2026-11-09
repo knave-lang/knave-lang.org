@@ -6,7 +6,7 @@
 (export build-doc-pages doc-page)
 
 (defstruct section
-  :title string
+  :heading string
   :slug string
   :start usize
   :end usize)
@@ -16,9 +16,9 @@
   :href string)
 
 (defstruct doc-page
-  :path string
-  :title string
-  :body string)
+  :directory string
+  :page-title string
+  :document string)
 
 (def overview-title "Overview")
 
@@ -28,13 +28,9 @@
 (def section-heading-level 2)
 
 (def blocks-between
-  (rust "&{0}[{1}..{2}]"
+  (rust "{0}[{1}..{2}].to_vec()"
     (fn ((ref (slice block)) usize usize)
-      (ref (slice block)))))
-
-(type build-doc-pages
-  (fn ((ref str) (ref str) (ref str))
-    (vec doc-page)))
+      (vec block))))
 
 (defn build-doc-pages (source revision template)
   (local linked (with-repository-links source revision))
@@ -58,12 +54,6 @@
                      (vec)))
   (apply-anchors (owned source) (ref anchors) 0))
 
-(type collect-anchors
-  (fn ((ref (vec block))
-       usize string
-       (vec anchor))
-    (vec anchor)))
-
 (defn collect-anchors (blocks index page-slug anchors)
   (if (>= index (len blocks))
     anchors
@@ -85,10 +75,6 @@
   (local href (str "/docs/" page-slug "/#" id))
   (->anchor id href))
 
-(type apply-anchors
-  (fn (string (ref (slice anchor)) usize)
-    string))
-
 (defn apply-anchors (source anchors position)
   (if (>= position (len anchors))
     source
@@ -99,18 +85,11 @@
              anchors
              (+ position 1)))))
 
-(type sections-of
-  (fn ((ref (vec block))) (vec section)))
-
 (defn sections-of (blocks)
   (local boundaries (section-boundaries blocks 0 (vec 0)))
   (collect (map (range 0 (- (len boundaries) 1))
                 (fn (position)
                   (section-at blocks (ref boundaries) position)))))
-
-(type section-boundaries
-  (fn ((ref (vec block)) usize (vec usize))
-    (vec usize)))
 
 (defn section-boundaries (blocks index boundaries)
   (cond
@@ -123,19 +102,10 @@
      (recur blocks (+ index 1) boundaries))
     (else (recur blocks (+ index 1) boundaries))))
 
-(type section-heading?
-  (fn ((ref block)) bool))
-
 (defn section-heading? (candidate)
   (match candidate
     ((heading level _) (= level section-heading-level))
     (_ false)))
-
-(type section-at
-  (fn ((ref (vec block))
-       (ref (vec usize))
-       usize)
-    section))
 
 (defn section-at (blocks boundaries position)
   (local start (at boundaries position))
@@ -147,51 +117,33 @@
                  (slug (as-str title))
                  start end))))
 
-(type heading-text
-  (fn ((ref block)) string))
-
 (defn heading-text (candidate)
   (match candidate
     ((heading _ text) (owned (as-str text)))
     (_ (str ""))))
-
-(type build-page
-  (fn ((ref (vec block))
-       (ref (vec section))
-       usize
-       (ref str))
-    doc-page))
 
 (defn build-page (blocks sections position template)
   (local current (at sections position))
   (local sidebar (render-sidebar sections position))
   (local pager (render-pager sections position))
   (local article
-    (render-blocks (blocks-between blocks (:start current) (:end current))))
+    (render-blocks (ref
+                     (blocks-between blocks (:start current) (:end current)))))
   (local with-sidebar
     (fill template "sidebar" (as-str sidebar)))
   (local with-pager
     (fill (as-str with-sidebar) "pager" (as-str pager)))
   (->doc-page (page-path current)
-              (owned (as-str (:title current)))
+              (owned (as-str (:heading current)))
               (fill (as-str with-pager) "article" (as-str article))))
-
-(type page-path
-  (fn ((ref section)) string))
 
 (defn page-path (current)
   (if (empty? (:slug current))
     (str "docs")
     (str "docs/" (:slug current))))
 
-(type section-href
-  (fn ((ref section)) string))
-
 (defn section-href (current)
   (str "/" (page-path current) "/"))
-
-(type render-sidebar
-  (fn ((ref (vec section)) usize) string))
 
 (defn render-sidebar (sections current-position)
   (local links
@@ -201,20 +153,14 @@
                                          (= position current-position))))))
   (join (ref links) "\n"))
 
-(type render-sidebar-link
-  (fn ((ref section) bool) string))
-
 (defn render-sidebar-link (current page?)
   (str "<a href=\""
        (section-href current)
        "\""
        (if page? " aria-current=\"page\"" "")
        ">"
-       (escape-html (as-str (:title current)))
+       (escape-html (as-str (:heading current)))
        "</a>"))
-
-(type render-pager
-  (fn ((ref (vec section)) usize) string))
 
 (defn render-pager (sections position)
   (str (if (> position 0)
@@ -224,12 +170,9 @@
          (render-pager-link "Next" (at sections (+ position 1)))
          (str "<span></span>"))))
 
-(type render-pager-link
-  (fn ((ref str) (ref section)) string))
-
 (defn render-pager-link (label target)
   (str "<a href=\""
        (section-href target)
        "\"><small>" label "</small>"
-       (escape-html (as-str (:title target)))
+       (escape-html (as-str (:heading target)))
        "</a>"))

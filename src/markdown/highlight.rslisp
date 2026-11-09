@@ -5,7 +5,7 @@
 
 (defstruct token
   :class string
-  :end usize)
+  :stop usize)
 
 (def special-forms
   " fn local let if cond match do loop recur use export type try when unless and or not struct enum impl trait ")
@@ -42,22 +42,15 @@
     highlighted
     (let (next (next-token code start))
       (recur code
-             (:end next)
+             (:stop next)
              (str highlighted (render-token code start (ref next)))))))
-
-(type render-token
-  (fn ((ref str) usize (ref token))
-    string))
 
 (defn render-token (code start current)
   (local text
-    (escape-html (subs code start (:end current))))
+    (escape-html (subs code start (:stop current))))
   (if (empty? (:class current))
     text
     (str "<span class=\"" (:class current) "\">" text "</span>")))
-
-(type next-token
-  (fn ((ref str) usize) token))
 
 (defn next-token (code start)
   (local rest (after code start))

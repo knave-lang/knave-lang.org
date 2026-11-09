@@ -10,20 +10,16 @@
     (unwrap-ok (read-file "tests/fixtures/reference.md")))
   (build-doc-pages (as-str source) "abc123" page-template))
 
-(type page-body
-  (fn ((ref (vec doc-page)) usize)
-    (ref str)))
-
 (defn page-body (pages position)
-  (as-str (:body (at pages position))))
+  (as-str (:document (at pages position))))
 
 (deftest builds-an-overview-and-one-page-per-section
   (assert (= (len (fixture-pages)) 3)))
 
 (deftest places-each-section-under-its-slug
   (local pages (fixture-pages))
-  (assert (= (:path (at pages 0)) "docs"))
-  (assert (= (:path (at pages 2)) "docs/second-part")))
+  (assert (= (:directory (at pages 0)) "docs"))
+  (assert (= (:directory (at pages 2)) "docs/second-part")))
 
 (deftest points-parent-links-at-the-pinned-revision
   (local pages (fixture-pages))

@@ -11,8 +11,5 @@
     ((serve-requested? (ref arguments)) (serve-preview))
     (else (err (failure (str usage))))))
 
-(type serve-requested?
-  (fn ((ref (vec string))) bool))
-
 (defn serve-requested? (arguments)
   (= (as-str (at arguments 0)) "serve"))

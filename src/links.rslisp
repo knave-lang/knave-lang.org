@@ -5,7 +5,7 @@
         site-files site-page)
 
 (defstruct site-page
-  :path string
+  :file string
   :html string)
 
 (defstruct site-files
@@ -16,9 +16,6 @@
 
 (def index-file "index.html")
 
-(type broken-links
-  (fn ((ref site-files)) (vec string)))
-
 (defn broken-links (site)
   (local broken (vec))
   (for-each (iter (:pages site))
@@ -26,22 +23,12 @@
               (collect-broken-links! site page (mut broken))))
   broken)
 
-(type collect-broken-links!
-  (fn ((ref site-files)
-       (ref site-page)
-       (mut (vec string)))
-    unit))
-
 (defn collect-broken-links! (site page broken)
   (for-each (iter (hrefs-in (as-str (:html page)) 0 (vec)))
             (fn (href)
               (if (broken-link? site page (as-str href))
-                (push! broken (str (:path page) ": " href))
+                (push! broken (str (:file page) ": " href))
                 (do)))))
-
-(type hrefs-in
-  (fn ((ref str) usize (vec string))
-    (vec string)))
 
 (defn hrefs-in (html start hrefs)
   (match (find-from html href-marker start)
@@ -54,12 +41,6 @@
         (push! hrefs (owned (subs html value-start value-end)))
         (recur html value-end hrefs))))))
 
-(type broken-link?
-  (fn ((ref site-files)
-       (ref site-page)
-       (ref str))
-    bool))
-
 (defn broken-link? (site page href)
   (and (internal? href)
        (not (resolves? site page href))))
@@ -67,34 +48,17 @@
 (defn internal? (href)
   (or (starts-with? href "/") (starts-with? href "#")))
 
-(type resolves?
-  (fn ((ref site-files)
-       (ref site-page)
-       (ref str))
-    bool))
-
 (defn resolves? (site page href)
   (match (find-from href "#" 0)
     (none (file-listed? site (as-str (target-file site page href))))
     ((some hash)
      (local target (target-file site page (subs href 0 hash)))
-     (holds-id? site
-                (as-str target)
-                (after href (+ hash 1))))))
-
-(type target-file
-  (fn ((ref site-files)
-       (ref site-page)
-       (ref str))
-    string))
+     (holds-id? site target (after href (+ hash 1))))))
 
 (defn target-file (site page path)
   (if (empty? path)
-    (owned (as-str (:path page)))
+    (owned (as-str (:file page)))
     (listed-or-index site (after path 1))))
-
-(type listed-or-index
-  (fn ((ref site-files) (ref str)) string))
 
 (defn listed-or-index (site relative)
   (if (file-listed? site relative)
@@ -106,21 +70,14 @@
     (str directory index-file)
     (str directory "/" index-file)))
 
-(type file-listed?
-  (fn ((ref site-files) (ref str)) bool))
-
 (defn file-listed? (site target)
   (any? (iter (:paths site))
         (fn (path) (= (as-str path) target))))
-
-(type holds-id?
-  (fn ((ref site-files) (ref str) (ref str))
-    bool))
 
 (defn holds-id? (site target id)
   (local id-attribute (str " id=\"" id "\""))
   (any? (iter (:pages site))
         (fn (page)
-          (and (= (as-str (:path page)) target)
+          (and (= (:file page) target)
                (contains? (as-str (:html page))
                           (as-str id-attribute))))))

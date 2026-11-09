@@ -67,20 +67,12 @@
                       (as-str (str target "/" name))))
       (recur source target names (+ position 1)))))
 
-(type files-under
-  (fn ((ref str))
-    (result (vec string) io-error)))
-
 (defn files-under (root)
-  (collect-files root
-                 (vec (str ""))
-                 (vec)))
+  (collect-files! root
+                  (vec (str ""))
+                  (vec)))
 
-(type collect-files
-  (fn ((ref str) (vec string) (vec string))
-    (result (vec string) io-error)))
-
-(defn collect-files (root pending found)
+(defn collect-files! (root pending found)
   (match (pop! pending)
     (none (ok found))
     ((some directory)

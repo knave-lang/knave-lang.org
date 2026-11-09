@@ -3,8 +3,8 @@
 (export render-inlines)
 
 (defstruct span
-  :html string
-  :end usize)
+  :markup string
+  :resume-at usize)
 
 (def next-delimiter
   (rust "{0}[{1}..].find(['`', '*', '[', '\\\\']).map(|offset| offset + {1})"
@@ -30,13 +30,10 @@
     ((some at)
      (local rendered-span (render-span text at))
      (recur text
-            (:end rendered-span)
+            (:resume-at rendered-span)
             (str rendered
                  (escape-html (subs text start at))
-                 (:html rendered-span))))))
-
-(type render-span
-  (fn ((ref str) usize) span))
+                 (:markup rendered-span))))))
 
 (defn render-span (text at)
   (local rest (after text at))

@@ -75,19 +75,15 @@
                      (as-str template)))
   (write-pages layout (ref pages) 0))
 
-(type write-pages
-  (fn ((ref str) (ref (vec doc-page)) usize)
-    (result unit io-error)))
-
 (defn write-pages (layout pages position)
   (if (>= position (len pages))
     (ok (do))
     (let (page (at pages position))
-      (try (write-index (as-str (str output-directory "/" (:path page)))
+      (try (write-index (as-str (str output-directory "/" (:directory page)))
                         (as-str (in-layout layout
-                                           (as-str (str (:title page)
+                                           (as-str (str (:page-title page)
                                                         " | Knave reference"))
-                                           (as-str (:body page))))))
+                                           (as-str (:document page))))))
       (recur layout pages (+ position 1)))))
 
 (defn check-links ()
@@ -99,12 +95,6 @@
   (if (empty? broken)
     (ok (do))
     (err (failure (str "broken internal links:\n" (join (ref broken) "\n"))))))
-
-(type read-pages
-  (fn ((ref (vec string))
-       usize
-       (vec site-page))
-    (result (vec site-page) io-error)))
 
 (defn read-pages (paths position pages)
   (if (>= position (len paths))

@@ -1,5 +1,12 @@
 @font-face {
   font-family: Iosevka;
+  src: url("/iosevka-light.woff2") format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Iosevka;
   src: url("/iosevka-regular.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
@@ -82,17 +89,28 @@ code, pre { font: inherit; }
   text-decoration: none;
 }
 
-.site-header nav { display: flex; gap: 2ch; }
+.site-header nav { display: flex; gap: 2ch; margin-left: auto; }
 
 .landing { padding-block: var(--line) calc(2 * var(--line)); }
 
-h1 {
+h1, .name {
   margin: 0 0 var(--line);
   color: var(--bright);
   font-size: 2em;
   font-weight: 700;
   line-height: calc(2 * var(--line));
 }
+
+.name {
+  margin-bottom: 0;
+  font-size: 4em;
+  font-weight: 300;
+  line-height: calc(3 * var(--line));
+}
+
+.landing h1 { font-weight: 400; }
+
+body:has(.landing) .wordmark { display: none; }
 
 .columns {
   display: grid;

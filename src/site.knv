@@ -9,8 +9,8 @@
 (use markdown/highlight highlight)
 (use markdown/html render-markdown)
 
-(use strings ends-with? escape-html in-line-spans join
-             owned)
+(use strings ends-with? escape-html fnv1a-digest
+             in-line-spans join owned)
 
 (use template fill)
 
@@ -31,10 +31,18 @@
   (try (copy-directory-files static-directory output-directory))
   (let (pages (vec (try (landing-page))
                    (try (install-page)))
-        layout (try (read-file "templates/layout.html")))
+        layout (try (layout-with-stylesheet-version)))
     (try (write-pages (as-str layout) (ref pages) 0))
     (try (write-discovery-files (ref pages)))
     (check-links)))
+
+(defn layout-with-stylesheet-version ()
+  (let (layout (try (read-file "templates/layout.html"))
+        stylesheet-path (str static-directory "/style.css")
+        stylesheet (try (read-file (as-str stylesheet-path))))
+    (ok (fill (as-str layout)
+              "stylesheet-version"
+              (as-str (fnv1a-digest (as-str stylesheet)))))))
 
 (defn write-pages (layout pages position)
   (if (>= position (len pages))

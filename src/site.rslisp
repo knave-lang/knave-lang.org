@@ -1,5 +1,9 @@
+(use src/discovery ->page canonical-url llms-links page
+                   sitemap-entries)
+
 (use src/files copy-directory-files failure files-under
-               read-file remove-directory write-index)
+               read-file remove-directory write-file
+               write-index)
 
 (use src/links ->site-files ->site-page broken-links
                site-page)
@@ -15,25 +19,59 @@
 
 (def static-directory "static")
 
-(def site-description
+(def landing-description
   "A small Lisp for humans and agents that infers types and ownership and compiles to readable Rust.")
+
+(def install-description
+  "Install the Knave compiler with Cargo or Nix, then create and run your first project.")
 
 (defn build-site ()
   (try (remove-directory output-directory))
   (try (copy-directory-files static-directory output-directory))
+  (local pages
+    (vec (try (landing-page))
+         (try (install-page))))
   (local layout (try (read-file "templates/layout.html")))
-  (try (write-landing (as-str layout)))
-  (try (write-install (as-str layout)))
+  (try (write-pages (as-str layout) (ref pages) 0))
+  (try (write-discovery-files (ref pages)))
   (check-links))
 
-(defn in-layout (layout title content)
-  (local with-title
-    (fill layout "title" (as-str (escape-html title))))
-  (local with-description
-    (fill (as-str with-title) "description" site-description))
-  (fill (as-str with-description) "content" content))
+(defn write-pages (layout pages position)
+  (if (>= position (len pages))
+    (ok (do))
+    (let (page (at pages position))
+      (try (write-index (as-str (str output-directory (:path page)))
+                        (as-str (in-layout layout page))))
+      (recur layout pages (+ position 1)))))
 
-(defn write-landing (layout)
+(defn in-layout (layout page)
+  (-> (fill layout "title"
+            (as-str (escape-html (as-str (:title page)))))
+      (as-str)
+      (fill "description"
+            (as-str (escape-html (as-str (:description page)))))
+      (as-str)
+      (fill "canonical"
+            (as-str (canonical-url (as-str (:path page)))))
+      (as-str)
+      (fill "content" (as-str (:content page)))))
+
+(defn write-discovery-files (pages)
+  (try (write-from-template "sitemap.xml" "pages"
+                            (as-str (sitemap-entries pages))))
+  (try (write-from-template "robots.txt" "sitemap"
+                            (as-str (canonical-url "/sitemap.xml"))))
+  (write-from-template "llms.txt" "pages"
+                       (as-str (llms-links pages))))
+
+(defn write-from-template (file-name placeholder value)
+  (local template-path (str "templates/" file-name))
+  (local template
+    (try (read-file (as-str template-path))))
+  (write-file (as-str (str output-directory "/" file-name))
+              (as-str (fill (as-str template) placeholder value))))
+
+(defn landing-page ()
   (local template (try (read-file "templates/landing.html")))
   (local knave-sample
     (try (read-file "content/sample.rslisp")))
@@ -46,17 +84,21 @@
     (fill (as-str with-knave)
           "rust-sample"
           (as-str (escape-html (trim (as-str rust-sample))))))
-  (write-index output-directory
-               (as-str (in-layout layout "Knave" (as-str content)))))
+  (ok (->page (owned "/")
+              (owned "Knave")
+              (owned landing-description)
+              content)))
 
-(defn write-install (layout)
+(defn install-page ()
   (local source (try (read-file "content/install.md")))
   (local content
     (str "<main class=\"prose\">"
          (render-markdown (as-str source))
          "</main>"))
-  (write-index (as-str (str output-directory "/install"))
-               (as-str (in-layout layout "Install Knave" (as-str content)))))
+  (ok (->page (owned "/install/")
+              (owned "Install Knave")
+              (owned install-description)
+              content)))
 
 (defn check-links ()
   (local paths (try (files-under output-directory)))

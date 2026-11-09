@@ -45,6 +45,8 @@
     ((ends-with? file ".html") "text/html; charset=utf-8")
     ((ends-with? file ".css") "text/css; charset=utf-8")
     ((ends-with? file ".svg") "image/svg+xml")
+    ((ends-with? file ".xml") "application/xml; charset=utf-8")
+    ((ends-with? file ".txt") "text/plain; charset=utf-8")
     (else "application/octet-stream")))
 
 (defn response-head (status file-type body-length)

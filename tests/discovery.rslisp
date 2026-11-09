@@ -1,0 +1,26 @@
+(use prelude/test assert deftest)
+
+(use src/discovery ->page canonical-url llms-links
+                   sitemap-entries)
+
+(defn fake-pages ()
+  (vec (->page (str "/")
+               (str "Home")
+               (str "The start.")
+               (str ""))
+       (->page (str "/guide/")
+               (str "Guide")
+               (str "How to.")
+               (str ""))))
+
+(deftest places-a-path-on-the-site-origin
+  (assert (= (canonical-url "/guide/")
+             "https://knave-lang.org/guide/")))
+
+(deftest lists-every-page-in-the-sitemap
+  (assert (= (sitemap-entries (ref (fake-pages)))
+             "  <url><loc>https://knave-lang.org/</loc></url>\n  <url><loc>https://knave-lang.org/guide/</loc></url>")))
+
+(deftest links-every-page-with-its-description
+  (assert (= (llms-links (ref (fake-pages)))
+             "- [Home](https://knave-lang.org/): The start.\n- [Guide](https://knave-lang.org/guide/): How to.")))

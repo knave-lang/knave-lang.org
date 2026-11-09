@@ -3,7 +3,8 @@
   :tricks (vec str))
 
 (defn scheme (rogue)
-  (str (:name rogue) " runs a racket with guile"))
+  (local trick (at (:tricks rogue) 0))
+  (str (:name rogue) " runs a racket with guile and " trick))
 
 (defn main ()
   (local tricks (vec "marked cards" "loaded dice"))

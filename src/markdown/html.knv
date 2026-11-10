@@ -68,7 +68,7 @@
 (defn render-row (tag cells)
   (str "<tr>"
        (join (ref (collect (map (iter cells)
-                                (fn (cell) (render-cell tag cell)))))
+                             (fn (cell) (render-cell tag cell)))))
              "")
        "</tr>"))
 

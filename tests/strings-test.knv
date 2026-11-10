@@ -1,5 +1,3 @@
-(use prelude/test assert deftest)
-
 (use strings after before first-char? fnv1a-digest
              in-line-spans leading-count slug)
 

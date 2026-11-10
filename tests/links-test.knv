@@ -1,4 +1,3 @@
-(use prelude/test assert deftest)
 (use links ->site-files ->site-page broken-links)
 
 (defn page-at (path html)

@@ -1,4 +1,3 @@
-(use prelude/test assert deftest)
 (use markdown/highlight highlight)
 
 (deftest colors-a-definition

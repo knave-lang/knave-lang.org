@@ -1,4 +1,3 @@
-(use prelude/test assert deftest)
 (use markdown/html render-markdown)
 (use strings contains?)
 

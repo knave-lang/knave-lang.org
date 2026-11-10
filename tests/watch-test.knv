@@ -1,4 +1,3 @@
-(use prelude/test assert deftest)
 (use strings contains?)
 (use watch fingerprint-directories)
 

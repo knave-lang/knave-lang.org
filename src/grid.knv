@@ -1,12 +1,15 @@
 (use files failure write-file)
 
-(use knave-grid ->body-type ->grid-spec ->type-area
-                check-grid grid-css overlay-css
-                overlay-javascript read-font-metrics)
+(use knave-grid ->body-type ->font-face ->grid-spec
+                ->type-area check-grid font-face-css
+                grid-css overlay-css overlay-javascript
+                read-font-metrics)
 
 (export write-grid-files)
 
-(def body-font-file "static/iosevka-regular.woff2")
+(def font-family "Iosevka")
+
+(def body-font-weight 400)
 
 (def body-font-size-px 18.0)
 
@@ -21,11 +24,34 @@
 (def measure-ch 80)
 
 (defn write-grid-files (directory)
-  (match (read-font-metrics body-font-file)
+  (match (iosevka-faces)
     ((err error) (err (failure (str "grid: " error))))
-    ((ok metrics)
-     (write-checked-grid-files directory
-                               (site-grid-spec metrics)))))
+    ((ok faces)
+     (write-font-and-grid-files directory (ref faces)))))
+
+(defn iosevka-faces ()
+  (ok (vec (try (iosevka-face 300 "light"))
+           (try (iosevka-face body-font-weight "regular"))
+           (try (iosevka-face 700 "bold")))))
+
+(defn iosevka-face (weight style-name)
+  (let (file-name (str "iosevka-" style-name ".woff2"))
+    (ok (->font-face :family (str font-family)
+                     :url (str "/" file-name)
+                     :weight weight
+                     :metrics (try (read-font-metrics (as-str (str "static/"
+                                                                   file-name))))))))
+
+(defn write-font-and-grid-files (directory faces)
+  (try (write-file (as-str (str directory "/fonts.css"))
+                   (as-str (font-face-css faces))))
+  (write-checked-grid-files directory
+                            (site-grid-spec (body-metrics faces))))
+
+(defn body-metrics (faces)
+  (deref (:metrics (unwrap (find (iter faces)
+                             (fn (face)
+                               (= (:weight face) body-font-weight)))))))
 
 (defn site-grid-spec (metrics)
   (->grid-spec (->body-type body-font-size-px body-line-height metrics)

@@ -7,7 +7,7 @@ Knave needs Rust 1.88 or later, because the compiler runs the `rustc` and `rustf
 Install [Rust](https://www.rust-lang.org/tools/install), then build the compiler:
 
 ```sh
-cargo install --locked --profile dist knave
+cargo install --locked knave
 ```
 
 ## With Nix

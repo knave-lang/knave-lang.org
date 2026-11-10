@@ -1,4 +1,3 @@
-(use prelude/test assert deftest)
 (use http content-type request-file response-head)
 
 (deftest serves-the-root-index

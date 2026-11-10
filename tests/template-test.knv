@@ -1,4 +1,3 @@
-(use prelude/test assert deftest)
 (use template fill)
 
 (deftest fills-every-use-of-a-name

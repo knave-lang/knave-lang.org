@@ -1,4 +1,3 @@
-(use prelude/test assert deftest)
 (use markdown/inlines render-inlines)
 
 (deftest escapes-plain-text

@@ -1,5 +1,3 @@
-(use prelude/test assert deftest)
-
 (use discovery ->page canonical-url llms-links
                sitemap-entries)
 

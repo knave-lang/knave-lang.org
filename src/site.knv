@@ -5,6 +5,7 @@
            read-file remove-directory write-file
            write-index)
 
+(use grid write-grid-files)
 (use links ->site-files ->site-page broken-links)
 (use markdown/highlight highlight)
 (use markdown/html render-markdown)
@@ -29,6 +30,7 @@
 (defn build-site ()
   (try (remove-directory output-directory))
   (try (copy-directory-files static-directory output-directory))
+  (try (write-grid-files output-directory))
   (let (pages (vec (try (landing-page))
                    (try (install-page)))
         layout (try (layout-with-stylesheet-version)))

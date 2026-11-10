@@ -1,1 +1,4 @@
-(project knave-site)
+(project knave-site
+  (libraries
+    (knave-grid
+      :path "/home/karl/.local/share/ringleader/worktrees/knave-grid/initial-setup")))

@@ -28,16 +28,14 @@
   --pip: #ff6b7d;
   --string: #8fd6b4;
   --number: #e8b36b;
-  --type: 1.125rem;
-  --line: calc(var(--type) * 1.5);
+  --type: 1rem;
+  --line: var(--baseline);
   --measure: 80ch;
-  --column: calc(144ch + 2px);
   --code-type: var(--type);
   --code-ch: calc(var(--code-type) / 2);
   --box-padding: var(--code-type);
   --left-pane: calc(68 * var(--code-ch));
   --rule: #2f3348;
-  --gutter: 2ch;
   --copy-button-width: 8ch;
   --hanging-indent: 6ch;
   color-scheme: dark;
@@ -68,7 +66,7 @@ body > main { flex: 1; }
 
 .site-header, .site-footer, .landing, .prose {
   width: 100%;
-  max-width: calc(var(--column) + 2 * var(--gutter));
+  max-width: calc(var(--grid-width) + 2px + 2 * var(--gutter));
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
@@ -118,7 +116,7 @@ h1, .name {
 }
 
 .landing h1 {
-  font-size: min(2em, (100vw - 3.5rem) / 18.5);
+  font-size: min(2em, (100vw - 3.5rem / 1.125) / 18.5);
   font-weight: 400;
   line-height: 1.5;
 }
@@ -253,7 +251,7 @@ body:has(.landing) .wordmark { display: none; }
 }
 
 @media (max-width: 44rem) {
-  .session pre, .command { font-size: .875rem; line-height: 1.5; }
+  .session pre, .command { font-size: calc(.875rem / 1.125); line-height: 1.5; }
 
   .session pre { white-space: pre-wrap; }
 

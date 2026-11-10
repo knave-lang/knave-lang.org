@@ -1,0 +1,33 @@
+(use files failure write-file)
+
+(use knave-grid ->body-type ->grid-spec ->lattice check-grid
+                grid-css overlay-css overlay-javascript)
+
+(export write-grid-files)
+
+(def body-font-size-px 18.0)
+
+(def body-leading 1.5)
+
+(def content-width-ch 144)
+
+(def gutter-ch 2)
+
+(def column-count 1)
+
+(defn site-grid-spec ()
+  (->grid-spec (->body-type body-font-size-px body-leading)
+               (->lattice content-width-ch gutter-ch column-count)))
+
+(defn write-grid-files (directory)
+  (match (check-grid (site-grid-spec))
+    ((err error) (err (failure (str "grid: " error))))
+    ((ok checked)
+     (for-each (iter (:warnings checked))
+       (fn (warning) (eprintln "warning: grid: " warning)))
+     (try (write-file (as-str (str directory "/grid.css"))
+                      (as-str (grid-css (ref checked)))))
+     (try (write-file (as-str (str directory "/grid-overlay.css"))
+                      overlay-css))
+     (write-file (as-str (str directory "/grid-overlay.js"))
+                 overlay-javascript))))

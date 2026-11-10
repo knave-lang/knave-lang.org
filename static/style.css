@@ -30,7 +30,6 @@
   --number: #e8b36b;
   --type: 1rem;
   --line: var(--leading);
-  --measure: 80ch;
   --code-type: var(--type);
   --code-ch: calc(var(--code-type) / 2);
   --box-padding: var(--code-type);

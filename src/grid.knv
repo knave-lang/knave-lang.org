@@ -16,9 +16,12 @@
 
 (def column-count 1)
 
+(def measure-ch 80)
+
 (defn site-grid-spec ()
   (->grid-spec (->body-type body-font-size-px body-line-height)
-               (->type-area content-width-ch gutter-ch column-count)))
+               (->type-area content-width-ch gutter-ch column-count)
+               measure-ch))
 
 (defn write-grid-files (directory)
   (match (check-grid (site-grid-spec))

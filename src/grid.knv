@@ -2,9 +2,11 @@
 
 (use knave-grid ->body-type ->grid-spec ->type-area
                 check-grid grid-css overlay-css
-                overlay-javascript)
+                overlay-javascript read-font-metrics)
 
 (export write-grid-files)
+
+(def body-font-file "static/iosevka-regular.woff2")
 
 (def body-font-size-px 18.0)
 
@@ -18,13 +20,20 @@
 
 (def measure-ch 80)
 
-(defn site-grid-spec ()
-  (->grid-spec (->body-type body-font-size-px body-line-height)
+(defn write-grid-files (directory)
+  (match (read-font-metrics body-font-file)
+    ((err error) (err (failure (str "grid: " error))))
+    ((ok metrics)
+     (write-checked-grid-files directory
+                               (site-grid-spec metrics)))))
+
+(defn site-grid-spec (metrics)
+  (->grid-spec (->body-type body-font-size-px body-line-height metrics)
                (->type-area content-width-ch gutter-ch column-count)
                measure-ch))
 
-(defn write-grid-files (directory)
-  (match (check-grid (site-grid-spec))
+(defn write-checked-grid-files (directory spec)
+  (match (check-grid spec)
     ((err error) (err (failure (str "grid: " error))))
     ((ok checked)
      (for-each (iter (:warnings checked))

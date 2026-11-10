@@ -1,4 +1,4 @@
 (project knave-site
   (libraries
     (knave-grid :git "https://github.com/KarlHarnois/knave-grid"
-                :rev "e775ab0d534413e5dec7773b0f68d3e1c2d54e4a")))
+                :rev "8ad62be6060a0e3569f86458a1e83dcb8b7a2835")))

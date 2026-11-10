@@ -16,7 +16,10 @@
         in
         {
           default = pkgs.mkShell {
-            packages = [ knave.packages.${system}.default ];
+            packages = [
+              knave.packages.${system}.default
+              pkgs.cargo
+            ];
           };
         }
       );

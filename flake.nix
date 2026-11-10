@@ -13,13 +13,21 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          playwrightBrowsers = pkgs.playwright-driver.browsers.override {
+            withWebkit = false;
+            withFfmpeg = false;
+          };
         in
         {
           default = pkgs.mkShell {
             packages = [
               knave.packages.${system}.default
               pkgs.cargo
+              pkgs.nodejs
             ];
+            PLAYWRIGHT_BROWSERS_PATH = playwrightBrowsers;
+            PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+            PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
           };
         }
       );

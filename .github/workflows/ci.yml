@@ -25,3 +25,31 @@ jobs:
               diff - content/sample.rs'
       - name: Build the site
         run: nix develop -c knave task build
+      - name: Check that body text sits on the baseline grid in Chromium and Firefox
+        run: |
+          nix develop -c npm ci --prefix browser-checks
+          nix develop -c node browser-checks/baselines.mjs public chromium firefox
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: public
+
+  baselines:
+    needs: check
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: public
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright's WebKit
+        working-directory: browser-checks
+        run: |
+          npm ci
+          npx playwright install webkit
+      - name: Check that body text sits on the baseline grid in WebKit on macOS
+        run: node browser-checks/baselines.mjs public webkit

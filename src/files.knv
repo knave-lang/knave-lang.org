@@ -63,9 +63,8 @@
       (recur source target names (+ position 1)))))
 
 (defn files-under (root)
-  (collect-files! root
-                  (vec (str ""))
-                  (vec)))
+  (let (pending (vec (str "")))
+    (collect-files! root pending (vec))))
 
 (defn collect-files! (root pending found)
   (match (pop! pending)
@@ -73,9 +72,9 @@
     ((some directory)
      (let (names (try (file-names (as-str (str root "/" directory)))))
        (for-each (iter names)
-                 (fn (name)
-                   (let (path (str directory name))
-                     (if (directory? (as-str (str root "/" path)))
-                       (push! pending (str path "/"))
-                       (push! found path)))))
+         (fn (name)
+           (let (path (str directory name))
+             (if (directory? (as-str (str root "/" path)))
+               (push! pending (str path "/"))
+               (push! found path)))))
        (recur root pending found)))))

@@ -55,7 +55,7 @@
 
 (defn leading-count (text mark)
   (count (take-while (chars text)
-                     (fn (c) (= c mark)))))
+           (fn (c) (= c mark)))))
 
 (defn first-char? (text test)
   (any? (take (chars text) 1) test))

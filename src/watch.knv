@@ -13,7 +13,7 @@
   (let (files (try (files-under directory)))
     (sort! files)
     (join-results (ref files)
-                  (fn (file) (file-stamp directory file)))))
+      (fn (file) (file-stamp directory file)))))
 
 (defn file-stamp (directory file)
   (let (full-path (str directory "/" file)
@@ -24,8 +24,7 @@
   (fn (_ (fn (_) (result _ _))) _))
 
 (defn join-results (items produce)
-  (reduce (iter items)
-          (ok (str ""))
-          (fn (joined item)
-            (ok (str (try joined)
-                     (try (produce (as-str item))))))))
+  (reduce (iter items) (ok (str ""))
+    (fn (joined item)
+      (ok (str (try joined)
+               (try (produce (as-str item))))))))

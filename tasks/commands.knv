@@ -1,0 +1,10 @@
+(use preview serve-preview)
+(use site build-site)
+
+(deftask build ()
+  "Builds the site into public/."
+  (build-site))
+
+(deftask serve ()
+  "Serves the site at http://127.0.0.1:8000 and rebuilds it on change."
+  (serve-preview))

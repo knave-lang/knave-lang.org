@@ -24,4 +24,4 @@ jobs:
               sed -e :a -e "/^\n*\$/{\$d;N;ba" -e "}" |
               diff - content/sample.rs'
       - name: Build the site
-        run: nix develop -c bash -c 'knave build && target/knave/knave-site/knave-site'
+        run: nix develop -c knave task build

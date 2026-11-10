@@ -1,15 +1,3 @@
-(use files failure)
-(use preview serve-preview)
 (use site build-site)
 
-(def usage "usage: knave-site [serve]")
-
-(defn main ()
-  (let (arguments (command-line-args))
-    (cond
-      ((empty? arguments) (build-site))
-      ((serve-requested? (ref arguments)) (serve-preview))
-      (else (err (failure (str usage)))))))
-
-(defn serve-requested? (arguments)
-  (= (as-str (at arguments 0)) "serve"))
+(defn main () (build-site))

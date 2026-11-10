@@ -1,13 +1,14 @@
 (use files failure write-file)
 
-(use knave-grid ->body-type ->grid-spec ->lattice check-grid
-                grid-css overlay-css overlay-javascript)
+(use knave-grid ->body-type ->grid-spec ->type-area
+                check-grid grid-css overlay-css
+                overlay-javascript)
 
 (export write-grid-files)
 
 (def body-font-size-px 18.0)
 
-(def body-leading 1.5)
+(def body-line-height 1.5)
 
 (def content-width-ch 144)
 
@@ -16,8 +17,8 @@
 (def column-count 1)
 
 (defn site-grid-spec ()
-  (->grid-spec (->body-type body-font-size-px body-leading)
-               (->lattice content-width-ch gutter-ch column-count)))
+  (->grid-spec (->body-type body-font-size-px body-line-height)
+               (->type-area content-width-ch gutter-ch column-count)))
 
 (defn write-grid-files (directory)
   (match (check-grid (site-grid-spec))

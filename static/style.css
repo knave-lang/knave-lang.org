@@ -142,7 +142,15 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 .session .form.marked::before, .session .form.marked::after { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: no-preference) {
+  .session .pane { animation: deal 450ms var(--sleight) 120ms backwards; transform-origin: 0 100%; }
+
+  .session .pane + .pane { animation-delay: 260ms; }
+
   .session .form::before, .session .form::after { transition: opacity 160ms var(--sleight), transform 160ms var(--sleight); }
+}
+
+@keyframes deal {
+  from { opacity: 0; transform: translateY(calc(var(--leading) / -2)) rotate(-1.5deg); }
 }
 
 .prose { margin-bottom: calc(2 * var(--leading)); }

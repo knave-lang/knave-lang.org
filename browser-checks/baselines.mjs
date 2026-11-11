@@ -116,6 +116,7 @@ class BaselineCheck {
       for (const path of BaselineCheck.#PAGES) {
         await page.goto(origin + path);
         await page.evaluate(() => document.fonts.ready);
+        await page.evaluate(() => Promise.all(document.getAnimations().map((animation) => animation.finished)));
         const measurements = await page.evaluate(`(${BaselineProbe.toString()}).measure()`);
         results.push(...measurements.map((measurement) => ({ browser: name, path, ...measurement })));
       }

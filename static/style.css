@@ -36,19 +36,35 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 
 .grid { row-gap: var(--leading); }
 
-.grid > * { min-width: 0; margin: 0; }
+.grid > * { grid-column-end: span 2; min-width: 0; margin: 0; }
 
-.site-header { margin-bottom: calc(2 * var(--leading)); }
+.site-header > *, .menu > * { grid-column-end: span 1; }
 
-.site-header nav p { margin: 0; }
+.site-header {
+  row-gap: 0;
+  margin-bottom: calc(2 * var(--leading));
+  box-shadow: 0 1px 0 var(--rule);
+}
+
+.menu { display: contents; }
+
+.menu p { margin: 0; }
+
+.menu a { text-decoration: none; }
+
+.menu a:hover { text-decoration: underline; }
+
+.menu p:first-child { grid-column-start: max(2, calc(var(--columns) - 1)); }
+
+.menu p:last-child { grid-column-start: var(--columns); }
 
 .wordmark { color: var(--bright); font-weight: 700; text-decoration: none; }
 
-body:has(.landing) .wordmark { visibility: hidden; }
 
-.name { margin: 0; color: var(--bright); }
 
 .landing h1 { margin-bottom: calc(2 * var(--leading)); }
+
+.name { margin: 0; color: var(--bright); }
 
 .caution { color: var(--dim); }
 

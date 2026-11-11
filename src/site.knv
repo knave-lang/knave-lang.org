@@ -105,7 +105,8 @@
                             (as-str (sitemap-entries pages))))
   (try (write-from-template "robots.txt" "sitemap"
                             (as-str (canonical-url "/sitemap.xml"))))
-  (let (header (try (read-file "templates/llms-header.md")))
+  (let (header-template (try (read-template "llms-header.md"))
+        header (fill (as-str header-template) "caution" landing-caution))
     (try (write-llms-file "llms.txt"
                           (as-str header)
                           (as-str (llms-links pages))))

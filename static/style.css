@@ -121,27 +121,19 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 
 .session .form { display: block; position: relative; isolation: isolate; }
 
-.session .form::before, .session .form::after {
+.session .form::before {
   content: "";
   position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--match);
   opacity: 0;
 }
 
-.session .form::before { inset: 0; z-index: -1; background: var(--match); }
-
-.session .form::after {
-  top: 0;
-  bottom: 0;
-  left: calc(var(--gutter) / -2);
-  width: 2px;
-  background: var(--pip);
-  transform: scaleY(0);
-}
-
-.session .form.matched::before, .session .form.matched::after { opacity: 1; transform: none; }
+.session .form.matched::before { opacity: 1; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .session .form::before, .session .form::after { transition: opacity 160ms ease-out, transform 160ms ease-out; }
+  .session .form::before { transition: opacity 160ms ease-out; }
 }
 
 .prose { margin-bottom: calc(2 * var(--leading)); }

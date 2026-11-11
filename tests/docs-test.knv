@@ -1,19 +1,26 @@
 (use docs site-markdown)
 
 (deftest links-a-sibling-module-page-to-its-site-path
-  (assert (= (site-markdown "[char](prelude/text.md#char)" "prelude.md")
+  (assert (= (site-markdown "[char](prelude/text.md#char)"
+                            "prelude.md" "")
              "[char](/docs/prelude/text/#char)")))
 
 (deftest resolves-a-parent-link-from-a-module-folder
   (assert (= (site-markdown "[>=](../prelude.md#%3E%3D)"
-                            "prelude/number.md")
+                            "prelude/number.md" "")
              "[>=](/docs/prelude/#%3E%3D)")))
 
+(deftest leaves-a-fragment-on-the-same-page-alone
+  (assert (= (site-markdown "[some?](#some%3F)" "prelude/option.md" "")
+             "[some?](#some%3F)")))
+
 (deftest roots-a-fragment-at-its-own-page
-  (assert (= (site-markdown "[some?](#some%3F)" "prelude/option.md")
+  (assert (= (site-markdown "[some?](#some%3F)"
+                            "prelude/option.md"
+                            "/docs/prelude/option/")
              "[some?](/docs/prelude/option/#some%3F)")))
 
 (deftest leaves-an-external-link-alone
   (assert (= (site-markdown "[notes](https://example.com/notes.md)"
-                            "prelude.md")
+                            "prelude.md" "")
              "[notes](https://example.com/notes.md)")))

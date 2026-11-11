@@ -12,6 +12,8 @@
 
 (def docs-path "/docs/")
 
+(def same-page "")
+
 (def markdown-extension ".md")
 
 (def link-opening "](")
@@ -65,13 +67,15 @@
   (let (source-path (str generated-directory "/" source)
         markdown (try (read-file (as-str source-path)))
         module (before source markdown-extension)
-        linked (site-markdown (as-str markdown) source)
-        rendered (render-markdown (as-str linked)))
-    (ok (->page (module-path module)
+        path (module-path module)
+        page-markdown (site-markdown (as-str markdown) source same-page)
+        copy-markdown (site-markdown (as-str markdown) source (as-str path))
+        rendered (render-markdown (as-str page-markdown)))
+    (ok (->page path
                 (str module " | Knave docs")
                 (summary (as-str markdown))
                 (in-prose (as-str rendered))
-                linked))))
+                copy-markdown))))
 
 (defn module-path (module) (str docs-path module "/"))
 
@@ -109,26 +113,26 @@
     (none (len text))
     ((some close) close)))
 
-(defn site-markdown (markdown source)
-  (rewrite-link-targets markdown source 0 (str "")))
+(defn site-markdown (markdown source same-page-prefix)
+  (rewrite-link-targets markdown source same-page-prefix 0
+                        (str "")))
 
-(defn rewrite-link-targets (markdown source start rewritten)
+(defn rewrite-link-targets (markdown source same-page-prefix start rewritten)
   (match (find-from markdown link-opening start)
     (none (str rewritten (after markdown start)))
     ((some opening)
      (let (target-start (+ opening (len link-opening))
            target-end (closing-paren markdown target-start))
-       (recur markdown source target-end
+       (recur markdown source same-page-prefix target-end
               (str rewritten
                    (subs markdown start target-start)
                    (site-target (subs markdown target-start target-end)
-                                source)))))))
+                                source
+                                same-page-prefix)))))))
 
-(defn site-target (target source)
+(defn site-target (target source same-page-prefix)
   (cond
-    ((starts-with? target "#")
-     (str (module-path (before source markdown-extension))
-          target))
+    ((starts-with? target "#") (str same-page-prefix target))
     ((markdown-link? target)
      (str (linked-module-path target (directory-of source))
           (fragment target)))

@@ -41,9 +41,13 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 .site-header > *, .menu > * { grid-column-end: span 1; }
 
 .site-header {
+  display: flex;
+  column-gap: var(--gutter);
   margin-bottom: calc(2 * var(--leading));
   box-shadow: 0 1px 0 var(--rule);
 }
+
+.site-header > p { margin: 0 auto 0 0; }
 
 .menu { display: contents; }
 
@@ -63,9 +67,18 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 
 .menu a:hover { text-decoration: underline; }
 
-.menu p:first-child { grid-column-start: calc(var(--columns) - 1); }
+@media (min-width: 62.4375em) {
+  .site-header {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  }
 
-.menu p:last-child { grid-column-start: var(--columns); }
+  .site-header > p { margin: 0; }
+
+  .menu p:first-child { grid-column-start: calc(var(--columns) - 1); }
+
+  .menu p:last-child { grid-column-start: var(--columns); }
+}
 
 .wordmark { color: var(--bright); font-weight: 700; text-decoration: none; }
 

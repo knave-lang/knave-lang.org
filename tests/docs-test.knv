@@ -24,3 +24,17 @@
   (assert (= (site-markdown "[notes](https://example.com/notes.md)"
                             "prelude.md" "")
              "[notes](https://example.com/notes.md)")))
+
+(deftest leaves-a-link-in-a-code-span-alone
+  (assert (= (site-markdown "`[x](y.md)` and [z](y.md)" "prelude.md" "")
+             "`[x](y.md)` and [z](/docs/y/)")))
+
+(deftest leaves-a-link-in-a-fence-alone
+  (assert (= (site-markdown "```lisp\n[x](y.md)\n```\n[z](y.md)"
+                            "prelude.md" "")
+             "```lisp\n[x](y.md)\n```\n[z](/docs/y/)")))
+
+(deftest rewrites-a-link-whose-label-is-code
+  (assert (= (site-markdown "[`vec`](prelude/vec.md#vec)"
+                            "prelude.md" "")
+             "[`vec`](/docs/prelude/vec/#vec)")))

@@ -1,4 +1,4 @@
-(use strings after find-from)
+(use strings after find-from leading-count starts-with?)
 
 (export closing-paren link-targets rewrite-link-targets)
 
@@ -7,6 +7,12 @@
   :end usize)
 
 (def link-opening "](")
+
+(def backtick "`")
+
+(def fence-marker "```")
+
+(def closing-fence "\n```")
 
 (defn link-targets (markdown)
   (collect (map (iter (target-spans markdown))
@@ -53,13 +59,49 @@
   (spans-from markdown 0 (vec)))
 
 (defn spans-from (markdown start spans)
-  (match (find-from markdown link-opening start)
-    (none spans)
-    ((some opening)
-     (let (target-start (+ opening (len link-opening))
-           target-end (closing-paren markdown target-start))
-       (push! spans (->target-span target-start target-end))
-       (recur markdown target-end spans)))))
+  (let (opening (position-of markdown link-opening start)
+        code (position-of markdown backtick start))
+    (cond
+      ((= opening (len markdown)) spans)
+      ((< code opening)
+       (recur markdown (after-code markdown code) spans))
+      (else (let (target-start (+ opening (len link-opening))
+                  target-end (closing-paren markdown target-start))
+              (push! spans (->target-span target-start target-end))
+              (recur markdown target-end spans))))))
+
+(defn position-of (text pattern start)
+  (match (find-from text pattern start)
+    (none (len text))
+    ((some found) found)))
+
+(defn after-code (markdown code)
+  (if (fence-at? markdown code)
+    (after-fence markdown code)
+    (after-code-span markdown code)))
+
+(defn fence-at? (markdown code)
+  (and (starts-with? (after markdown code) fence-marker)
+       (line-start? markdown code)))
+
+(defn line-start? (markdown position)
+  (or (= position 0)
+      (= (subs markdown (- position 1) position) "\n")))
+
+(defn after-fence (markdown fence)
+  (let (close (position-of markdown closing-fence
+                           (+ fence (len fence-marker))))
+    (position-of markdown "\n"
+                 (min (+ close 1) (len markdown)))))
+
+(defn after-code-span (markdown code)
+  (let (run (leading-count (after markdown code) (char "`"))
+        content-start (+ code run)
+        delimiter (subs markdown code content-start)
+        close (position-of markdown delimiter content-start))
+    (if (= close (len markdown))
+      content-start
+      (+ close run))))
 
 (defn closing-paren (text start)
   (match (find-from text ")" start)

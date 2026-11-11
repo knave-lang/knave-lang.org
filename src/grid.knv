@@ -11,11 +11,11 @@
                   (regular "iosevka-regular.woff2")
                   (bold "iosevka-bold.woff2")))
   (body iosevka :size 18 :line-height 1.5)
-  (type-areas (narrow :width 19 :column-count 1 :head 5 :field-lines 4)
-              (medium :width 35 :column-count 4 :head 5 :field-lines 4)
+  (type-areas (narrow :width 19 :column-count 1 :head 2 :field-lines 4)
+              (medium :width 35 :column-count 4 :head 2 :field-lines 4)
               (wide :width 47
                     :column-count 4
-                    :head 5
+                    :head 2
                     :margin 2
                     :foot 3
                     :measure-columns 2

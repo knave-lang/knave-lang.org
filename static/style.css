@@ -43,7 +43,7 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 .site-header {
   display: flex;
   column-gap: var(--gutter);
-  margin-bottom: calc(2 * var(--leading));
+  margin-bottom: calc(var(--field-pitch) - var(--leading));
   box-shadow: 0 1px 0 var(--rule);
 }
 
@@ -80,13 +80,13 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
   .menu p:last-child { grid-column-start: var(--columns); }
 }
 
-.wordmark { color: var(--bright); font-weight: 700; text-decoration: none; }
+.wordmark { color: var(--bright); text-decoration: none; }
 
 
 
 .landing h1 { margin-bottom: calc(2 * var(--leading)); }
 
-.name { margin: 0; color: var(--bright); }
+.name { margin: 0 0 var(--field-gap); color: var(--bright); }
 
 .caution { color: var(--dim); }
 

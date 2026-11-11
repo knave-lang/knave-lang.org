@@ -24,11 +24,15 @@
     ((numbered-list items) (render-list "ol" items))
     ((table header rows) (render-table header rows))))
 
+(defn heading-class (level)
+  (if (= level 1) " class=\"type-title\"" ""))
+
 (defn render-heading (level text)
   (let (anchor (slug text))
-    (str "<h" level " id=\"" anchor "\" aria-labelledby=\""
-         anchor "-title\">" "<a class=\"anchor\" href=\"#"
-         anchor
+    (str "<h" level
+         (heading-class level)
+         " id=\"" anchor "\" aria-labelledby=\"" anchor
+         "-title\">" "<a class=\"anchor\" href=\"#" anchor
          "\" aria-label=\"Link to this section\">#</a>"
          "<span id=\"" anchor "-title\">"
          (render-inlines text)

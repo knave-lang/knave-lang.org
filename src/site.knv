@@ -1,4 +1,4 @@
-(use discovery ->page canonical-url llms-links
+(use discovery ->page canonical-url llms-links page
                sitemap-entries)
 
 (use files copy-directory-files failure files-under
@@ -46,6 +46,10 @@
               "stylesheet-version"
               (as-str (fnv1a-digest (as-str stylesheet)))))))
 
+(type write-pages
+  (fn ((ref str) (ref (vec page)) usize)
+    (result unit io-error)))
+
 (defn write-pages (layout pages position)
   (if (>= position (len pages))
     (ok (do))
@@ -53,6 +57,9 @@
       (try (write-index (as-str (str output-directory (:path page)))
                         (as-str (in-layout layout page))))
       (recur layout pages (+ position 1)))))
+
+(type in-layout
+  (fn ((ref str) (ref page)) string))
 
 (defn in-layout (layout page)
   (-> (fill layout "title"

@@ -1,71 +1,32 @@
 (use files failure write-file)
 
-(use knave-grid ->body-type ->font-face ->grid-spec
-                ->type-area check-grid font-face-css
-                grid-css overlay-css overlay-javascript
-                read-font-metrics)
+(use knave-grid defgrid overlay-css overlay-javascript
+                write-grid)
 
 (export write-grid-files)
 
-(def font-family "Iosevka")
-
-(def body-font-weight 400)
-
-(def body-font-size-px 18.0)
-
-(def body-line-height 1.5)
-
-(def content-width-ch 144)
-
-(def gutter-ch 2)
-
-(def column-count 1)
-
-(def measure-ch 80)
+(defgrid site-grid
+         ()
+         (fonts :from "static"
+                (iosevka "Iosevka"
+                         (regular "iosevka-regular.woff2")
+                         (bold "iosevka-bold.woff2")))
+         (body iosevka :size 18 :line-height 1.5)
+         (type-areas (narrow :width 19 :column-count 1)
+                     (medium :width 35 :column-count 2)
+                     (wide :width 47 :column-count 2 :margin 2 :foot 3))
+         (type-styles (wordmark :lines 4) (title :lines 2)))
 
 (defn write-grid-files (directory)
-  (match (iosevka-faces)
+  (match (site-grid)
     ((err error) (err (failure (str "grid: " error))))
-    ((ok faces)
-     (write-font-and-grid-files directory (ref faces)))))
-
-(defn iosevka-faces ()
-  (ok (vec (try (iosevka-face 300 "light"))
-           (try (iosevka-face body-font-weight "regular"))
-           (try (iosevka-face 700 "bold")))))
-
-(defn iosevka-face (weight style-name)
-  (let (file-name (str "iosevka-" style-name ".woff2"))
-    (ok (->font-face :family (str font-family)
-                     :url (str "/" file-name)
-                     :weight weight
-                     :metrics (try (read-font-metrics (as-str (str "static/"
-                                                                   file-name))))))))
-
-(defn write-font-and-grid-files (directory faces)
-  (try (write-file (as-str (str directory "/fonts.css"))
-                   (as-str (font-face-css faces))))
-  (write-checked-grid-files directory
-                            (site-grid-spec (body-metrics faces))))
-
-(defn body-metrics (faces)
-  (deref (:metrics (unwrap (find (iter faces)
-                             (fn (face)
-                               (= (:weight face) body-font-weight)))))))
-
-(defn site-grid-spec (metrics)
-  (->grid-spec (->body-type body-font-size-px body-line-height metrics)
-               (->type-area content-width-ch gutter-ch column-count)
-               measure-ch))
-
-(defn write-checked-grid-files (directory spec)
-  (match (check-grid spec)
-    ((err error) (err (failure (str "grid: " error))))
-    ((ok checked)
-     (for-each (iter (:warnings checked))
+    ((ok grid)
+     (for-each (iter (:warnings grid))
        (fn (warning) (eprintln "warning: grid: " warning)))
-     (try (write-file (as-str (str directory "/grid.css"))
-                      (as-str (grid-css (ref checked)))))
+     (try (map-err (write-grid (ref grid)
+                               (as-str (str directory "/grid.css")))
+                   (fn (error)
+                     (failure (str "grid: " error)))))
      (try (write-file (as-str (str directory "/grid-overlay.css"))
                       overlay-css))
      (write-file (as-str (str directory "/grid-overlay.js"))

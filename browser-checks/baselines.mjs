@@ -50,7 +50,7 @@ class BaselineProbe {
   static measure() {
     const root = document.documentElement;
     const bodyFontSize = getComputedStyle(root).fontSize;
-    const expected = BaselineProbe.#lengthOf("var(--baseline-offset)");
+    const expected = BaselineProbe.#lengthOf("var(--_grid-baseline-offset)");
     return [...document.querySelectorAll("p")]
       .filter((paragraph) => getComputedStyle(paragraph).fontSize === bodyFontSize)
       .map((paragraph) => ({

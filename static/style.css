@@ -8,6 +8,8 @@
   --string: #8fd6b4;
   --number: #e8b36b;
   --rule: #2f3348;
+  --marked: #1c1f2f;
+  --sleight: cubic-bezier(0.2, 0.7, 0.1, 1);
   --hanging-indent: calc(2 * var(--leading));
   color-scheme: dark;
 }
@@ -116,6 +118,31 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
   display: block;
   padding-left: var(--hanging-indent);
   text-indent: calc(-1 * var(--hanging-indent));
+}
+
+.session .form { display: block; position: relative; isolation: isolate; }
+
+.session .form::before, .session .form::after {
+  content: "";
+  position: absolute;
+  opacity: 0;
+}
+
+.session .form::before { inset: 0; z-index: -1; background: var(--marked); }
+
+.session .form::after {
+  top: 0;
+  bottom: 0;
+  left: calc(var(--gutter) / -2);
+  width: 2px;
+  background: var(--pip);
+  transform: scaleY(0);
+}
+
+.session .form.marked::before, .session .form.marked::after { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .session .form::before, .session .form::after { transition: opacity 160ms var(--sleight), transform 160ms var(--sleight); }
 }
 
 .prose { margin-bottom: calc(2 * var(--leading)); }

@@ -1,7 +1,7 @@
 (export after before contains? ends-with? escape-html
         find-from first-char? fnv1a-digest in-line-spans
-        join leading-count owned replace-all slug
-        starts-with?)
+        join leading-count owned percent-encode replace-all
+        slug starts-with?)
 
 (def fnv1a-digest
   (rust "{0}.bytes().fold(0xcbf29ce484222325_u64, |hash, byte| (hash ^ u64::from(byte)).wrapping_mul(0x100000001b3)).to_string()"
@@ -37,6 +37,10 @@
 (def chars-to-string
   (rust "{0}.collect::<String>()"
     (fn ((iterator char)) string)))
+
+(def percent-encode
+  (rust "{0}.bytes().map(|byte| Some(byte).filter(|kept| kept.is_ascii_alphanumeric() || b\"-._~\".contains(kept)).map_or_else(|| format!(\"%{{:02X}}\", byte), |kept| char::from(kept).to_string())).collect::<String>()"
+    (fn ((ref str)) string)))
 
 (defn after (text start)
   (subs text start (len text)))

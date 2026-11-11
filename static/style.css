@@ -8,8 +8,7 @@
   --string: #8fd6b4;
   --number: #e8b36b;
   --rule: #2f3348;
-  --marked: #1c1f2f;
-  --sleight: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --match: #1c1f2f;
   --hanging-indent: calc(2 * var(--leading));
   color-scheme: dark;
 }
@@ -128,7 +127,7 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
   opacity: 0;
 }
 
-.session .form::before { inset: 0; z-index: -1; background: var(--marked); }
+.session .form::before { inset: 0; z-index: -1; background: var(--match); }
 
 .session .form::after {
   top: 0;
@@ -139,18 +138,10 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
   transform: scaleY(0);
 }
 
-.session .form.marked::before, .session .form.marked::after { opacity: 1; transform: none; }
+.session .form.matched::before, .session .form.matched::after { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .session .pane { animation: deal 450ms var(--sleight) 120ms backwards; transform-origin: 0 100%; }
-
-  .session .pane + .pane { animation-delay: 260ms; }
-
-  .session .form::before, .session .form::after { transition: opacity 160ms var(--sleight), transform 160ms var(--sleight); }
-}
-
-@keyframes deal {
-  from { opacity: 0; transform: translateY(calc(var(--leading) / -2)) rotate(-1.5deg); }
+  .session .form::before, .session .form::after { transition: opacity 160ms ease-out, transform 160ms ease-out; }
 }
 
 .prose { margin-bottom: calc(2 * var(--leading)); }

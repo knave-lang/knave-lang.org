@@ -10,21 +10,21 @@ class CodeForm {
 
   pairWith(counterpart) {
     this.#element.addEventListener("pointerenter", () => {
-      this.mark();
-      counterpart.mark();
+      this.highlight();
+      counterpart.highlight();
     });
     this.#element.addEventListener("pointerleave", () => {
-      this.unmark();
-      counterpart.unmark();
+      this.unhighlight();
+      counterpart.unhighlight();
     });
   }
 
-  mark() {
-    this.#element.classList.add("marked");
+  highlight() {
+    this.#element.classList.add("matched");
   }
 
-  unmark() {
-    this.#element.classList.remove("marked");
+  unhighlight() {
+    this.#element.classList.remove("matched");
   }
 }
 
@@ -50,7 +50,7 @@ class CodePane {
 }
 
 class CompiledSample {
-  static markMatchingForms() {
+  static highlightMatchingForms() {
     const [source, emitted] = [...document.querySelectorAll(".session pre code")]
       .map((code) => new CodePane(code).lineGroups());
     if (!emitted || source.length !== emitted.length) return;
@@ -65,4 +65,4 @@ class CompiledSample {
   }
 }
 
-CompiledSample.markMatchingForms();
+CompiledSample.highlightMatchingForms();

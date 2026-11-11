@@ -1,11 +1,6 @@
 class CopyButton {
   static #CONFIRMATION_DURATION_MS = 1500;
   static #IDLE_LABEL = "Copy";
-  static #TURN_DURATION_MS = 180;
-  static #TURN_OVER = [
-    { transform: "rotateX(90deg)", opacity: 0 },
-    { transform: "none", opacity: 1 },
-  ];
 
   #codeBlock;
   #element;
@@ -59,28 +54,12 @@ class CopyButton {
   }
 
   #confirm(label) {
-    this.#showLabel(label);
+    this.#element.textContent = label;
     clearTimeout(this.#resetTimer);
     this.#resetTimer = setTimeout(
-      () => this.#showLabel(CopyButton.#IDLE_LABEL),
+      () => { this.#element.textContent = CopyButton.#IDLE_LABEL; },
       CopyButton.#CONFIRMATION_DURATION_MS,
     );
-  }
-
-  #showLabel(label) {
-    this.#element.textContent = label;
-    if (CopyButton.#motionAllowed()) this.#turnOver();
-  }
-
-  #turnOver() {
-    this.#element.animate(CopyButton.#TURN_OVER, {
-      duration: CopyButton.#TURN_DURATION_MS,
-      easing: getComputedStyle(this.#element).getPropertyValue("--sleight").trim(),
-    });
-  }
-
-  static #motionAllowed() {
-    return matchMedia("(prefers-reduced-motion: no-preference)").matches;
   }
 }
 

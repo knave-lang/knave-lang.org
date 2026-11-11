@@ -78,7 +78,9 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 
   .site-header > p { margin: 0; }
 
-  .menu p:first-child { grid-column-start: calc(var(--columns) - 1); }
+  .menu p:nth-last-child(3) { grid-column-start: calc(var(--columns) - 2); }
+
+  .menu p:nth-last-child(2) { grid-column-start: calc(var(--columns) - 1); }
 
   .menu p:last-child { grid-column-start: var(--columns); }
 }

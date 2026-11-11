@@ -48,3 +48,15 @@
 (deftest reports-a-relative-link
   (assert (= (broken-in "<a href=\"missing/\">x</a>")
              (vec (str "index.html: missing/")))))
+
+(deftest accepts-a-percent-encoded-fragment
+  (assert (empty? (broken-in
+                    "<h2 id=\"some?\"></h2><a href=\"#some%3F\">x</a>"))))
+
+(deftest accepts-a-percent-encoded-operator-fragment
+  (assert (empty? (broken-in
+                    "<h2 id=\"&gt;=\"></h2><a href=\"#%3E%3D\">x</a>"))))
+
+(deftest reports-a-fragment-that-decodes-to-another-name
+  (assert (= (broken-in "<h2 id=\"some\"></h2><a href=\"#some%3F\">x</a>")
+             (vec (str "index.html: #some%3F")))))

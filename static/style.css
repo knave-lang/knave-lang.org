@@ -120,7 +120,7 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 
 .prose { margin-bottom: calc(2 * var(--leading)); }
 
-.prose > * { max-width: var(--measure); }
+.prose > * { box-sizing: border-box; max-width: var(--measure); }
 
 .prose h2, .prose h3, .prose h4 {
   margin: calc(2 * var(--leading)) 0 var(--leading);

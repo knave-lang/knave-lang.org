@@ -48,7 +48,7 @@
   (str "- ["
        (:title page)
        "]("
-       (canonical-url (as-str (:path page)))
+       (canonical-url (as-str (markdown-path (as-str (:path page)))))
        "): "
        (:description page)))
 

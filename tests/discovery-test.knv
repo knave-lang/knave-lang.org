@@ -21,9 +21,9 @@
   (assert (= (sitemap-entries (ref (fake-pages)))
              "  <url><loc>https://knave-lang.org/</loc></url>\n  <url><loc>https://knave-lang.org/guide/</loc></url>")))
 
-(deftest links-every-page-with-its-description
+(deftest links-every-markdown-copy-with-its-description
   (assert (= (llms-links (ref (fake-pages)))
-             "- [Home](https://knave-lang.org/): The start.\n- [Guide](https://knave-lang.org/guide/): How to.")))
+             "- [Home](https://knave-lang.org/index.html.md): The start.\n- [Guide](https://knave-lang.org/guide/index.html.md): How to.")))
 
 (deftest appends-index-html-md-to-a-directory-path
   (assert (= (markdown-path "/docs/prelude/")

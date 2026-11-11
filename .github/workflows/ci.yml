@@ -12,6 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/dev-shell
+      - name: Fetch libraries so the formatter can read their shapes
+        run: nix develop -c knave check
       - name: Check formatting
         run: nix develop -c knave fmt --check
       - name: Run tests

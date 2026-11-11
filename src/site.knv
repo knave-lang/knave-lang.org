@@ -31,6 +31,12 @@
 (def landing-description
   "Knave is a programming language for humans and agents. It is a small Lisp that infers types and ownership and compiles to readable Rust.")
 
+(def landing-pitch
+  "Knave infers most types and ownership for you. The Rust it emits is the Rust you would have written, with no clones or allocations you did not ask for.")
+
+(def landing-caution
+  "Knave is experimental. The syntax, the prelude and the command line can change in any commit.")
+
 (def install-description
   "Install the Knave programming language with Cargo or Nix, then create and run your first project.")
 
@@ -121,27 +127,32 @@
   (let (template (try (read-file "templates/landing.html"))
         knave-sample (try (read-file "content/sample.knv"))
         rust-sample (try (read-file "content/sample.rs"))
-        with-knave (fill (as-str template)
-                         "knave-sample"
-                         (as-str (in-line-spans (as-str (highlight (trim (as-str
-                                                                           knave-sample)))))))
-        content (fill (as-str with-knave)
-                      "rust-sample"
-                      (as-str (in-line-spans (as-str (escape-html (trim (as-str rust-sample)))))))
-        markdown (landing-markdown (trim (as-str knave-sample))
-                                   (trim (as-str rust-sample))))
+        knave-code (trim (as-str knave-sample))
+        rust-code (trim (as-str rust-sample)))
     (ok (->page (owned landing-path)
                 (owned landing-title)
                 (owned landing-description)
-                content markdown))))
+                (landing-html (as-str template) knave-code rust-code)
+                (landing-markdown knave-code rust-code)))))
 
-(defn landing-markdown (knave-sample rust-sample)
-  (str "# " landing-title "\n\n" landing-description "\n\n"
-       "A Knave program:\n\n"
-       (fenced "lisp" knave-sample)
+(defn landing-html (template knave-code rust-code)
+  (-> (fill template "pitch" (as-str (escape-html landing-pitch)))
+      (as-str)
+      (fill "caution" (as-str (escape-html landing-caution)))
+      (as-str)
+      (fill "knave-sample"
+            (as-str (in-line-spans (as-str (highlight knave-code)))))
+      (as-str)
+      (fill "rust-sample"
+            (as-str (in-line-spans (as-str (escape-html rust-code)))))))
+
+(defn landing-markdown (knave-code rust-code)
+  (str "# " landing-title "\n\n" landing-pitch "\n\n"
+       landing-caution "\n\n" "A Knave program:\n\n"
+       (fenced "lisp" knave-code)
        "\n\n"
        "The Rust that `knave emit main.knv` prints for it:\n\n"
-       (fenced "rust" rust-sample)
+       (fenced "rust" rust-code)
        "\n"))
 
 (defn fenced (language code)

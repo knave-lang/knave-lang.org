@@ -2,6 +2,7 @@
 (use files files-under read-file)
 (use markdown/blocks block parse-blocks)
 (use markdown/html render-markdown)
+(use markdown/targets closing-paren rewrite-link-targets)
 
 (use strings after before contains? ends-with? find-from
              in-prose join owned replace-all starts-with?)
@@ -15,8 +16,6 @@
 (def same-page "")
 
 (def markdown-extension ".md")
-
-(def link-opening "](")
 
 (def parent-segment "..")
 
@@ -108,27 +107,9 @@
   (min (+ (closing-paren text label-end) 1)
        (len text)))
 
-(defn closing-paren (text start)
-  (match (find-from text ")" start)
-    (none (len text))
-    ((some close) close)))
-
 (defn site-markdown (markdown source same-page-prefix)
-  (rewrite-link-targets markdown source same-page-prefix 0
-                        (str "")))
-
-(defn rewrite-link-targets (markdown source same-page-prefix start rewritten)
-  (match (find-from markdown link-opening start)
-    (none (str rewritten (after markdown start)))
-    ((some opening)
-     (let (target-start (+ opening (len link-opening))
-           target-end (closing-paren markdown target-start))
-       (recur markdown source same-page-prefix target-end
-              (str rewritten
-                   (subs markdown start target-start)
-                   (site-target (subs markdown target-start target-end)
-                                source
-                                same-page-prefix)))))))
+  (rewrite-link-targets markdown
+    (fn (target) (site-target target source same-page-prefix))))
 
 (defn site-target (target source same-page-prefix)
   (cond

@@ -1,7 +1,8 @@
-(use links ->site-files ->site-page broken-links)
+(use links ->site-files broken-links html-page
+           markdown-page)
 
 (defn page-at (path html)
-  (->site-page (str path) (str html)))
+  (html-page (str path) (str html)))
 
 (defn broken-in (html)
   (let (site (->site-files (vec (str "index.html")
@@ -60,3 +61,18 @@
 (deftest reports-a-fragment-that-decodes-to-another-name
   (assert (= (broken-in "<h2 id=\"some\"></h2><a href=\"#some%3F\">x</a>")
              (vec (str "index.html: #some%3F")))))
+
+(deftest reports-a-broken-link-in-a-markdown-copy
+  (let (site (->site-files (vec (str "index.html") (str "index.html.md"))
+                           (vec (markdown-page (str "index.html.md")
+                                               (str "[gone](/missing/)")))))
+    (assert (= (broken-links (ref site))
+               (vec (str "index.html.md: /missing/"))))))
+
+(deftest accepts-a-markdown-link-to-a-fragment-that-exists
+  (let (site (->site-files (vec (str "docs/index.html") (str "index.html.md"))
+                           (vec (html-page (str "docs/index.html")
+                                           (str "<h2 id=\"some?\"></h2>"))
+                                (markdown-page (str "index.html.md")
+                                               (str "[x](/docs/#some%3F)")))))
+    (assert (empty? (broken-links (ref site))))))

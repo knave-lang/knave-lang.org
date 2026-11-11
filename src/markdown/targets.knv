@@ -1,0 +1,67 @@
+(use strings after find-from)
+
+(export closing-paren link-targets rewrite-link-targets)
+
+(defstruct target-span
+  :start usize
+  :end usize)
+
+(def link-opening "](")
+
+(defn link-targets (markdown)
+  (collect (map (iter (target-spans markdown))
+             (fn (span) (span-text markdown span)))))
+
+(defn rewrite-link-targets (markdown rewrite)
+  (let (spans (target-spans markdown)
+        replacements (collect (map (iter spans)
+                                (fn (span)
+                                  (rewrite (as-str (span-text markdown
+                                                              span)))))))
+    (stitch markdown
+            (ref spans)
+            (ref replacements)
+            0 0
+            (str ""))))
+
+(type stitch
+  (fn ((ref str)
+       (ref (vec target-span))
+       (ref (vec string))
+       usize usize string)
+    string))
+
+(defn stitch (markdown spans replacements position start stitched)
+  (if (>= position (len spans))
+    (str stitched (after markdown start))
+    (let (span (at spans position))
+      (recur markdown spans replacements
+             (+ position 1)
+             (:end span)
+             (str stitched
+                  (subs markdown start (:start span))
+                  (at replacements position))))))
+
+(type span-text
+  (fn ((ref str) (ref target-span))
+    string))
+
+(defn span-text (markdown span)
+  (str (subs markdown (:start span) (:end span))))
+
+(defn target-spans (markdown)
+  (spans-from markdown 0 (vec)))
+
+(defn spans-from (markdown start spans)
+  (match (find-from markdown link-opening start)
+    (none spans)
+    ((some opening)
+     (let (target-start (+ opening (len link-opening))
+           target-end (closing-paren markdown target-start))
+       (push! spans (->target-span target-start target-end))
+       (recur markdown target-end spans)))))
+
+(defn closing-paren (text start)
+  (match (find-from text ")" start)
+    (none (len text))
+    ((some close) close)))

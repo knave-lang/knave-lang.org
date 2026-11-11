@@ -159,7 +159,7 @@
 (defn landing-markdown (knave-code rust-code)
   (str "# " landing-title "\n\n" landing-pitch "\n\n"
        landing-caution "\n\n" "A Knave program:\n\n"
-       (fenced "lisp" knave-code)
+       (fenced "knave" knave-code)
        "\n\n"
        "The Rust that `knave emit main.knv` prints for it:\n\n"
        (fenced "rust" rust-code)

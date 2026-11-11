@@ -2,19 +2,20 @@
 (use files files-under read-file)
 (use markdown/blocks block parse-blocks)
 (use markdown/html render-markdown)
+(use markdown/targets closing-paren rewrite-link-targets)
 
 (use strings after before contains? ends-with? find-from
              in-prose join owned replace-all starts-with?)
 
-(export docs-pages site-links)
+(export docs-pages site-markdown)
 
 (def generated-directory "target/prelude-docs")
 
 (def docs-path "/docs/")
 
-(def markdown-extension ".md")
+(def same-page "")
 
-(def href-marker " href=\"")
+(def markdown-extension ".md")
 
 (def parent-segment "..")
 
@@ -65,12 +66,15 @@
   (let (source-path (str generated-directory "/" source)
         markdown (try (read-file (as-str source-path)))
         module (before source markdown-extension)
-        rendered (render-markdown (as-str markdown))
-        linked (site-links (as-str rendered) (directory-of source)))
-    (ok (->page (module-path module)
+        path (module-path module)
+        page-markdown (site-markdown (as-str markdown) source same-page)
+        copy-markdown (site-markdown (as-str markdown) source (as-str path))
+        rendered (render-markdown (as-str page-markdown)))
+    (ok (->page path
                 (str module " | Knave docs")
                 (summary (as-str markdown))
-                (in-prose (as-str linked))))))
+                (in-prose (as-str rendered))
+                copy-markdown))))
 
 (defn module-path (module) (str docs-path module "/"))
 
@@ -100,33 +104,20 @@
             (str plain (subs text start label-end))))))
 
 (defn link-end (text label-end)
-  (match (find-from text ")" label-end)
-    (none (len text))
-    ((some close) (+ close 1))))
+  (min (+ (closing-paren text label-end) 1)
+       (len text)))
 
-(defn site-links (html directory)
-  (rewrite-hrefs html directory 0 (str "")))
+(defn site-markdown (markdown source same-page-prefix)
+  (rewrite-link-targets markdown
+    (fn (target) (site-target target source same-page-prefix))))
 
-(defn rewrite-hrefs (html directory start rewritten)
-  (match (find-from html href-marker start)
-    (none (str rewritten (after html start)))
-    ((some marker)
-     (let (value-start (+ marker (len href-marker))
-           value-end (quote-after html value-start))
-       (recur html directory value-end
-              (str rewritten
-                   (subs html start value-start)
-                   (site-href (subs html value-start value-end) directory)))))))
-
-(defn quote-after (html start)
-  (match (find-from html "\"" start)
-    (none (len html))
-    ((some quote) quote)))
-
-(defn site-href (href directory)
-  (if (markdown-link? href)
-    (str (linked-module-path href directory) (fragment href))
-    (owned href)))
+(defn site-target (target source same-page-prefix)
+  (cond
+    ((starts-with? target "#") (str same-page-prefix target))
+    ((markdown-link? target)
+     (str (linked-module-path target (directory-of source))
+          (fragment target)))
+    (else (owned target))))
 
 (defn linked-module-path (href directory)
   (let (relative-module (str directory (before href markdown-extension))
@@ -157,11 +148,12 @@
                module-pages))
 
 (defn index-page (module-pages)
-  (->page (owned docs-path)
-          (owned index-title)
-          (owned index-description)
-          (in-prose (as-str (render-markdown (as-str (index-markdown
-                                                       module-pages)))))))
+  (let (markdown (index-markdown module-pages))
+    (->page (owned docs-path)
+            (owned index-title)
+            (owned index-description)
+            (in-prose (as-str (render-markdown (as-str markdown))))
+            markdown)))
 
 (defn index-markdown (module-pages)
   (str "# Documentation\n\n" index-description "\n\n"

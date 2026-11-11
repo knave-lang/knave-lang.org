@@ -31,6 +31,10 @@
 (deftest names-the-text-content-type
   (assert (= (content-type "robots.txt") "text/plain; charset=utf-8")))
 
+(deftest serves-markdown-as-text
+  (assert (= (content-type "index.html.md")
+             "text/plain; charset=utf-8")))
+
 (deftest falls-back-to-a-binary-content-type
   (assert (= (content-type "archive.zip") "application/octet-stream")))
 

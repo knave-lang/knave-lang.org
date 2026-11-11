@@ -1,11 +1,16 @@
 (use strings after before contains? ends-with? escape-html
              find-from owned percent-decode starts-with?)
 
-(export ->site-files ->site-page broken-links index-of)
+(use discovery site-origin)
+(use markdown/targets link-targets)
+
+(export ->site-files broken-links html-page index-of
+        markdown-page)
 
 (defstruct site-page
   :file string
-  :html string)
+  :html string
+  :links (vec string))
 
 (defstruct site-files
   :paths (vec string)
@@ -15,6 +20,15 @@
 
 (def index-file "index.html")
 
+(defn html-page (file html)
+  (let (links (hrefs-in (as-str html) 0 (vec)))
+    (->site-page file html links)))
+
+(defn markdown-page (file markdown)
+  (->site-page file
+               (str "")
+               (link-targets (as-str markdown))))
+
 (defn broken-links (site)
   (let (broken (vec))
     (for-each (iter (:pages site))
@@ -23,7 +37,7 @@
     broken))
 
 (defn collect-broken-links! (site page broken)
-  (for-each (iter (hrefs-in (as-str (:html page)) 0 (vec)))
+  (for-each (iter (:links page))
     (fn (href)
       (if (broken-link? site page (as-str href))
         (push! broken (str (:file page) ": " href))
@@ -42,9 +56,14 @@
 
 (defn broken-link? (site page href)
   (cond
+    ((on-site? href)
+     (not (resolves? site page (after href (len site-origin)))))
     ((external? href) false)
     ((rooted? href) (not (resolves? site page href)))
     (else true)))
+
+(defn on-site? (href)
+  (starts-with? href (as-str (str site-origin "/"))))
 
 (defn external? (href)
   (or (contains? href "://") (starts-with? href "mailto:")))

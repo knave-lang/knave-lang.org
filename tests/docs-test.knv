@@ -1,17 +1,40 @@
-(use docs site-links)
+(use docs site-markdown)
 
 (deftest links-a-sibling-module-page-to-its-site-path
-  (assert (= (site-links "<a href=\"prelude/text.md#char\">" "")
-             "<a href=\"/docs/prelude/text/#char\">")))
+  (assert (= (site-markdown "[char](prelude/text.md#char)"
+                            "prelude.md" "")
+             "[char](/docs/prelude/text/#char)")))
 
 (deftest resolves-a-parent-link-from-a-module-folder
-  (assert (= (site-links "<a href=\"../prelude.md#%3E%3D\">" "prelude/")
-             "<a href=\"/docs/prelude/#%3E%3D\">")))
+  (assert (= (site-markdown "[>=](../prelude.md#%3E%3D)"
+                            "prelude/number.md" "")
+             "[>=](/docs/prelude/#%3E%3D)")))
 
 (deftest leaves-a-fragment-on-the-same-page-alone
-  (assert (= (site-links "<a href=\"#some%3F\">" "prelude/")
-             "<a href=\"#some%3F\">")))
+  (assert (= (site-markdown "[some?](#some%3F)" "prelude/option.md" "")
+             "[some?](#some%3F)")))
+
+(deftest roots-a-fragment-at-its-own-page
+  (assert (= (site-markdown "[some?](#some%3F)"
+                            "prelude/option.md"
+                            "/docs/prelude/option/")
+             "[some?](/docs/prelude/option/#some%3F)")))
 
 (deftest leaves-an-external-link-alone
-  (assert (= (site-links "<a href=\"https://example.com/notes.md\">" "")
-             "<a href=\"https://example.com/notes.md\">")))
+  (assert (= (site-markdown "[notes](https://example.com/notes.md)"
+                            "prelude.md" "")
+             "[notes](https://example.com/notes.md)")))
+
+(deftest leaves-a-link-in-a-code-span-alone
+  (assert (= (site-markdown "`[x](y.md)` and [z](y.md)" "prelude.md" "")
+             "`[x](y.md)` and [z](/docs/y/)")))
+
+(deftest leaves-a-link-in-a-fence-alone
+  (assert (= (site-markdown "```lisp\n[x](y.md)\n```\n[z](y.md)"
+                            "prelude.md" "")
+             "```lisp\n[x](y.md)\n```\n[z](/docs/y/)")))
+
+(deftest rewrites-a-link-whose-label-is-code
+  (assert (= (site-markdown "[`vec`](prelude/vec.md#vec)"
+                            "prelude.md" "")
+             "[`vec`](/docs/prelude/vec/#vec)")))

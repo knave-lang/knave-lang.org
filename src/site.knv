@@ -1,4 +1,5 @@
-(use discovery ->page canonical-url followed-by llms-links
+(use discovery ->page canonical-url followed-by
+               llms-full-sections llms-links markdown-path
                page sitemap-entries)
 
 (use files copy-directory-files failure files-under
@@ -7,7 +8,10 @@
 
 (use docs docs-pages)
 (use grid write-grid-files)
-(use links ->site-files ->site-page broken-links)
+
+(use links ->site-files broken-links html-page
+           markdown-page)
+
 (use markdown/highlight highlight)
 (use markdown/html render-markdown)
 
@@ -24,8 +28,17 @@
 
 (def static-directory "static")
 
+(def landing-title
+  "Knave programming language: a Lisp that compiles to Rust")
+
 (def landing-description
   "Knave is a programming language for humans and agents. It is a small Lisp that infers types and ownership and compiles to readable Rust.")
+
+(def landing-pitch
+  "Knave infers most types and ownership for you. The Rust it emits is the Rust you would have written, with no clones or allocations you did not ask for.")
+
+(def landing-caution
+  "Knave is experimental. The syntax, the prelude and the command line can change in any commit.")
 
 (def install-description
   "Install the Knave programming language with Cargo or Nix, then create and run your first project.")
@@ -60,7 +73,17 @@
     (let (page (at pages position))
       (try (write-index (as-str (str output-directory (:path page)))
                         (as-str (in-layout layout page))))
+      (try (write-markdown-copy page))
       (recur layout pages (+ position 1)))))
+
+(type write-markdown-copy
+  (fn ((ref page)) (result unit io-error)))
+
+(defn write-markdown-copy (page)
+  (let (copy-path (str output-directory
+                       (markdown-path (as-str (:path page)))))
+    (write-file (as-str copy-path)
+                (as-str (:markdown page)))))
 
 (type in-layout
   (fn ((ref str) (ref page)) string))
@@ -82,31 +105,68 @@
                             (as-str (sitemap-entries pages))))
   (try (write-from-template "robots.txt" "sitemap"
                             (as-str (canonical-url "/sitemap.xml"))))
-  (write-from-template "llms.txt" "pages"
-                       (as-str (llms-links pages))))
+  (let (header-template (try (read-template "llms-header.md"))
+        header (fill (as-str header-template) "caution" landing-caution))
+    (try (write-llms-file "llms.txt"
+                          (as-str header)
+                          (as-str (llms-links pages))))
+    (write-llms-file "llms-full.txt"
+                     (as-str header)
+                     (as-str (llms-full-sections pages)))))
+
+(defn write-llms-file (file-name header pages)
+  (let (template (try (read-template file-name))
+        with-header (fill (as-str template) "header" header))
+    (write-output file-name
+                  (as-str (fill (as-str with-header) "pages" pages)))))
 
 (defn write-from-template (file-name placeholder value)
-  (let (template-path (str "templates/" file-name)
-        template (try (read-file (as-str template-path))))
-    (write-file (as-str (str output-directory "/" file-name))
-                (as-str (fill (as-str template) placeholder value)))))
+  (let (template (try (read-template file-name)))
+    (write-output file-name
+                  (as-str (fill (as-str template) placeholder value)))))
+
+(defn read-template (file-name)
+  (let (template-path (str "templates/" file-name))
+    (read-file (as-str template-path))))
+
+(defn write-output (file-name contents)
+  (let (output-path (str output-directory "/" file-name))
+    (write-file (as-str output-path) contents)))
 
 (defn landing-page ()
   (let (template (try (read-file "templates/landing.html"))
         knave-sample (try (read-file "content/sample.knv"))
         rust-sample (try (read-file "content/sample.rs"))
-        with-knave (fill (as-str template)
-                         "knave-sample"
-                         (as-str (in-line-spans (as-str (highlight (trim (as-str
-                                                                           knave-sample)))))))
-        content (fill (as-str with-knave)
-                      "rust-sample"
-                      (as-str (in-line-spans (as-str (escape-html (trim (as-str rust-sample))))))))
+        knave-code (trim (as-str knave-sample))
+        rust-code (trim (as-str rust-sample)))
     (ok (->page (owned landing-path)
-                (owned
-                  "Knave programming language: a Lisp that compiles to Rust")
+                (owned landing-title)
                 (owned landing-description)
-                content))))
+                (landing-html (as-str template) knave-code rust-code)
+                (landing-markdown knave-code rust-code)))))
+
+(defn landing-html (template knave-code rust-code)
+  (-> (fill template "pitch" (as-str (escape-html landing-pitch)))
+      (as-str)
+      (fill "caution" (as-str (escape-html landing-caution)))
+      (as-str)
+      (fill "knave-sample"
+            (as-str (in-line-spans (as-str (highlight knave-code)))))
+      (as-str)
+      (fill "rust-sample"
+            (as-str (in-line-spans (as-str (escape-html rust-code)))))))
+
+(defn landing-markdown (knave-code rust-code)
+  (str "# " landing-title "\n\n" landing-pitch "\n\n"
+       landing-caution "\n\n" "A Knave program:\n\n"
+       (fenced "knave" knave-code)
+       "\n\n"
+       "The Rust that `knave emit main.knv` prints for it:\n\n"
+       (fenced "rust" rust-code)
+       "\n"))
+
+(defn fenced (language code)
+  (str "```" language "\n" code "\n```"))
 
 (defn install-page ()
   (let (source (try (read-file "content/install.md"))
@@ -114,7 +174,7 @@
     (ok (->page (owned "/install/")
                 (owned "Install Knave")
                 (owned install-description)
-                content))))
+                content source))))
 
 (defn check-links ()
   (let (paths (try (files-under output-directory))
@@ -126,14 +186,24 @@
       (err (failure (str "broken internal links:\n"
                          (join (ref broken) "\n")))))))
 
+(defn markdown-file? (path)
+  (or (ends-with? path ".md")
+      (= path "llms.txt")
+      (= path "llms-full.txt")))
+
 (defn read-pages (paths position pages)
   (if (>= position (len paths))
     (ok pages)
     (let (path (as-str (at paths position))
           full-path (str output-directory "/" path))
-      (if (ends-with? path ".html")
-        (push! pages
-               (->site-page (owned path)
-                            (try (read-file (as-str full-path)))))
-        (do))
+      (cond
+        ((ends-with? path ".html")
+         (push! pages
+                (html-page (owned path)
+                           (try (read-file (as-str full-path))))))
+        ((markdown-file? path)
+         (push! pages
+                (markdown-page (owned path)
+                               (try (read-file (as-str full-path))))))
+        (else (do)))
       (recur paths (+ position 1) pages))))

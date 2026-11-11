@@ -1,12 +1,11 @@
-# Knave
-
-> Knave is a small Lisp programming language for humans and agents that infers types and ownership and compiles to readable Rust.
-
-Knave is experimental. The syntax, the prelude and the command line can change in any commit.
-
+{{header}}
 ## Pages
 
 {{pages}}
+
+## Full text
+
+- [All pages](https://knave-lang.org/llms-full.txt): The Markdown of every page above, in this order, in one file.
 
 ## Source
 

@@ -23,6 +23,9 @@
 (def index-description
   "Reference pages for the modules of the Knave prelude, generated from the compiler's docstrings.")
 
+(def install-pointer
+  "New to Knave? [Install it](/install/) first.")
+
 (def write-prelude-docs
   (rust "std::process::Command::new(\"knave\").args([\"doc\", \"--write\", \"--prelude\", \"--output\", {0}]).status().and_then(|status| status.success().then_some(()).ok_or_else(|| std::io::Error::other(format!(\"knave doc --write --prelude {{status}}\"))))"
     (fn ((ref str)) (result unit io-error))))
@@ -165,6 +168,7 @@
 
 (defn index-markdown (module-pages)
   (str "# Documentation\n\n" index-description "\n\n"
+       install-pointer "\n\n"
        (join (ref (collect (map (iter module-pages) index-entry)))
              "\n")))
 

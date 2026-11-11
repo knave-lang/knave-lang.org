@@ -15,21 +15,26 @@
 <meta name="twitter:card" content="summary">
 <link rel="preload" href="/iosevka-regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/iosevka-bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/grid.css">
 <link rel="stylesheet" href="/style.css?v={{stylesheet-version}}">
+<link rel="stylesheet" href="/grid-overlay.css">
 <script src="/copy.js" defer></script>
+<script src="/grid-overlay.js" defer></script>
 </head>
 <body>
+<div class="type-area">
 <header class="site-header">
-  <a class="wordmark" href="/">knave</a>
-  <nav aria-label="Main">
-    <a href="/install/">Install</a>
-    <a href="https://github.com/knave-lang/knave">GitHub</a>
+  <p><a class="wordmark" href="/">knave</a></p>
+  <nav aria-label="Main" class="menu">
+    <p><a href="/install/">Install</a></p>
+    <p><a href="https://github.com/knave-lang/knave">GitHub</a></p>
   </nav>
 </header>
 {{content}}
-<footer class="site-footer">
-  <p>Knave is MIT licensed. This site is built by a generator written in Knave.</p>
-  <a href="https://github.com/knave-lang/knave-lang.org">Site source</a>
+<footer class="site-footer grid">
+  <p>Knave is MIT licensed.<br>This site is built by a generator written in Knave.</p>
+  <p><a href="https://github.com/knave-lang/knave-lang.org">Site source</a></p>
 </footer>
+</div>
 </body>
 </html>

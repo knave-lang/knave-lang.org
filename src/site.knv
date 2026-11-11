@@ -1,10 +1,11 @@
-(use discovery ->page canonical-url llms-links
+(use discovery ->page canonical-url llms-links page
                sitemap-entries)
 
 (use files copy-directory-files failure files-under
            read-file remove-directory write-file
            write-index)
 
+(use grid write-grid-files)
 (use links ->site-files ->site-page broken-links)
 (use markdown/highlight highlight)
 (use markdown/html render-markdown)
@@ -18,6 +19,8 @@
 
 (def output-directory "public")
 
+(def landing-path "/")
+
 (def static-directory "static")
 
 (def landing-description
@@ -29,6 +32,7 @@
 (defn build-site ()
   (try (remove-directory output-directory))
   (try (copy-directory-files static-directory output-directory))
+  (try (write-grid-files output-directory))
   (let (pages (vec (try (landing-page))
                    (try (install-page)))
         layout (try (layout-with-stylesheet-version)))
@@ -44,6 +48,10 @@
               "stylesheet-version"
               (as-str (fnv1a-digest (as-str stylesheet)))))))
 
+(type write-pages
+  (fn ((ref str) (ref (vec page)) usize)
+    (result unit io-error)))
+
 (defn write-pages (layout pages position)
   (if (>= position (len pages))
     (ok (do))
@@ -51,6 +59,9 @@
       (try (write-index (as-str (str output-directory (:path page)))
                         (as-str (in-layout layout page))))
       (recur layout pages (+ position 1)))))
+
+(type in-layout
+  (fn ((ref str) (ref page)) string))
 
 (defn in-layout (layout page)
   (-> (fill layout "title"
@@ -89,7 +100,7 @@
         content (fill (as-str with-knave)
                       "rust-sample"
                       (as-str (in-line-spans (as-str (escape-html (trim (as-str rust-sample))))))))
-    (ok (->page (owned "/")
+    (ok (->page (owned landing-path)
                 (owned
                   "Knave programming language: a Lisp that compiles to Rust")
                 (owned landing-description)

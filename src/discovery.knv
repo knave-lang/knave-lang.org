@@ -16,6 +16,9 @@
 (defn sitemap-entries (pages)
   (join-lines (map (iter pages) sitemap-entry)))
 
+(type sitemap-entry
+  (fn ((ref page)) string))
+
 (defn sitemap-entry (page)
   (str "  <url><loc>"
        (canonical-url (as-str (:path page)))
@@ -23,6 +26,9 @@
 
 (defn llms-links (pages)
   (join-lines (map (iter pages) llms-link)))
+
+(type llms-link
+  (fn ((ref page)) string))
 
 (defn llms-link (page)
   (str "- ["

@@ -1,1 +1,4 @@
-(project knave-site)
+(project knave-site
+  (libraries
+    (knave-grid :git "https://github.com/KarlHarnois/knave-grid"
+                :rev "0c155e96db63728672b8b63729eb584d7545b334")))

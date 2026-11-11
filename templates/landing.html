@@ -1,16 +1,18 @@
 <main class="landing">
-  <p class="name">knave</p>
-  <h1>A Lisp that compiles to readable Rust</h1>
-  <div class="columns intro">
+  <header class="hero grid">
+    <p class="name type-wordmark">knave</p>
+    <h1 class="tagline type-title">A Lisp that compiles to readable Rust</h1>
+  </header>
+  <div class="grid intro">
     <p>Knave infers most types and ownership for you. The Rust it emits is the Rust you would have written, with no clones or allocations you did not ask for.</p>
     <p class="caution">Knave is experimental. The syntax, the prelude and the command line can change in any commit.</p>
   </div>
-  <figure class="columns session" aria-label="A Knave program beside the Rust it compiles to">
-    <div>
+  <figure class="grid session" aria-label="A Knave program beside the Rust it compiles to">
+    <div class="pane">
       <p class="command"><code>cat main.knv</code></p>
       <pre><code>{{knave-sample}}</code></pre>
     </div>
-    <div>
+    <div class="pane">
       <p class="command"><code>knave emit main.knv</code></p>
       <pre class="emitted"><code>{{rust-sample}}</code></pre>
     </div>

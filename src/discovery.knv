@@ -1,7 +1,8 @@
 (use strings ends-with? join)
 
 (export ->page canonical-url followed-by llms-full-sections
-        llms-links markdown-path page sitemap-entries)
+        llms-links markdown-path page site-origin
+        sitemap-entries)
 
 (defstruct page
   :path string

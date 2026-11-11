@@ -187,7 +187,9 @@
                          (join (ref broken) "\n")))))))
 
 (defn markdown-file? (path)
-  (or (ends-with? path ".md") (= path "llms-full.txt")))
+  (or (ends-with? path ".md")
+      (= path "llms.txt")
+      (= path "llms-full.txt")))
 
 (defn read-pages (paths position pages)
   (if (>= position (len paths))

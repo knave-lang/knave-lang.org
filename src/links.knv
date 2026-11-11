@@ -1,6 +1,7 @@
 (use strings after before contains? ends-with? escape-html
              find-from owned percent-decode starts-with?)
 
+(use discovery site-origin)
 (use markdown/targets link-targets)
 
 (export ->site-files broken-links html-page index-of
@@ -55,9 +56,14 @@
 
 (defn broken-link? (site page href)
   (cond
+    ((on-site? href)
+     (not (resolves? site page (after href (len site-origin)))))
     ((external? href) false)
     ((rooted? href) (not (resolves? site page href)))
     (else true)))
+
+(defn on-site? (href)
+  (starts-with? href (as-str (str site-origin "/"))))
 
 (defn external? (href)
   (or (contains? href "://") (starts-with? href "mailto:")))

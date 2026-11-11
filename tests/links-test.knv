@@ -35,6 +35,14 @@
 (deftest accepts-a-fragment-on-the-same-page
   (assert (empty? (broken-in "<h1 id=\"top\"></h1><a href=\"#top\">x</a>"))))
 
+(deftest accepts-a-full-url-to-a-page-on-the-site
+  (assert (empty? (broken-in
+                    "<a href=\"https://knave-lang.org/docs/\">x</a>"))))
+
+(deftest reports-a-full-url-to-a-missing-page-on-the-site
+  (assert (= (broken-in "<a href=\"https://knave-lang.org/missing/\">x</a>")
+             (vec (str "index.html: https://knave-lang.org/missing/")))))
+
 (deftest ignores-external-links
   (assert (empty? (broken-in "<a href=\"https://example.com/missing\">x</a>"))))
 

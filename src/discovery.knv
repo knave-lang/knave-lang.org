@@ -1,6 +1,6 @@
 (use strings join)
 
-(export ->page canonical-url llms-links page
+(export ->page canonical-url followed-by llms-links page
         sitemap-entries)
 
 (defstruct page
@@ -8,6 +8,10 @@
   :title string
   :description string
   :content string)
+
+(def followed-by
+  (rust "{0}.into_iter().chain({1}).collect::<Vec<_>>()"
+    (fn ((vec page) (vec page)) (vec page))))
 
 (def site-origin "https://knave-lang.org")
 

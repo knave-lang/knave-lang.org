@@ -1,10 +1,10 @@
-(use strings after find-from join leading-count owned
-             replace-all starts-with?)
+(use strings after before ends-with? find-from join
+             leading-count owned replace-all starts-with?)
 
 (export block parse-blocks)
 
 (defenum block
-  (heading usize string)
+  (heading usize string (option string))
   (paragraph string)
   (code-block string string)
   (bullet-list (vec string))
@@ -26,6 +26,10 @@
 (def pipe-placeholder "\u{E000}")
 
 (def max-heading-level 6)
+
+(def anchor-opening "<a id=\"")
+
+(def anchor-closing "\"></a>")
 
 (def lines-between
   (rust "{0}[{1}..{2}].to_vec()"
@@ -54,6 +58,8 @@
   (let (line (as-str (at source-lines index)))
     (cond
       ((fence? line) (parse-fence source-lines index))
+      ((anchored-heading? source-lines index)
+       (parse-anchored-heading source-lines index))
       ((heading? line) (parse-heading line index))
       ((table-row? line) (parse-table source-lines index))
       ((bullet-item? line) (parse-bullets source-lines index))
@@ -113,10 +119,37 @@
 (defn fence-language (line)
   (owned (trim (after line (len fence-marker)))))
 
+(defn anchored-heading? (source-lines index)
+  (let (heading-index (after-blank-lines source-lines (+ index 1)))
+    (and (anchor-line? (as-str (at source-lines index)))
+         (< heading-index (len source-lines))
+         (heading? (as-str (at source-lines heading-index))))))
+
+(defn after-blank-lines (source-lines start)
+  (run-end source-lines start blank?))
+
+(defn anchor-line? (line)
+  (and (starts-with? line anchor-opening)
+       (ends-with? line anchor-closing)))
+
+(defn parse-anchored-heading (source-lines index)
+  (let (anchor (anchor-id (as-str (at source-lines index)))
+        heading-index (after-blank-lines source-lines (+ index 1)))
+    (heading-block (as-str (at source-lines heading-index))
+                   (some anchor)
+                   heading-index)))
+
+(defn anchor-id (line)
+  (owned (before (after line (len anchor-opening)) anchor-closing)))
+
 (defn parse-heading (line index)
+  (heading-block line none index))
+
+(defn heading-block (line anchor index)
   (let (level (heading-level line))
     (->parsed (block/heading level
-                             (owned (trim (after line level))))
+                             (owned (trim (after line level)))
+                             anchor)
               (+ index 1))))
 
 (defn parse-table (source-lines index)

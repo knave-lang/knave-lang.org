@@ -1,5 +1,5 @@
-(use strings after before contains? ends-with? find-from
-             owned starts-with?)
+(use strings after before contains? ends-with? escape-html
+             find-from owned percent-decode starts-with?)
 
 (export ->site-files ->site-page broken-links index-of)
 
@@ -79,7 +79,9 @@
     (fn (path) (= (as-str path) target))))
 
 (defn holds-id? (site target id)
-  (let (id-attribute (str " id=\"" id "\""))
+  (let (id-attribute (str " id=\""
+                          (escape-html (as-str (percent-decode id)))
+                          "\""))
     (any? (iter (:pages site))
       (fn (page)
         (and (= (:file page) target)

@@ -1,0 +1,184 @@
+(use discovery ->page followed-by page)
+(use files files-under read-file)
+(use markdown/blocks block parse-blocks)
+(use markdown/html render-markdown)
+
+(use strings after before contains? ends-with? find-from
+             in-prose join owned replace-all starts-with?)
+
+(export docs-pages site-links)
+
+(def generated-directory "target/prelude-docs")
+
+(def docs-path "/docs/")
+
+(def markdown-extension ".md")
+
+(def href-marker " href=\"")
+
+(def parent-segment "..")
+
+(def index-title "Knave documentation")
+
+(def index-description
+  "Reference pages for the modules of the Knave prelude, generated from the compiler's docstrings.")
+
+(def write-prelude-docs
+  (rust "std::process::Command::new(\"knave\").args([\"doc\", \"--write\", \"--prelude\", \"--output\", {0}]).status().and_then(|status| status.success().then_some(()).ok_or_else(|| std::io::Error::other(format!(\"knave doc --write --prelude {{status}}\"))))"
+    (fn ((ref str)) (result unit io-error))))
+
+(def directory-of
+  (rust "{0}.rfind('/').map_or(\"\", |slash| &{0}[..=slash])"
+    (fn ((ref str)) (ref str))))
+
+(defn docs-pages ()
+  (try (write-prelude-docs generated-directory))
+  (let (sources (try (markdown-sources))
+        module-pages (try (module-pages (ref sources) 0 (vec))))
+    (ok (with-index-first module-pages))))
+
+(defn markdown-sources ()
+  (let (paths (try (files-under generated-directory))
+        sources (collect (map (filter (iter paths) markdown-file?) owned-path)))
+    (sort! sources)
+    (ok sources)))
+
+(defn owned-path (path)
+  (owned (as-str path)))
+
+(defn markdown-file? (path)
+  (ends-with? (as-str path) markdown-extension))
+
+(type module-pages
+  (fn ((ref (vec string)) usize (vec page))
+    (result (vec page) io-error)))
+
+(defn module-pages (sources position pages)
+  (if (>= position (len sources))
+    (ok pages)
+    (do
+      (push! pages
+             (try (module-page (as-str (at sources position)))))
+      (recur sources (+ position 1) pages))))
+
+(defn module-page (source)
+  (let (source-path (str generated-directory "/" source)
+        markdown (try (read-file (as-str source-path)))
+        module (before source markdown-extension)
+        rendered (render-markdown (as-str markdown))
+        linked (site-links (as-str rendered) (directory-of source)))
+    (ok (->page (module-path module)
+                (str module " | Knave docs")
+                (summary (as-str markdown))
+                (in-prose (as-str linked))))))
+
+(defn module-path (module) (str docs-path module "/"))
+
+(defn summary (markdown)
+  (plain-text (as-str (first-paragraph (ref (parse-blocks markdown)) 0))))
+
+(defn first-paragraph (blocks position)
+  (if (>= position (len blocks))
+    (str "")
+    (match (at blocks position)
+      ((paragraph text) (owned (as-str text)))
+      (_ (recur blocks (+ position 1))))))
+
+(defn plain-text (markdown)
+  (-> (without-link-targets markdown 0 (str ""))
+      (as-str)
+      (replace-all "[" "")
+      (as-str)
+      (replace-all "`" "")))
+
+(defn without-link-targets (text start plain)
+  (match (find-from text "](" start)
+    (none (str plain (after text start)))
+    ((some label-end)
+     (recur text
+            (link-end text label-end)
+            (str plain (subs text start label-end))))))
+
+(defn link-end (text label-end)
+  (match (find-from text ")" label-end)
+    (none (len text))
+    ((some close) (+ close 1))))
+
+(defn site-links (html directory)
+  (rewrite-hrefs html directory 0 (str "")))
+
+(defn rewrite-hrefs (html directory start rewritten)
+  (match (find-from html href-marker start)
+    (none (str rewritten (after html start)))
+    ((some marker)
+     (let (value-start (+ marker (len href-marker))
+           value-end (quote-after html value-start))
+       (recur html directory value-end
+              (str rewritten
+                   (subs html start value-start)
+                   (site-href (subs html value-start value-end) directory)))))))
+
+(defn quote-after (html start)
+  (match (find-from html "\"" start)
+    (none (len html))
+    ((some quote) quote)))
+
+(defn site-href (href directory)
+  (if (markdown-link? href)
+    (str (linked-module-path href directory) (fragment href))
+    (owned href)))
+
+(defn linked-module-path (href directory)
+  (let (relative-module (str directory (before href markdown-extension))
+        module (resolved-path (as-str relative-module)))
+    (module-path (as-str module))))
+
+(defn markdown-link? (href)
+  (and (not (starts-with? href "#"))
+       (not (contains? href "://"))
+       (contains? href markdown-extension)))
+
+(defn fragment (href)
+  (match (find-from href "#" 0)
+    (none "")
+    ((some hash) (after href hash))))
+
+(defn resolved-path (path)
+  (let (segments (vec))
+    (for-each (split path "/")
+      (fn (segment)
+        (if (= segment parent-segment)
+          (do (pop! segments) (do))
+          (push! segments (owned segment)))))
+    (join (ref segments) "/")))
+
+(defn with-index-first (module-pages)
+  (followed-by (vec (index-page (ref module-pages)))
+               module-pages))
+
+(defn index-page (module-pages)
+  (->page (owned docs-path)
+          (owned index-title)
+          (owned index-description)
+          (in-prose (as-str (render-markdown (as-str (index-markdown
+                                                       module-pages)))))))
+
+(defn index-markdown (module-pages)
+  (str "# Documentation\n\n" index-description "\n\n"
+       (join (ref (collect (map (iter module-pages) index-entry)))
+             "\n")))
+
+(type index-entry
+  (fn ((ref page)) string))
+
+(defn index-entry (module-page)
+  (str "- [`"
+       (module-name (as-str (:path module-page)))
+       "`]("
+       (:path module-page)
+       "): "
+       (:description module-page)))
+
+(defn module-name (path)
+  (let (module-with-slash (after path (len docs-path)))
+    (subs module-with-slash 0 (- (len module-with-slash) 1))))

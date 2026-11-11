@@ -1,0 +1,17 @@
+(use docs site-links)
+
+(deftest links-a-sibling-module-page-to-its-site-path
+  (assert (= (site-links "<a href=\"prelude/text.md#char\">" "")
+             "<a href=\"/docs/prelude/text/#char\">")))
+
+(deftest resolves-a-parent-link-from-a-module-folder
+  (assert (= (site-links "<a href=\"../prelude.md#%3E%3D\">" "prelude/")
+             "<a href=\"/docs/prelude/#%3E%3D\">")))
+
+(deftest leaves-a-fragment-on-the-same-page-alone
+  (assert (= (site-links "<a href=\"#some%3F\">" "prelude/")
+             "<a href=\"#some%3F\">")))
+
+(deftest leaves-an-external-link-alone
+  (assert (= (site-links "<a href=\"https://example.com/notes.md\">" "")
+             "<a href=\"https://example.com/notes.md\">")))

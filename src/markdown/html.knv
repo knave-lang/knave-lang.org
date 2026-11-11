@@ -1,7 +1,7 @@
 (use markdown/blocks block parse-blocks)
 (use markdown/highlight highlight)
 (use markdown/inlines render-inlines)
-(use strings escape-html join slug)
+(use strings escape-html join owned percent-encode slug)
 
 (export render-markdown)
 
@@ -15,7 +15,10 @@
 
 (defn render-block (current)
   (match current
-    ((heading level text) (render-heading level (as-str text)))
+    ((heading level text anchor)
+     (render-heading level
+                     (as-str text)
+                     (heading-anchor (as-str text) anchor)))
     ((paragraph text)
      (str "<p>" (render-inlines (as-str text)) "</p>"))
     ((code-block language code)
@@ -27,14 +30,24 @@
 (defn heading-class (level)
   (if (= level 1) " class=\"type-title\"" ""))
 
-(defn render-heading (level text)
-  (let (anchor (slug text))
+(type heading-anchor
+  (fn ((ref str) (ref (option string)))
+    string))
+
+(defn heading-anchor (text anchor)
+  (match anchor
+    (none (slug text))
+    ((some explicit) (owned explicit))))
+
+(defn render-heading (level text anchor)
+  (let (id (escape-html (as-str anchor))
+        fragment (percent-encode (as-str anchor)))
     (str "<h" level
          (heading-class level)
-         " id=\"" anchor "\" aria-labelledby=\"" anchor
-         "-title\">" "<a class=\"anchor\" href=\"#" anchor
+         " id=\"" id "\" aria-labelledby=\"" id "-title\">"
+         "<a class=\"anchor\" href=\"#" fragment
          "\" aria-label=\"Link to this section\">#</a>"
-         "<span id=\"" anchor "-title\">"
+         "<span id=\"" id "-title\">"
          (render-inlines text)
          "</span>" "</h" level ">")))
 
@@ -46,9 +59,14 @@
        "</code></pre>"))
 
 (defn highlighted-code (language code)
-  (if (or (= language "lisp") (= language "clojure"))
+  (if (knave-code? language)
     (highlight code)
     (escape-html code)))
+
+(defn knave-code? (language)
+  (or (= language "knave")
+      (= language "lisp")
+      (= language "clojure")))
 
 (defn render-list (tag items)
   (str "<" tag ">"

@@ -34,7 +34,7 @@ a { color: var(--link); text-underline-offset: .2em; }
 
 a:hover { color: var(--bright); }
 
-a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); outline-offset: 2px; }
+a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-offset: 2px; }
 
 .grid { row-gap: var(--leading); }
 
@@ -45,7 +45,7 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 .site-header {
   display: flex;
   column-gap: var(--gutter);
-  margin: calc(-3 * var(--leading)) 0 calc(2 * var(--leading));
+  margin: 0 0 calc(var(--field-pitch) - var(--leading));
   box-shadow: 0 1px 0 var(--rule);
 }
 
@@ -60,15 +60,15 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
   position: relative;
 }
 
-.menu a, .site-footer a { text-decoration: none; }
+.button { color: var(--link); text-decoration: none; }
+
+.button:hover { color: var(--bright); }
 
 .menu a::after {
   content: "";
   position: absolute;
   inset: calc(var(--leading) / -2) 0;
 }
-
-.menu a:hover, .site-footer a:hover { text-decoration: underline; }
 
 @media (min-width: 62.4375em) {
   .site-header {
@@ -78,7 +78,9 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 
   .site-header > p { margin: 0; }
 
-  .menu p:first-child { grid-column-start: calc(var(--columns) - 1); }
+  .menu p:nth-last-child(3) { grid-column-start: calc(var(--columns) - 2); }
+
+  .menu p:nth-last-child(2) { grid-column-start: calc(var(--columns) - 1); }
 
   .menu p:last-child { grid-column-start: var(--columns); }
 }
@@ -93,10 +95,6 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 }
 
 .hero > * { min-height: var(--field); }
-
-@media (min-width: 62.4375em) {
-  .hero { padding-top: var(--field-pitch); }
-}
 
 .tagline { margin: 0; font-weight: 400; text-wrap: balance; }
 
@@ -122,7 +120,7 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 
 .prose { margin-bottom: calc(2 * var(--leading)); }
 
-.prose > * { max-width: var(--measure); }
+.prose > * { box-sizing: border-box; max-width: var(--measure); }
 
 .prose h2, .prose h3, .prose h4 {
   margin: calc(2 * var(--leading)) 0 var(--leading);
@@ -159,13 +157,10 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
   padding: 0;
   border: 0;
   background: none;
-  color: var(--dim);
   font: inherit;
   line-height: var(--leading);
   cursor: pointer;
 }
-
-.copy-button:hover { color: var(--bright); }
 
 .table-scroll { overflow-x: auto; margin-bottom: var(--leading); }
 

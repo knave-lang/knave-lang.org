@@ -37,7 +37,7 @@ class CopyButton {
   #createElement() {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "copy-button";
+    button.className = "button copy-button";
     button.textContent = CopyButton.#IDLE_LABEL;
     button.setAttribute("aria-live", "polite");
     button.addEventListener("click", () => this.#copy());

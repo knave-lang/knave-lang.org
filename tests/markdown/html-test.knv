@@ -44,6 +44,10 @@
   (assert (= (render-markdown "```text\n<a>\n```")
              "<pre><code class=\"language-text\">&lt;a&gt;</code></pre>")))
 
+(deftest highlights-a-knave-code-block
+  (assert (contains? (as-str (render-markdown "```knave\n:key\n```"))
+                     "<span class=\"keyword\">:key</span>")))
+
 (deftest highlights-a-lisp-code-block
   (assert (contains? (as-str (render-markdown "```lisp\n:key\n```"))
                      "<span class=\"keyword\">:key</span>")))
@@ -55,3 +59,11 @@
 (deftest leaves-an-untagged-code-block-plain
   (assert (not (contains? (as-str (render-markdown "```\n:key\n```"))
                           "<span"))))
+
+(deftest gives-a-heading-the-explicit-anchor-before-it
+  (assert (= (render-markdown "<a id=\"some?\"></a>\n\n## `some?`")
+             "<h2 id=\"some?\" aria-labelledby=\"some?-title\"><a class=\"anchor\" href=\"#some%3F\" aria-label=\"Link to this section\">#</a><span id=\"some?-title\"><code>some?</code></span></h2>")))
+
+(deftest escapes-an-explicit-operator-anchor
+  (assert (contains? (as-str (render-markdown "<a id=\">=\"></a>\n## `>=`"))
+                     "<h2 id=\"&gt;=\" aria-labelledby=\"&gt;=-title\"><a class=\"anchor\" href=\"#%3E%3D\"")))

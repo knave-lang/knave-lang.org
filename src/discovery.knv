@@ -63,7 +63,7 @@
   (fn ((ref page)) string))
 
 (defn llms-full-section (page)
-  (str "## "
+  (str "---\nSource: "
        (canonical-url (as-str (:path page)))
        "\n\n"
        (trim (as-str (:markdown page)))))

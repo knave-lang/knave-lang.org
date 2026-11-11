@@ -32,6 +32,6 @@
 (deftest appends-md-to-a-file-path
   (assert (= (markdown-path "/notes.html") "/notes.html.md")))
 
-(deftest puts-each-page-under-a-heading-with-its-url
+(deftest starts-each-page-with-a-separator-and-its-url
   (assert (= (llms-full-sections (ref (fake-pages)))
-             "## https://knave-lang.org/\n\n# Home\n\n## https://knave-lang.org/guide/\n\n# Guide")))
+             "---\nSource: https://knave-lang.org/\n\n# Home\n\n---\nSource: https://knave-lang.org/guide/\n\n# Guide")))

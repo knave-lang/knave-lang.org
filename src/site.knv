@@ -1,5 +1,6 @@
-(use discovery ->page canonical-url followed-by llms-links
-               markdown-path page sitemap-entries)
+(use discovery ->page canonical-url followed-by
+               llms-full-sections llms-links markdown-path
+               page sitemap-entries)
 
 (use files copy-directory-files failure files-under
            read-file remove-directory write-file
@@ -95,8 +96,20 @@
                             (as-str (sitemap-entries pages))))
   (try (write-from-template "robots.txt" "sitemap"
                             (as-str (canonical-url "/sitemap.xml"))))
-  (write-from-template "llms.txt" "pages"
-                       (as-str (llms-links pages))))
+  (let (header (try (read-file "templates/llms-header.md")))
+    (try (write-llms-file "llms.txt"
+                          (as-str header)
+                          (as-str (llms-links pages))))
+    (write-llms-file "llms-full.txt"
+                     (as-str header)
+                     (as-str (llms-full-sections pages)))))
+
+(defn write-llms-file (file-name header pages)
+  (let (template-path (str "templates/" file-name)
+        template (try (read-file (as-str template-path)))
+        with-header (fill (as-str template) "header" header))
+    (write-file (as-str (str output-directory "/" file-name))
+                (as-str (fill (as-str with-header) "pages" pages)))))
 
 (defn write-from-template (file-name placeholder value)
   (let (template-path (str "templates/" file-name)

@@ -1,7 +1,7 @@
 (use strings ends-with? join)
 
-(export ->page canonical-url followed-by llms-links
-        markdown-path page sitemap-entries)
+(export ->page canonical-url followed-by llms-full-sections
+        llms-links markdown-path page sitemap-entries)
 
 (defstruct page
   :path string
@@ -54,3 +54,16 @@
 
 (defn join-lines (lines)
   (join (ref (collect lines)) "\n"))
+
+(defn llms-full-sections (pages)
+  (join (ref (collect (map (iter pages) llms-full-section)))
+        "\n\n"))
+
+(type llms-full-section
+  (fn ((ref page)) string))
+
+(defn llms-full-section (page)
+  (str "## "
+       (canonical-url (as-str (:path page)))
+       "\n\n"
+       (trim (as-str (:markdown page)))))

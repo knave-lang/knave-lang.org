@@ -1,5 +1,5 @@
-(use discovery ->page canonical-url llms-links markdown-path
-               sitemap-entries)
+(use discovery ->page canonical-url llms-full-sections
+               llms-links markdown-path sitemap-entries)
 
 (defn fake-pages ()
   (vec (->page (str "/")
@@ -31,3 +31,7 @@
 
 (deftest appends-md-to-a-file-path
   (assert (= (markdown-path "/notes.html") "/notes.html.md")))
+
+(deftest puts-each-page-under-a-heading-with-its-url
+  (assert (= (llms-full-sections (ref (fake-pages)))
+             "## https://knave-lang.org/\n\n# Home\n\n## https://knave-lang.org/guide/\n\n# Guide")))

@@ -114,17 +114,23 @@
                      (as-str (llms-full-sections pages)))))
 
 (defn write-llms-file (file-name header pages)
-  (let (template-path (str "templates/" file-name)
-        template (try (read-file (as-str template-path)))
+  (let (template (try (read-template file-name))
         with-header (fill (as-str template) "header" header))
-    (write-file (as-str (str output-directory "/" file-name))
-                (as-str (fill (as-str with-header) "pages" pages)))))
+    (write-output file-name
+                  (as-str (fill (as-str with-header) "pages" pages)))))
 
 (defn write-from-template (file-name placeholder value)
-  (let (template-path (str "templates/" file-name)
-        template (try (read-file (as-str template-path))))
-    (write-file (as-str (str output-directory "/" file-name))
-                (as-str (fill (as-str template) placeholder value)))))
+  (let (template (try (read-template file-name)))
+    (write-output file-name
+                  (as-str (fill (as-str template) placeholder value)))))
+
+(defn read-template (file-name)
+  (let (template-path (str "templates/" file-name))
+    (read-file (as-str template-path))))
+
+(defn write-output (file-name contents)
+  (let (output-path (str output-directory "/" file-name))
+    (write-file (as-str output-path) contents)))
 
 (defn landing-page ()
   (let (template (try (read-file "templates/landing.html"))

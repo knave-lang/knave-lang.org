@@ -1,13 +1,14 @@
-(use strings join)
+(use strings ends-with? join)
 
-(export ->page canonical-url followed-by llms-links page
-        sitemap-entries)
+(export ->page canonical-url followed-by llms-links
+        markdown-path page sitemap-entries)
 
 (defstruct page
   :path string
   :title string
   :description string
-  :content string)
+  :content string
+  :markdown string)
 
 (def followed-by
   (rust "{0}.into_iter().chain({1}).collect::<Vec<_>>()"
@@ -15,7 +16,16 @@
 
 (def site-origin "https://knave-lang.org")
 
+(def markdown-extension ".md")
+
+(def directory-markdown-name "index.html.md")
+
 (defn canonical-url (path) (str site-origin path))
+
+(defn markdown-path (path)
+  (if (ends-with? path "/")
+    (str path directory-markdown-name)
+    (str path markdown-extension)))
 
 (defn sitemap-entries (pages)
   (join-lines (map (iter pages) sitemap-entry)))

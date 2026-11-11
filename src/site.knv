@@ -1,5 +1,5 @@
 (use discovery ->page canonical-url followed-by llms-links
-               page sitemap-entries)
+               markdown-path page sitemap-entries)
 
 (use files copy-directory-files failure files-under
            read-file remove-directory write-file
@@ -23,6 +23,9 @@
 (def landing-path "/")
 
 (def static-directory "static")
+
+(def landing-title
+  "Knave programming language: a Lisp that compiles to Rust")
 
 (def landing-description
   "Knave is a programming language for humans and agents. It is a small Lisp that infers types and ownership and compiles to readable Rust.")
@@ -60,7 +63,17 @@
     (let (page (at pages position))
       (try (write-index (as-str (str output-directory (:path page)))
                         (as-str (in-layout layout page))))
+      (try (write-markdown-copy page))
       (recur layout pages (+ position 1)))))
+
+(type write-markdown-copy
+  (fn ((ref page)) (result unit io-error)))
+
+(defn write-markdown-copy (page)
+  (let (copy-path (str output-directory
+                       (markdown-path (as-str (:path page)))))
+    (write-file (as-str copy-path)
+                (as-str (:markdown page)))))
 
 (type in-layout
   (fn ((ref str) (ref page)) string))
@@ -101,12 +114,25 @@
                                                                            knave-sample)))))))
         content (fill (as-str with-knave)
                       "rust-sample"
-                      (as-str (in-line-spans (as-str (escape-html (trim (as-str rust-sample))))))))
+                      (as-str (in-line-spans (as-str (escape-html (trim (as-str rust-sample)))))))
+        markdown (landing-markdown (trim (as-str knave-sample))
+                                   (trim (as-str rust-sample))))
     (ok (->page (owned landing-path)
-                (owned
-                  "Knave programming language: a Lisp that compiles to Rust")
+                (owned landing-title)
                 (owned landing-description)
-                content))))
+                content markdown))))
+
+(defn landing-markdown (knave-sample rust-sample)
+  (str "# " landing-title "\n\n" landing-description "\n\n"
+       "A Knave program:\n\n"
+       (fenced "lisp" knave-sample)
+       "\n\n"
+       "The Rust that `knave emit main.knv` prints for it:\n\n"
+       (fenced "rust" rust-sample)
+       "\n"))
+
+(defn fenced (language code)
+  (str "```" language "\n" code "\n```"))
 
 (defn install-page ()
   (let (source (try (read-file "content/install.md"))
@@ -114,7 +140,7 @@
     (ok (->page (owned "/install/")
                 (owned "Install Knave")
                 (owned install-description)
-                content))))
+                content source))))
 
 (defn check-links ()
   (let (paths (try (files-under output-directory))

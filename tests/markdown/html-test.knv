@@ -44,6 +44,10 @@
   (assert (= (render-markdown "```text\n<a>\n```")
              "<pre><code class=\"language-text\">&lt;a&gt;</code></pre>")))
 
+(deftest highlights-a-knave-code-block
+  (assert (contains? (as-str (render-markdown "```knave\n:key\n```"))
+                     "<span class=\"keyword\">:key</span>")))
+
 (deftest highlights-a-lisp-code-block
   (assert (contains? (as-str (render-markdown "```lisp\n:key\n```"))
                      "<span class=\"keyword\">:key</span>")))

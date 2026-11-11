@@ -91,6 +91,10 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
 
 .hero > * { min-height: var(--field); }
 
+@media (min-width: 62.4375em) {
+  .hero { padding-top: var(--field-pitch); }
+}
+
 .tagline { margin: 0; font-weight: 400; text-wrap: balance; }
 
 .name { margin: 0; color: var(--bright); }

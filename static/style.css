@@ -34,7 +34,7 @@ a { color: var(--link); text-underline-offset: .2em; }
 
 a:hover { color: var(--bright); }
 
-a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); outline-offset: 2px; }
+a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-offset: 2px; }
 
 .grid { row-gap: var(--leading); }
 
@@ -60,15 +60,15 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
   position: relative;
 }
 
-.menu a, .site-footer a { text-decoration: none; }
+.button { color: var(--link); text-decoration: none; }
+
+.button:hover { color: var(--bright); }
 
 .menu a::after {
   content: "";
   position: absolute;
   inset: calc(var(--leading) / -2) 0;
 }
-
-.menu a:hover, .site-footer a:hover { text-decoration: underline; }
 
 @media (min-width: 62.4375em) {
   .site-header {
@@ -157,13 +157,10 @@ a:focus-visible, .copy-button:focus-visible { outline: 2px solid var(--pip); out
   padding: 0;
   border: 0;
   background: none;
-  color: var(--dim);
   font: inherit;
   line-height: var(--leading);
   cursor: pointer;
 }
-
-.copy-button:hover { color: var(--bright); }
 
 .table-scroll { overflow-x: auto; margin-bottom: var(--leading); }
 

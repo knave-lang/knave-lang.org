@@ -2,7 +2,7 @@
 (use discovery ->page followed-by page)
 (use files files-under path-in read-file)
 (use prose prose)
-(use targets closing-paren rewrite-link-targets)
+(use markdown-links closing-paren rewrite-link-targets)
 
 (use strings after before contains? ends-with? find-from
              join owned replace-all starts-with?)

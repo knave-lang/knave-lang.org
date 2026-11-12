@@ -29,6 +29,9 @@
 
 (def index-title "Knave documentation")
 
+(def llms-guide-entry
+  "To write Knave with a language model's help, read [Writing Knave with a language model](/docs/llms/).")
+
 (def index-description
   "Reference pages for the modules of the Knave prelude, generated from the compiler's docstrings.")
 
@@ -183,6 +186,7 @@
 
 (defn index-markdown (module-pages)
   (str "# Documentation\n\n" index-description "\n\n"
+       llms-guide-entry "\n\n"
        (join (ref (collect (map (iter module-pages) index-entry)))
              "\n")))
 

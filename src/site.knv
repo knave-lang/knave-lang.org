@@ -40,6 +40,9 @@
 (def install-description
   "Install the Knave programming language with Cargo or Nix, then create and run your first project.")
 
+(def llms-guide-description
+  "Write Knave with a language model's help: the idioms that differ from Rust and how to read Knave's errors.")
+
 (def knave-language "knave")
 
 (def rust-language "rust")
@@ -49,7 +52,8 @@
   (try (copy-directory-files static-directory output-directory))
   (try (write-grid-files output-directory))
   (let (pages (followed-by (vec (try (landing-page))
-                                (try (install-page)))
+                                (try (install-page))
+                                (try (llms-guide-page)))
                            (try (docs-pages)))
         layout (try (layout-with-stylesheet-version)))
     (try (write-pages (as-str layout) (ref pages) 0))
@@ -167,11 +171,21 @@
        "\n"))
 
 (defn install-page ()
-  (let (source (try (read-file "content/install.md"))
+  (markdown-content-page "content/install.md" "/install/"
+                         "Install Knave"
+                         install-description))
+
+(defn llms-guide-page ()
+  (markdown-content-page "content/llms.md" "/docs/llms/"
+                         "Writing Knave with a language model"
+                         llms-guide-description))
+
+(defn markdown-content-page (source-path path title description)
+  (let (source (try (read-file source-path))
         content (prose (as-str source)))
-    (ok (->page (owned "/install/")
-                (owned "Install Knave")
-                (owned install-description)
+    (ok (->page (owned path)
+                (owned title)
+                (owned description)
                 content source))))
 
 (defn check-links ()

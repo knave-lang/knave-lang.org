@@ -2,7 +2,7 @@
                llms-full-sections llms-links markdown-path
                page sitemap-entries)
 
-(use files copy-directory-files failure files-under
+(use files copy-directory-files failure files-under path-in
            read-file remove-directory write-file
            write-index)
 
@@ -130,7 +130,7 @@
     (read-file (as-str template-path))))
 
 (defn write-output (file-name contents)
-  (let (output-path (str output-directory "/" file-name))
+  (let (output-path (path-in output-directory file-name))
     (write-file (as-str output-path) contents)))
 
 (defn landing-page ()
@@ -195,7 +195,7 @@
   (if (>= position (len paths))
     (ok pages)
     (let (path (as-str (at paths position))
-          full-path (str output-directory "/" path))
+          full-path (path-in output-directory path))
       (cond
         ((ends-with? path ".html")
          (push! pages

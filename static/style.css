@@ -9,6 +9,7 @@
   --number: #e8b36b;
   --rule: #2f3348;
   --match: #1c1f2f;
+  --code-surface: #1a1d2b;
   --hanging-indent: calc(2 * var(--leading));
   color-scheme: dark;
 }
@@ -197,18 +198,47 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 
 .prose :not(pre) > code { color: var(--bright); }
 
-.prose pre { overflow-x: auto; box-shadow: inset 0 1px 0 var(--rule), inset 0 -1px 0 var(--rule); }
+.prose pre {
+  --line-number-width: 4ch;
+  padding: var(--leading) var(--gutter);
+  background: var(--code-surface);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  counter-reset: line;
+}
+
+.prose pre .line {
+  display: block;
+  position: relative;
+  padding-left: calc(var(--line-number-width) + var(--hanging-indent));
+  text-indent: calc(-1 * var(--hanging-indent));
+}
+
+.prose pre .line::before {
+  counter-increment: line;
+  content: counter(line);
+  position: absolute;
+  left: 0;
+  width: calc(var(--line-number-width) / 2);
+  text-indent: 0;
+  color: var(--dim);
+  text-align: right;
+}
+
+.prose pre .line:only-child { padding-left: var(--hanging-indent); }
+
+.prose pre .line:only-child::before { content: none; }
 
 .copyable { position: relative; }
 
-.copyable pre { padding-right: calc(2 * var(--leading)); white-space: pre-wrap; overflow-wrap: anywhere; }
+.copyable pre { padding-right: calc(var(--gutter) + 2 * var(--leading)); white-space: pre-wrap; overflow-wrap: anywhere; }
 
 .copyable .word { display: inline-block; }
 
 .copy-button {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: var(--leading);
+  right: var(--gutter);
   height: var(--leading);
   padding: 0;
   border: 0;

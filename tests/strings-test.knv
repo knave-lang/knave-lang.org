@@ -1,15 +1,10 @@
-(use strings after before fnv1a-digest in-line-spans
-             leading-count)
+(use strings after before fnv1a-digest leading-count)
 
 (deftest hashes-empty-text-to-the-fnv1a-offset-basis
   (assert (= (fnv1a-digest "") "14695981039346656037")))
 
 (deftest hashes-text-to-its-published-fnv1a-value
   (assert (= (fnv1a-digest "foobar") "9625390261332436968")))
-
-(deftest puts-each-line-in-its-own-span
-  (assert (= (in-line-spans "one\n\ntwo")
-             "<span class=\"line\">one\n</span><span class=\"line\">\n</span><span class=\"line\">two</span>")))
 
 (deftest takes-the-text-after-a-byte-offset
   (assert (= (after "héllo" 3) "llo")))

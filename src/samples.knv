@@ -1,0 +1,9 @@
+(use knave-markdown render-markdown)
+
+(export code-sample fenced)
+
+(defn code-sample (language code)
+  (render-markdown (as-str (fenced language code))))
+
+(defn fenced (language code)
+  (str "```" language "\n" code "\n```"))

@@ -1,7 +1,6 @@
 (export after before contains? ends-with? escape-html
-        find-from fnv1a-digest in-line-spans join
-        leading-count owned percent-decode replace-all
-        starts-with?)
+        find-from fnv1a-digest join leading-count owned
+        percent-decode replace-all starts-with?)
 
 (def fnv1a-digest
   (rust "{0}.bytes().fold(0xcbf29ce484222325_u64, |hash, byte| (hash ^ u64::from(byte)).wrapping_mul(0x100000001b3)).to_string()"
@@ -65,8 +64,3 @@
       (replace-all ">" "&gt;")
       (as-str)
       (replace-all "\"" "&quot;")))
-
-(defn in-line-spans (text)
-  (str "<span class=\"line\">"
-       (replace-all text "\n" "\n</span><span class=\"line\">")
-       "</span>"))

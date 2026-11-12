@@ -2,8 +2,10 @@
 
 (export code-sample fenced)
 
+(def fence "```")
+
 (defn code-sample (language code)
   (render-markdown (as-str (fenced language code))))
 
 (defn fenced (language code)
-  (str "```" language "\n" code "\n```"))
+  (str fence language "\n" code "\n" fence))

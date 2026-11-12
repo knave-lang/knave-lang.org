@@ -2,11 +2,11 @@
 (use discovery ->page followed-by page)
 (use files files-under path-in read-file)
 (use markdown/blocks block parse-blocks)
-(use markdown/html render-markdown)
+(use prose prose)
 (use markdown/targets closing-paren rewrite-link-targets)
 
 (use strings after before contains? ends-with? find-from
-             in-prose join owned replace-all starts-with?)
+             join owned replace-all starts-with?)
 
 (export docs-pages site-markdown)
 
@@ -72,12 +72,11 @@
         module (before source markdown-extension)
         path (module-path module)
         page-markdown (site-markdown (as-str markdown) source same-page)
-        copy-markdown (site-markdown (as-str markdown) source (as-str path))
-        rendered (render-markdown (as-str page-markdown)))
+        copy-markdown (site-markdown (as-str markdown) source (as-str path)))
     (ok (->page path
                 (str module " | Knave docs")
                 (summary (as-str markdown))
-                (in-prose (as-str rendered))
+                (prose (as-str page-markdown))
                 copy-markdown))))
 
 (defn module-path (module) (str docs-path module "/"))
@@ -156,7 +155,7 @@
     (->page (owned docs-path)
             (owned index-title)
             (owned index-description)
-            (in-prose (as-str (render-markdown (as-str markdown))))
+            (prose (as-str markdown))
             markdown)))
 
 (defn index-markdown (module-pages)

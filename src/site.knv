@@ -12,11 +12,11 @@
 (use links ->site-files broken-links html-page
            markdown-page)
 
-(use markdown/highlight highlight)
-(use markdown/html render-markdown)
+(use knave-markdown render-markdown)
+(use prose prose)
 
 (use strings ends-with? escape-html fnv1a-digest
-             in-line-spans in-prose join owned)
+             in-line-spans join owned)
 
 (use template fill)
 
@@ -151,7 +151,7 @@
       (fill "caution" (as-str (escape-html landing-caution)))
       (as-str)
       (fill "knave-sample"
-            (as-str (in-line-spans (as-str (highlight knave-code)))))
+            (as-str (render-markdown (as-str (fenced "knave" knave-code)))))
       (as-str)
       (fill "rust-sample"
             (as-str (in-line-spans (as-str (escape-html rust-code)))))))
@@ -170,7 +170,7 @@
 
 (defn install-page ()
   (let (source (try (read-file "content/install.md"))
-        content (in-prose (as-str (render-markdown (as-str source)))))
+        content (prose (as-str source)))
     (ok (->page (owned "/install/")
                 (owned "Install Knave")
                 (owned install-description)

@@ -1,4 +1,5 @@
-(use docs site-markdown summary)
+(use docs index-markdown site-markdown summary)
+(use strings contains?)
 
 (deftest links-a-sibling-module-page-to-its-site-path
   (assert (= (site-markdown "[char](prelude/text.md#char)"
@@ -58,3 +59,7 @@
 
 (deftest summarizes-only-the-first-of-several-paragraphs
   (assert (= (summary "# m\n\nFirst.\n\nSecond.\n") "First.")))
+
+(deftest links-the-language-model-guide-from-the-index
+  (assert (contains? (as-str (index-markdown (ref (vec))))
+                     "](/docs/llms/)")))

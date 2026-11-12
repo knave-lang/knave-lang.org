@@ -85,13 +85,19 @@
 (defn module-path (module) (str docs-path module "/"))
 
 (defn summary (markdown)
-  (plain-text (as-str (first-paragraph markdown))))
+  (let (paragraph (first-paragraph markdown))
+    (if (missing-docstring? paragraph)
+      (str "")
+      (plain-text paragraph))))
+
+(type first-paragraph
+  (fn ((ref str)) (ref str)))
 
 (defn first-paragraph (markdown)
-  (let (description (before (after-title markdown) paragraph-break))
-    (if (starts-with? description anchor-opening)
-      (str "")
-      (replace-all (trim description) "\n" " "))))
+  (before (after-title markdown) paragraph-break))
+
+(defn missing-docstring? (paragraph)
+  (starts-with? paragraph anchor-opening))
 
 (type after-title
   (fn ((ref str)) (ref str)))
@@ -107,7 +113,10 @@
       (as-str)
       (replace-all "[" "")
       (as-str)
-      (replace-all "`" "")))
+      (replace-all "`" "")
+      (as-str)
+      (trim)
+      (replace-all "\n" " ")))
 
 (defn without-link-targets (text start plain)
   (match (find-from text "](" start)

@@ -130,10 +130,39 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
   opacity: 0;
 }
 
-.session .form.matched::before { opacity: 1; }
+@media (hover: hover) {
+  .session .form.matched::before { opacity: 1; }
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .session .form::before { transition: opacity 160ms ease-out; }
+}
+
+.pane-switch { display: none; }
+
+@media (width < 62.4375em) {
+  .pane-switch {
+    display: flex;
+    column-gap: var(--gutter);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--screen);
+  }
+
+  .pane-switch button {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    line-height: var(--leading);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pane-switch [aria-pressed="true"] { color: var(--bright); }
+
+  .switchable .pane[data-hidden] { display: none; }
 }
 
 .prose { margin-bottom: calc(2 * var(--leading)); }

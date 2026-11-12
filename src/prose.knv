@@ -1,5 +1,5 @@
 (use knave-markdown render-markdown)
-(use strings in-prose replace-all)
+(use strings replace-all)
 
 (export prose)
 
@@ -13,3 +13,6 @@
                    "<div class=\"table-scroll\"><table>")
       (as-str)
       (replace-all "</table>" "</table></div>")))
+
+(defn in-prose (html)
+  (str "<main><div class=\"prose\">" html "</div></main>"))

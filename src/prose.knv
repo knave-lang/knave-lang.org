@@ -1,0 +1,15 @@
+(use knave-markdown render-markdown)
+(use strings in-prose replace-all)
+
+(export prose)
+
+(defn prose (markdown)
+  (in-prose (as-str (with-style-hooks (as-str (render-markdown markdown))))))
+
+(defn with-style-hooks (html)
+  (-> (replace-all html "<h1 " "<h1 class=\"type-title\" ")
+      (as-str)
+      (replace-all "<table>"
+                   "<div class=\"table-scroll\"><table>")
+      (as-str)
+      (replace-all "</table>" "</table></div>")))

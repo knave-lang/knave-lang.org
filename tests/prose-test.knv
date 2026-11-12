@@ -1,0 +1,18 @@
+(use prose prose)
+(use strings contains?)
+
+(deftest gives-a-top-heading-the-title-type
+  (assert (contains? (as-str (prose "# Install"))
+                     "<h1 class=\"type-title\" id=\"install\"")))
+
+(deftest wraps-a-table-so-it-can-scroll
+  (assert (contains? (as-str (prose "| A |\n| --- |\n| b |"))
+                     "<div class=\"table-scroll\"><table><thead>")))
+
+(deftest closes-the-table-scroll-wrapper
+  (assert (contains? (as-str (prose "| A |\n| --- |\n| b |"))
+                     "</tbody></table></div>")))
+
+(deftest puts-the-rendered-markdown-in-the-prose-container
+  (assert (= (prose "text")
+             "<main><div class=\"prose\"><p>text</p></div></main>")))

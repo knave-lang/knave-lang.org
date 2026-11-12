@@ -45,3 +45,12 @@
 
 (deftest summarizes-a-page-without-a-paragraph-as-empty
   (assert (= (summary "# text\n") "")))
+
+(deftest summarizes-a-module-without-a-docstring-as-empty
+  (assert (= (summary "# m\n\n<a id=\"f\"></a>\n\n## `f`\n") "")))
+
+(deftest summarizes-a-page-ending-in-its-paragraph
+  (assert (= (summary "# m\n\nOnly line.\n") "Only line.")))
+
+(deftest summarizes-only-the-first-of-several-paragraphs
+  (assert (= (summary "# m\n\nFirst.\n\nSecond.\n") "First.")))

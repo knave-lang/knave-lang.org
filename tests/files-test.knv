@@ -1,0 +1,8 @@
+(use files path-in)
+
+(deftest joins-a-directory-and-a-name-with-a-slash
+  (assert (= (path-in "public" "index.html") "public/index.html")))
+
+(deftest keeps-the-slashes-inside-a-nested-name
+  (assert (= (path-in "public" "docs/index.html")
+             "public/docs/index.html")))

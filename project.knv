@@ -3,4 +3,4 @@
     (knave-grid :git "https://github.com/KarlHarnois/knave-grid"
                 :rev "fcd7a12e0f8ccc0ed693ae94ffe66d1ea3e396a9")
     (knave-preview :git "https://github.com/KarlHarnois/knave-preview"
-                   :rev "f5828042e4ad7c9f17c946b616a1ae90131b9e7c")))
+                   :rev "3d759e7f9d2c48ed2119b53839c30a228cebd975")))

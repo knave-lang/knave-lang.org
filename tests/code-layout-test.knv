@@ -1,0 +1,20 @@
+(use code-layout code-parts part)
+(use strings owned)
+
+(defn code-at (parts position)
+  (match (at parts position)
+    ((code source) (owned (as-str source)))
+    ((text _) (str ""))))
+
+(deftest groups-the-code-lines-of-a-block
+  (let (parts (code-parts "```\n(f 1)\n(g 2)\n```"))
+    (assert (= (code-at (ref parts) 1) "(f 1)\n(g 2)"))))
+
+(deftest keeps-a-result-line-out-of-the-code
+  (let (parts (code-parts "```\n(f 1)\n=> 2\n```"))
+    (assert (= (len parts) 4))
+    (assert (= (code-at (ref parts) 1) "(f 1)"))))
+
+(deftest leaves-prose-outside-blocks-alone
+  (let (parts (code-parts "(not code)\n```\n(f 1)\n```"))
+    (assert (= (code-at (ref parts) 0) ""))))

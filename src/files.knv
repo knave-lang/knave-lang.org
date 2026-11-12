@@ -1,6 +1,6 @@
-(export copy-directory-files directory? failure files-under
-        read-bytes read-file remove-directory write-file
-        write-index)
+(export copy-directory-files create-directories directory?
+        failure files-under read-bytes read-file
+        remove-directory write-file write-index)
 
 (def index-file-name "index.html")
 

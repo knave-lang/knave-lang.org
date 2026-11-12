@@ -1,0 +1,27 @@
+(use markdown-links link-targets rewrite-link-targets)
+
+(deftest finds-link-targets-in-order
+  (assert (= (link-targets "[a](x.md) and [b](y.md#z)")
+             (vec (str "x.md") (str "y.md#z")))))
+
+(deftest skips-a-link-inside-a-code-span
+  (assert (= (link-targets "`[a](x)` then [b](y)")
+             (vec (str "y")))))
+
+(deftest skips-a-link-inside-a-double-backtick-code-span
+  (assert (= (link-targets "`` [a](x) `` then [b](y)")
+             (vec (str "y")))))
+
+(deftest skips-a-link-inside-a-fence
+  (assert (= (link-targets "```knave\n[a](x)\n```\n[b](y)")
+             (vec (str "y")))))
+
+(deftest rewrites-only-the-targets
+  (assert (= (rewrite-link-targets "see [a](x) and [b](y) now"
+               (fn (target) (str "/" target)))
+             "see [a](/x) and [b](/y) now")))
+
+(deftest leaves-markdown-without-links-unchanged
+  (assert (= (rewrite-link-targets "plain `[a](x)` text"
+               (fn (target) (str "/" target)))
+             "plain `[a](x)` text")))

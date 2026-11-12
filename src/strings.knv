@@ -1,5 +1,5 @@
 (export after before contains? ends-with? escape-html
-        find-from fnv1a-digest in-line-spans in-prose join
+        find-from fnv1a-digest in-line-spans join
         leading-count owned percent-decode replace-all
         starts-with?)
 
@@ -70,6 +70,3 @@
   (str "<span class=\"line\">"
        (replace-all text "\n" "\n</span><span class=\"line\">")
        "</span>"))
-
-(defn in-prose (html)
-  (str "<main><div class=\"prose\">" html "</div></main>"))

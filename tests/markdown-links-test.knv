@@ -25,3 +25,11 @@
   (assert (= (rewrite-link-targets "plain `[a](x)` text"
                (fn (target) (str "/" target)))
              "plain `[a](x)` text")))
+
+(deftest treats-mid-line-triple-backticks-as-a-code-span
+  (assert (= (link-targets "a ```[a](x)``` then [b](y)")
+             (vec (str "y")))))
+
+(deftest reads-past-an-unclosed-backtick
+  (assert (= (link-targets "a ` then [b](y)")
+             (vec (str "y")))))

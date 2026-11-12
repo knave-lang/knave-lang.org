@@ -3,16 +3,36 @@
 
 (export prose)
 
-(defn prose (markdown)
-  (in-prose (as-str (with-style-hooks (as-str (render-markdown markdown))))))
+(def heading-one "<h1 ")
 
-(defn with-style-hooks (html)
-  (-> (replace-all html "<h1 " "<h1 class=\"type-title\" ")
+(def titled-heading-one "<h1 class=\"type-title\" ")
+
+(def table-opening "<table>")
+
+(def table-closing "</table>")
+
+(def scroll-opening "<div class=\"table-scroll\">")
+
+(def scroll-closing "</div>")
+
+(defn prose (markdown)
+  (-> (render-markdown markdown)
       (as-str)
-      (replace-all "<table>"
-                   "<div class=\"table-scroll\"><table>")
+      (with-title-type)
       (as-str)
-      (replace-all "</table>" "</table></div>")))
+      (with-scrolling-tables)
+      (as-str)
+      (in-prose)))
+
+(defn with-title-type (html)
+  (replace-all html heading-one titled-heading-one))
+
+(defn with-scrolling-tables (html)
+  (-> (replace-all html table-opening
+                   (as-str (str scroll-opening table-opening)))
+      (as-str)
+      (replace-all table-closing
+                   (as-str (str table-closing scroll-closing)))))
 
 (defn in-prose (html)
   (str "<main><div class=\"prose\">" html "</div></main>"))

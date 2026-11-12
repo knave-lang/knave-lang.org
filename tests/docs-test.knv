@@ -1,4 +1,4 @@
-(use docs site-markdown)
+(use docs site-markdown summary)
 
 (deftest links-a-sibling-module-page-to-its-site-path
   (assert (= (site-markdown "[char](prelude/text.md#char)"
@@ -38,3 +38,10 @@
   (assert (= (site-markdown "[`vec`](prelude/vec.md#vec)"
                             "prelude.md" "")
              "[`vec`](/docs/prelude/vec/#vec)")))
+
+(deftest summarizes-a-page-by-its-first-paragraph
+  (assert (= (summary "# text\n\nWorks with `str` and\n[char](prelude/text.md#char).\n\n## `len`\n")
+             "Works with str and char.")))
+
+(deftest summarizes-a-page-without-a-paragraph-as-empty
+  (assert (= (summary "# text\n") "")))

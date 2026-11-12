@@ -19,7 +19,9 @@
 
 (def markdown-extension ".md")
 
-(def summary-line 2)
+(def paragraph-break "\n\n")
+
+(def anchor-opening "<a id=\"")
 
 (def parent-segment "..")
 
@@ -86,21 +88,19 @@
   (plain-text (as-str (first-paragraph markdown))))
 
 (defn first-paragraph (markdown)
-  (let (source-lines (collect (map (lines markdown) owned)))
-    (join (ref (paragraph-from (ref source-lines) summary-line (vec)))
-          " ")))
+  (let (description (before (after-title markdown) paragraph-break))
+    (if (starts-with? description anchor-opening)
+      (str "")
+      (replace-all (trim description) "\n" " "))))
 
-(defn paragraph-from (source-lines index paragraph)
-  (if (paragraph-continues? source-lines index)
-    (do
-      (push! paragraph
-             (owned (as-str (at source-lines index))))
-      (recur source-lines (+ index 1) paragraph))
-    paragraph))
+(type after-title
+  (fn ((ref str)) (ref str)))
 
-(defn paragraph-continues? (source-lines index)
-  (and (< index (len source-lines))
-       (not (empty? (trim (as-str (at source-lines index)))))))
+(defn after-title (markdown)
+  (match (find-from markdown paragraph-break 0)
+    (none "")
+    ((some title-end)
+     (after markdown (+ title-end (len paragraph-break))))))
 
 (defn plain-text (markdown)
   (-> (without-link-targets markdown 0 (str ""))

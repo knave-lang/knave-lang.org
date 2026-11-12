@@ -1,6 +1,6 @@
 (export copy-directory-files create-directories failure
-        files-under read-file remove-directory write-file
-        write-index)
+        files-under path-in read-file remove-directory
+        write-file write-index)
 
 (def index-file-name "index.html")
 
@@ -36,12 +36,14 @@
   (rust "std::path::Path::new({0}).is_dir()"
     (fn ((ref str)) bool)))
 
+(defn path-in (directory name) (str directory "/" name))
+
 (def failure
   (rust "std::io::Error::other({0})" (fn (string) io-error)))
 
 (defn write-index (directory html)
   (try (create-directories directory))
-  (write-file (as-str (str directory "/" index-file-name))
+  (write-file (as-str (path-in directory index-file-name))
               html))
 
 (defn copy-directory-files (source target)
@@ -53,8 +55,8 @@
   (if (>= position (len names))
     (ok (do))
     (let (name (as-str (at names position)))
-      (try (copy-file (as-str (str source "/" name))
-                      (as-str (str target "/" name))))
+      (try (copy-file (as-str (path-in source name))
+                      (as-str (path-in target name))))
       (recur source target names (+ position 1)))))
 
 (defn files-under (root)
@@ -65,11 +67,11 @@
   (match (pop! pending)
     (none (ok found))
     ((some directory)
-     (let (names (try (file-names (as-str (str root "/" directory)))))
+     (let (names (try (file-names (as-str (path-in root directory)))))
        (for-each (iter names)
          (fn (name)
            (let (path (str directory name))
-             (if (directory? (as-str (str root "/" path)))
+             (if (directory? (as-str (path-in root path)))
                (push! pending (str path "/"))
                (push! found path)))))
        (recur root pending found)))))

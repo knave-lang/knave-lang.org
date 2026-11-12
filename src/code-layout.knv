@@ -1,4 +1,4 @@
-(use files create-directories files-under read-file
+(use files create-directories files-under path-in read-file
            remove-directory write-file)
 
 (use strings ends-with? join owned starts-with?)
@@ -53,7 +53,7 @@
 (defn read-documents (directory paths position documents)
   (if (>= position (len paths))
     (ok documents)
-    (let (path (str directory "/" (at paths position))
+    (let (path (path-in directory (at paths position))
           markdown (try (read-file (as-str path))))
       (push! documents (code-parts (as-str markdown)))
       (recur directory paths (+ position 1) documents))))
@@ -118,8 +118,8 @@
       (recur snippet-directory document parts (+ position 1)))))
 
 (defn snippet-path (snippet-directory document part)
-  (str snippet-directory "/" document "-" part
-       snippet-extension))
+  (path-in snippet-directory
+           (str document "-" part snippet-extension)))
 
 (type write-documents
   (fn ((ref str)
@@ -137,7 +137,7 @@
                                      (at documents position)
                                      0
                                      (vec))))
-      (let (path (str directory "/" (at paths position))
+      (let (path (path-in directory (at paths position))
             markdown (join (ref lines) "\n"))
         (try (write-file (as-str path) (as-str markdown))))
       (recur directory snippet-directory paths documents

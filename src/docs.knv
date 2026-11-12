@@ -1,6 +1,6 @@
 (use code-layout lay-out-code-blocks)
 (use discovery ->page followed-by page)
-(use files files-under read-file)
+(use files files-under path-in read-file)
 (use markdown/blocks block parse-blocks)
 (use markdown/html render-markdown)
 (use markdown/targets closing-paren rewrite-link-targets)
@@ -67,7 +67,7 @@
       (recur sources (+ position 1) pages))))
 
 (defn module-page (source)
-  (let (source-path (str generated-directory "/" source)
+  (let (source-path (path-in generated-directory source)
         markdown (try (read-file (as-str source-path)))
         module (before source markdown-extension)
         path (module-path module)

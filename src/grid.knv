@@ -31,9 +31,8 @@
 
 (defn write-checked-grid (directory)
   (let (grid (try (site-grid)))
-    (report-warnings (ref grid))
-    (write-grid (ref grid)
-                (as-str (str directory "/grid.css")))))
+    (report-warnings grid)
+    (write-grid grid (as-str (str directory "/grid.css")))))
 
 (defn report-warnings (grid)
   (for-each (iter (:warnings grid))

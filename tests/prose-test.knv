@@ -1,28 +1,8 @@
 (use knave-markdown render-markdown)
 (use prose prose)
-(use strings contains?)
-
-(deftest gives-a-top-heading-the-title-type
-  (assert (contains? (as-str (prose "# Install"))
-                     "<h1 class=\"type-title\" ")))
-
-(deftest leaves-lower-headings-without-the-title-type
-  (assert (not (contains? (as-str (prose "## Part")) "type-title"))))
-
-(deftest wraps-a-table-so-it-can-scroll
-  (let (table "| A |\n| --- |\n| b |")
-    (assert (= (prose table)
-               (str "<main><div class=\"prose\"><div class=\"table-scroll\">"
-                    (render-markdown table)
-                    "</div></div></main>")))))
-
-(deftest leaves-markup-written-as-text-alone
-  (let (html (prose "`<table>` and <h1 x>"))
-    (assert (not (or (contains? (as-str html) "table-scroll")
-                     (contains? (as-str html) "type-title"))))))
 
 (deftest puts-the-rendered-markdown-in-the-prose-container
-  (assert (= (prose "text")
+  (assert (= (prose "# Title\n\ntext")
              (str "<main><div class=\"prose\">"
-                  (render-markdown "text")
+                  (render-markdown "# Title\n\ntext")
                   "</div></main>"))))

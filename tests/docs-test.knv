@@ -49,6 +49,10 @@
 (deftest summarizes-a-module-without-a-docstring-as-empty
   (assert (= (summary "# m\n\n<a id=\"f\"></a>\n\n## `f`\n") "")))
 
+(deftest summarizes-a-re-export-only-module-as-empty
+  (assert (= (summary "# m\n\n## Re-exported names\n\n- [`x`](a.md#x)\n")
+             "")))
+
 (deftest summarizes-a-page-ending-in-its-paragraph
   (assert (= (summary "# m\n\nOnly line.\n") "Only line.")))
 

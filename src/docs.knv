@@ -23,6 +23,8 @@
 
 (def anchor-opening "<a id=\"")
 
+(def heading-marker "#")
+
 (def parent-segment "..")
 
 (def index-title "Knave documentation")
@@ -97,7 +99,8 @@
   (before (after-title markdown) paragraph-break))
 
 (defn missing-docstring? (paragraph)
-  (starts-with? paragraph anchor-opening))
+  (or (starts-with? paragraph anchor-opening)
+      (starts-with? paragraph heading-marker)))
 
 (type after-title
   (fn ((ref str)) (ref str)))

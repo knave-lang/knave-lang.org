@@ -18,10 +18,10 @@ let copy = scores.clone();
 (defn add-bonus! (scores) (push! scores 10))
 
 (defn main ()
-  (local scores (vec 1 2 3))
-  (add-bonus! scores)
-  (local copy (clone scores))
-  (println (len copy)))
+  (let (scores (vec 1 2 3))
+    (add-bonus! scores)
+    (let (copy (clone scores))
+      (println (len copy)))))
 ```
 
 Write no `&` or `&mut`. The compiler infers each parameter's mode from its uses, so `add-bonus!` takes `&mut Vec<i64>` and the call passes `&mut scores`. `&scores` is a symbol in Knave, and the check reports it as an unknown name. Write `(ref x)` or `(mut x)` only to force a borrow, and `(clone x)` for every copy of heap data, since the compiler never clones for you. Run `knave types file.knv` to see the modes it picked.
@@ -34,11 +34,12 @@ count += 1;
 ```
 
 ```knave
-(local count 0)
-(set! count (+ count 1))
+(let (count 0)
+  (set! count (+ count 1))
+  (println count))
 ```
 
-Every `local` can change, so there is no `mut` keyword, and `set!` replaces `+=`. The emitted Rust still uses `count += 1`.
+`set!` can change any `let` binding, so there is no `mut` keyword, and `set!` replaces `+=`. A binding lasts until the `let` closes, so the forms that use it go in the `let`'s body. The emitted Rust still uses `count += 1`.
 
 ### Loops
 
@@ -120,14 +121,14 @@ Shape::Circle(1.0)
   point)
 
 (defn main ()
-  (local p (->point :x 1.0 :y 2.0))
-  (local q (->point 3.0 4.0))
-  (println (+ (:x p) (:y q)))
-  (local moved (assoc p :x 5.0))
-  (println (:x moved))
-  (prn (shape/circle 1.0))
-  (prn (shape/labeled :text (str "box") :size 2.0))
-  (prn shape/point))
+  (let (p (->point :x 1.0 :y 2.0)
+        q (->point 3.0 4.0)
+        moved (assoc p :x 5.0))
+    (println (+ (:x p) (:y q)))
+    (println (:x moved))
+    (prn (shape/circle 1.0))
+    (prn (shape/labeled :text (str "box") :size 2.0))
+    (prn shape/point)))
 ```
 
 `defstruct` defines the constructor `->point`, which takes the fields by `:label` or by position. `(:x p)` reads a field, since `p.x` is one symbol. `assoc` returns a copy with fields replaced. An enum variant is `shape/circle`, with a slash where Rust writes `::`.
@@ -180,9 +181,9 @@ use crate::geometry::{distance, Point};
   :y f64)
 
 (defn distance (a b)
-  (local dx (- (:x a) (:x b)))
-  (local dy (- (:y a) (:y b)))
-  (sqrt (+ (* dx dx) (* dy dy))))
+  (let (dx (- (:x a) (:x b))
+        dy (- (:y a) (:y b)))
+    (sqrt (+ (* dx dx) (* dy dy)))))
 
 ; main.knv
 (use geometry ->point distance)
@@ -207,10 +208,10 @@ format!("hello {}", name)
 (defn greeting (name) (str "hello " name))
 
 (defn main ()
-  (local u (->user (str "ana")))
-  (println (greeting (:name u)))
-  (println (len "four"))
-  (println (upper-case "shout")))
+  (let (u (->user (str "ana")))
+    (println (greeting (:name u)))
+    (println (len "four"))
+    (println (upper-case "shout"))))
 ```
 
 A literal is a `(ref str)`, so a `string` field needs `(str "ana")`. `str` joins its arguments into a `string` and replaces `format!`. Knave has no `format`.
@@ -230,8 +231,8 @@ fn half(text: &str) -> Result<i64, ParseIntError> {
     (result i64 parse-int-error)))
 
 (defn half (text)
-  (local n (try (parse text)))
-  (ok (/ n 2)))
+  (let (n (try (parse text)))
+    (ok (/ n 2))))
 
 (defn sum-halves (a b)
   (let-try (x (half a)
@@ -279,10 +280,9 @@ let total: i64 = 13;
 (defn triple ((x i64)) (* x 3))
 
 (defn main ()
-  (local (total i64)
-    (+ (double 2) (triple 3)))
-  (println total)
-  (println (the u8 7)))
+  (let ((total i64) (+ (double 2) (triple 3)))
+    (println total)
+    (println (the u8 7))))
 ```
 
 Most code needs no types. To pin one, write a `type` signature, a `(name type)` binder, or `(the type value)`. A type is lowercase and applied in a list: `(vec i64)`, not `Vec<i64>`. `x: i64` is a symbol `x:` followed by `i64`.
@@ -296,27 +296,25 @@ return 1;
 
 ```knave
 (defn main ()
-  (local helper (fn (n) (* n 2)))
-  (println (helper 2)))
+  (let (helper (fn (n) (* n 2)))
+    (println (helper 2))))
 ```
 
-`defn` works only at module level, so bind a local `fn` instead. Knave has no `return`: a body's last form is its value.
+`defn` works only at module level, so bind a `fn` with `let` instead. Knave has no `return`: a body's last form is its value.
 
 ### Collections
 
 ```knave
 (defn main ()
-  (local items (vec 3 1 2))
-  (push! items 4)
-  (sort! items)
-  (prn items)
-  (println (at items 0))
-  (println (unwrap-or (get items 9) 0))
-  (local doubled
-    (collect (map (copied items) (fn (n) (* n 2)))))
-  (prn doubled)
-  (local ages (hash-map "ana" 31 "bo" 27))
-  (println (unwrap (get ages "ana"))))
+  (let (items (vec 3 1 2)
+        ages (hash-map "ana" 31 "bo" 27))
+    (push! items 4)
+    (sort! items)
+    (prn items)
+    (println (at items 0))
+    (println (unwrap-or (get items 9) 0))
+    (prn (collect (map (copied items) (fn (n) (* n 2)))))
+    (println (unwrap (get ages "ana")))))
 ```
 
 `(vec ...)` replaces `vec![...]`, and the reader rejects `[` and `{`. Functions take the collection first, `(len items)`, in place of `.len()`.
@@ -329,15 +327,15 @@ Knave prints errors in rustc's layout:
 
 ```text
 error[L0201]: cannot find `shape::circle` in this scope
- --> bad_enum_colons.knv:4:13
+ --> bad_enum_colons.knv:4:12
   |
-4 |   (local s (shape::circle 1.0))
-  |             ^^^^^^^^^^^^^ not found in this scope
+4 |   (let (s (shape::circle 1.0))
+  |            ^^^^^^^^^^^^^ not found in this scope
   |
 help: a name with a similar spelling exists
   |
-4 -   (local s (shape::circle 1.0))
-4 +   (local s (shape/circle 1.0))
+4 -   (let (s (shape::circle 1.0))
+4 +   (let (s (shape/circle 1.0))
   |
 ```
 
@@ -410,15 +408,15 @@ error[L0301]: no rule of `when` matches this form
 
 ```text
 error[L0201]: cannot find `+=` in this scope
- --> bad_plus_eq.knv:3:4
+ --> bad_plus_eq.knv:3:6
   |
-3 |   (+= count 1)
-  |    ^^ not found in this scope
+3 |     (+= count 1)
+  |      ^^ not found in this scope
   |
 help: a name with a similar spelling exists
   |
-3 -   (+= count 1)
-3 +   (+ count 1)
+3 -     (+= count 1)
+3 +     (+ count 1)
   |
 ```
 
@@ -430,24 +428,24 @@ Fix: `(set! count (+ count 1))`.
 (defn keep (names) names)
 
 (defn main ()
-  (local names (vec (str "ana") (str "bo")))
-  (local kept (keep names))
-  (println (len names)))
+  (let (names (vec (str "ana") (str "bo"))
+        kept (keep names))
+    (println (len names))))
 ```
 
 ```text
 error[L0501]: use of moved value `names`
- --> bad_moved.knv:6:17
+ --> bad_moved.knv:6:19
   |
-5 |   (local kept (keep names))
-  |                     ----- value moved here
-6 |   (println (len names)))
-  |                 ^^^^^ value used here after it moved
+5 |         kept (keep names))
+  |                    ----- value moved here
+6 |     (println (len names))))
+  |                   ^^^^^ value used here after it moved
   |
 help: clone the value if both places need it
   |
-5 -   (local kept (keep names))
-5 +   (local kept (keep (clone names)))
+5 -         kept (keep names))
+5 +         kept (keep (clone names)))
   |
 ```
 
@@ -456,15 +454,16 @@ Fix: clone it as the help shows, or reorder so the last use moves it.
 **`L0401` mismatched types.** A string literal is `(ref str)`, not `string`.
 
 ```knave
-(local u (->user "ana"))
+(let (u (->user "ana"))
+  (println (:name u)))
 ```
 
 ```text
 error[L0401]: mismatched types
- --> bad_literal.knv:4:20
+ --> bad_literal.knv:4:19
   |
-4 |   (local u (->user "ana"))
-  |                    ^^^^^ expected `string`, found `str`
+4 |   (let (u (->user "ana"))
+  |                   ^^^^^ expected `string`, found `str`
 ```
 
 Fix: `(->user (str "ana"))`. Numbers do not convert either: `(* width 1.5)` with a width declared `i64` reports ``expected `i64`, found a float``.
@@ -499,10 +498,10 @@ Fix: add `((rect w h) ...)` or a `_` arm.
 
 ```text
 error[L0210]: malformed `if`
- --> bad_if.knv:3:3
+ --> bad_if.knv:3:5
   |
-3 |   (if (> n 2) (println "big")))
-  |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this does not fit the shape of `if`
+3 |     (if (> n 2) (println "big"))))
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this does not fit the shape of `if`
   |
   = help: write `(when test body ...)` to run forms only when the test holds
 ```
@@ -519,7 +518,7 @@ error[L0208]: `defn` can only appear at module level
   = help: use `local` to bind a name inside a body
 ```
 
-Fix: `(local helper (fn (n) (* n 2)))`.
+Fix: bind the function with `let`, as in `(let (helper (fn (n) (* n 2))) (println (helper 2)))`.
 
 **`L0514` changing a copy.** A function that `set!`s its parameter needs a place, not a computed value.
 
@@ -535,6 +534,8 @@ error[L0514]: this argument is a copy, so changing it changes nothing
   |
   = help: bind it to a local and pass the local: `(local value (+ 1 2))`
 ```
+
+Fix: bind the value with `let` and pass the name, as in `(let (value (+ 1 2)) (bump! value))`.
 
 **`L0106` a character outside the syntax.** `[`, `]`, `{` and `}` are errors. Write every list with parentheses.
 
@@ -570,16 +571,16 @@ Fix: `(prn (vec 1 2 3))`. Plain parentheses, `(1 2 3)`, report `L0403` because t
 
 ```knave
 (defn dangling-name ()
-  (local someone (->person (str "Grace") 85))
-  (:name someone))
+  (let (someone (->person (str "Grace") 85))
+    (:name someone)))
 ```
 
 ```text
 error[E0515]: cannot return reference to local data `someone.name`
- --> bad_rustc.knv:7:3
+ --> bad_rustc.knv:7:5
   |
-7 |   (:name someone))
-  |   ^^^^^^^^^^^^^^^ returns a reference to data owned by the current function
+7 |     (:name someone)))
+  |     ^^^^^^^^^^^^^^^ returns a reference to data owned by the current function
   |
   = note: reported by rustc while compiling the generated Rust
 ```

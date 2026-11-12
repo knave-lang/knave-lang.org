@@ -1,5 +1,5 @@
-(use preview serve-preview)
-(use site build-site)
+(use knave-preview ->preview serve)
+(use site build-site output-directory)
 
 (deftask build ()
   "Builds the site into public/."
@@ -7,4 +7,10 @@
 
 (deftask serve ()
   "Serves the site at http://127.0.0.1:8000 and rebuilds it on change."
-  (serve-preview))
+  (serve
+    (->preview :directory (str output-directory)
+               :port 8000
+               :watched (vec (str "content")
+                             (str "templates")
+                             (str "static")))
+    build-site))

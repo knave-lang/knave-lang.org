@@ -9,6 +9,7 @@
   --number: #e8b36b;
   --rule: #2f3348;
   --match: #1c1f2f;
+  --code-surface: #1a1d2b;
   --hanging-indent: calc(2 * var(--leading));
   color-scheme: dark;
 }
@@ -197,18 +198,38 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 
 .prose :not(pre) > code { color: var(--bright); }
 
-.prose pre { overflow-x: auto; box-shadow: inset 0 1px 0 var(--rule), inset 0 -1px 0 var(--rule); }
+.prose pre {
+  position: relative;
+  isolation: isolate;
+  padding: var(--leading) var(--gutter);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.prose pre::before {
+  content: "";
+  position: absolute;
+  inset: var(--_grid-cap-top) 0 calc(var(--leading) - var(--_grid-descender-bottom));
+  z-index: -1;
+  background: var(--code-surface);
+}
+
+.prose pre .line {
+  display: block;
+  padding-left: var(--hanging-indent);
+  text-indent: calc(-1 * var(--hanging-indent));
+}
 
 .copyable { position: relative; }
 
-.copyable pre { padding-right: calc(2 * var(--leading)); white-space: pre-wrap; overflow-wrap: anywhere; }
+.copyable pre { padding-right: calc(var(--gutter) + 2 * var(--leading)); white-space: pre-wrap; overflow-wrap: anywhere; }
 
 .copyable .word { display: inline-block; }
 
 .copy-button {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: var(--leading);
+  right: var(--gutter);
   height: var(--leading);
   padding: 0;
   border: 0;
@@ -243,3 +264,5 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 .definer, .special { color: var(--pip); }
 
 .paren { color: var(--dim); }
+
+.result-arrow, .line:has(> .result-arrow), .line:has(> .result-arrow) * { color: var(--dim); }

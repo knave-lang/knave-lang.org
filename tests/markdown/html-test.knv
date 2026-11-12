@@ -12,7 +12,7 @@
 (deftest keeps-markup-inside-a-fence
   (assert (= (render-markdown
                "```text\n## not a heading\n\n- not a list\n```\n")
-             "<pre><code class=\"language-text\">## not a heading\n\n- not a list</code></pre>")))
+             "<pre><code class=\"language-text\"><span class=\"line\">## not a heading\n</span><span class=\"line\">\n</span><span class=\"line\">- not a list</span></code></pre>")))
 
 (deftest needs-a-space-after-heading-hashes
   (assert (= (render-markdown "#hash\n") "<p>#hash</p>")))
@@ -42,7 +42,7 @@
 
 (deftest escapes-a-plain-code-block
   (assert (= (render-markdown "```text\n<a>\n```")
-             "<pre><code class=\"language-text\">&lt;a&gt;</code></pre>")))
+             "<pre><code class=\"language-text\"><span class=\"line\">&lt;a&gt;</span></code></pre>")))
 
 (deftest highlights-a-knave-code-block
   (assert (contains? (as-str (render-markdown "```knave\n:key\n```"))
@@ -58,7 +58,7 @@
 
 (deftest leaves-an-untagged-code-block-plain
   (assert (not (contains? (as-str (render-markdown "```\n:key\n```"))
-                          "<span"))))
+                          "class=\"keyword\""))))
 
 (deftest gives-a-heading-the-explicit-anchor-before-it
   (assert (= (render-markdown "<a id=\"some?\"></a>\n\n## `some?`")

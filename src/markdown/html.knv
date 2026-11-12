@@ -1,7 +1,9 @@
 (use markdown/blocks block parse-blocks)
 (use markdown/highlight highlight)
 (use markdown/inlines render-inlines)
-(use strings escape-html join owned percent-encode slug)
+
+(use strings escape-html in-line-spans join owned
+             percent-encode slug)
 
 (export render-markdown)
 
@@ -55,7 +57,7 @@
   (str "<pre><code class=\"language-"
        (escape-html language)
        "\">"
-       (highlighted-code language code)
+       (in-line-spans (as-str (highlighted-code language code)))
        "</code></pre>"))
 
 (defn highlighted-code (language code)

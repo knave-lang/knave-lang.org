@@ -1,0 +1,167 @@
+(use files create-directories files-under read-file
+           remove-directory write-file)
+
+(use strings ends-with? join owned starts-with?)
+
+(export code-parts lay-out-code-blocks part)
+
+(defenum part
+  (text string)
+  (code string))
+
+(def fence "```")
+
+(def result-arrow "=>")
+
+(def markdown-extension ".md")
+
+(def snippet-extension ".knv")
+
+(def format-snippets
+  (rust "std::process::Command::new(\"knave\").args([\"fmt\", {0}]).stderr(std::process::Stdio::null()).status().map(drop)"
+    (fn ((ref str)) (result unit io-error))))
+
+(defn lay-out-code-blocks (directory snippet-directory)
+  (let (paths (try (markdown-paths directory))
+        documents (try (read-documents directory (ref paths) 0 (vec))))
+    (try (remove-directory snippet-directory))
+    (try (create-directories snippet-directory))
+    (try (write-snippets snippet-directory (ref documents) 0))
+    (try (format-snippets snippet-directory))
+    (write-documents directory snippet-directory
+                     (ref paths)
+                     (ref documents)
+                     0)))
+
+(defn markdown-paths (directory)
+  (let (paths (try (files-under directory)))
+    (ok (collect (map (filter (iter paths) markdown-file?) owned-path)))))
+
+(defn markdown-file? (path)
+  (ends-with? (as-str path) markdown-extension))
+
+(defn owned-path (path)
+  (owned (as-str path)))
+
+(type read-documents
+  (fn ((ref str)
+       (ref (vec string))
+       usize
+       (vec (vec part)))
+    (result (vec (vec part)) io-error)))
+
+(defn read-documents (directory paths position documents)
+  (if (>= position (len paths))
+    (ok documents)
+    (let (path (str directory "/" (at paths position))
+          markdown (try (read-file (as-str path))))
+      (push! documents (code-parts (as-str markdown)))
+      (recur directory paths (+ position 1) documents))))
+
+(defn code-parts (markdown)
+  (let (parts (vec)
+        pending (str "")
+        in-fence false)
+    (for-each (split markdown "\n")
+      (fn (line)
+        (if (code-line? line in-fence)
+          (set! pending (with-line pending line))
+          (do
+            (if (empty? pending)
+              (do)
+              (push! parts
+                     (part/code (owned (as-str pending)))))
+            (set! pending (str ""))
+            (push! parts (part/text (owned line)))
+            (if (starts-with? line fence)
+              (set! in-fence (not in-fence))
+              (do))))))
+    parts))
+
+(defn code-line? (line in-fence)
+  (and in-fence
+       (not (starts-with? line fence))
+       (not (starts-with? line result-arrow))))
+
+(defn with-line (code line)
+  (if (empty? code)
+    (owned line)
+    (str code "\n" line)))
+
+(type write-snippets
+  (fn ((ref str) (ref (vec (vec part))) usize)
+    (result unit io-error)))
+
+(defn write-snippets (snippet-directory documents position)
+  (if (>= position (len documents))
+    (ok (do))
+    (do
+      (try (write-document-snippets snippet-directory
+                                    position
+                                    (at documents position)
+                                    0))
+      (recur snippet-directory documents (+ position 1)))))
+
+(type write-document-snippets
+  (fn ((ref str) usize (ref (vec part)) usize)
+    (result unit io-error)))
+
+(defn write-document-snippets (snippet-directory document parts position)
+  (if (>= position (len parts))
+    (ok (do))
+    (do
+      (match (at parts position)
+        ((code source)
+         (let (path (snippet-path snippet-directory document position))
+           (try (write-file (as-str path) (as-str source)))))
+        ((text _) (do)))
+      (recur snippet-directory document parts (+ position 1)))))
+
+(defn snippet-path (snippet-directory document part)
+  (str snippet-directory "/" document "-" part
+       snippet-extension))
+
+(type write-documents
+  (fn ((ref str)
+       (ref str)
+       (ref (vec string))
+       (ref (vec (vec part)))
+       usize)
+    (result unit io-error)))
+
+(defn write-documents (directory snippet-directory paths documents position)
+  (if (>= position (len documents))
+    (ok (do))
+    (let (lines (try (laid-out-lines snippet-directory
+                                     position
+                                     (at documents position)
+                                     0
+                                     (vec))))
+      (let (path (str directory "/" (at paths position))
+            markdown (join (ref lines) "\n"))
+        (try (write-file (as-str path) (as-str markdown))))
+      (recur directory snippet-directory paths documents
+             (+ position 1)))))
+
+(type laid-out-lines
+  (fn ((ref str)
+       usize
+       (ref (vec part))
+       usize
+       (vec string))
+    (result (vec string) io-error)))
+
+(defn laid-out-lines (snippet-directory document parts position lines)
+  (if (>= position (len parts))
+    (ok lines)
+    (do
+      (match (at parts position)
+        ((text line) (push! lines (owned (as-str line))))
+        ((code _)
+         (let (path (snippet-path snippet-directory document position)
+               formatted (try (read-file (as-str path))))
+           (push! lines
+                  (owned (trim (as-str formatted)))))))
+      (recur snippet-directory document parts
+             (+ position 1)
+             lines))))

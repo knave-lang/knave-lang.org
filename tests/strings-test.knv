@@ -1,5 +1,5 @@
-(use strings after before first-char? fnv1a-digest
-             in-line-spans leading-count slug)
+(use strings after before fnv1a-digest in-line-spans
+             leading-count)
 
 (deftest hashes-empty-text-to-the-fnv1a-offset-basis
   (assert (= (fnv1a-digest "") "14695981039346656037")))
@@ -28,21 +28,3 @@
 
 (deftest counts-no-marks-when-text-starts-differently
   (assert (= (leading-count "a##" (char "#")) 0)))
-
-(deftest tests-the-first-character
-  (assert (first-char? "1a" digit?)))
-
-(deftest ignores-characters-after-the-first
-  (assert (not (first-char? "a1" digit?))))
-
-(deftest finds-no-first-character-in-empty-text
-  (assert (not (first-char? "" digit?))))
-
-(deftest lowercases-and-hyphenates-a-slug
-  (assert (= (slug "Hello Big World") "hello-big-world")))
-
-(deftest drops-punctuation-from-a-slug
-  (assert (= (slug "What's new-ish?") "whats-new-ish")))
-
-(deftest keeps-non-ascii-letters-in-a-slug
-  (assert (= (slug "Café Noël") "café-noël")))

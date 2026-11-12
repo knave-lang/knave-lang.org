@@ -2,7 +2,7 @@
              find-from owned percent-decode starts-with?)
 
 (use discovery site-origin)
-(use targets link-targets)
+(use markdown-links link-targets)
 
 (export ->site-files broken-links html-page index-of
         markdown-page)

@@ -1,4 +1,4 @@
-(use files failure write-file)
+(use files failure path-in write-file)
 
 (use knave-grid defgrid overlay-css overlay-javascript
                 write-grid)
@@ -24,15 +24,15 @@
 
 (defn write-grid-files (directory)
   (try (map-err (write-checked-grid directory) grid-failure))
-  (try (write-file (as-str (str directory "/grid-overlay.css"))
+  (try (write-file (as-str (path-in directory "grid-overlay.css"))
                    overlay-css))
-  (write-file (as-str (str directory "/grid-overlay.js"))
+  (write-file (as-str (path-in directory "grid-overlay.js"))
               overlay-javascript))
 
 (defn write-checked-grid (directory)
   (let (grid (try (site-grid)))
     (report-warnings grid)
-    (write-grid grid (as-str (str directory "/grid.css")))))
+    (write-grid grid (as-str (path-in directory "grid.css")))))
 
 (defn report-warnings (grid)
   (for-each (iter (:warnings grid))

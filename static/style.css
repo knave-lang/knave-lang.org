@@ -99,7 +99,15 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 
 .tagline { margin: 0; font-weight: 400; text-wrap: balance; }
 
-.name { margin: 0; color: var(--bright); }
+.hero { container-type: inline-size; }
+
+.name {
+  --side-bearing: 0.078;
+  --ink-width-in-em: 2.4;
+  margin: 0 0 0 calc(var(--side-bearing) * (1rem - 1em));
+  color: var(--bright);
+  font-size: min(calc(128rem / 18), 100cqi / var(--ink-width-in-em));
+}
 
 .caution { color: var(--dim); }
 

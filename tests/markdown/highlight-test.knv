@@ -16,6 +16,10 @@
   (assert (= (highlight ":x 42")
              "<span class=\"keyword\">:x</span> <span class=\"number\">42</span>")))
 
+(deftest marks-the-result-arrow
+  (assert (= (highlight "=> 7")
+             "<span class=\"result-arrow\">=&gt;</span> <span class=\"number\">7</span>")))
+
 (deftest accepts-non-ascii-words
   (assert (= (highlight "café") "café")))
 

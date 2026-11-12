@@ -7,6 +7,8 @@
   :class string
   :stop usize)
 
+(def result-arrow "=>")
+
 (def special-forms
   " fn local let if cond match do loop recur use export type try when unless and or not struct enum impl trait ")
 
@@ -82,6 +84,7 @@
 
 (defn word-class (word)
   (cond
+    ((= word result-arrow) (str "result-arrow"))
     ((starts-with? word ":") (str "keyword"))
     ((first-char? word digit?) (str "number"))
     ((definer? word) (str "definer"))

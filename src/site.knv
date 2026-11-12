@@ -12,12 +12,9 @@
 (use links ->site-files broken-links html-page
            markdown-page)
 
-(use knave-markdown render-markdown)
 (use prose prose)
-
-(use strings ends-with? escape-html fnv1a-digest
-             in-line-spans join owned)
-
+(use samples code-sample fenced)
+(use strings ends-with? escape-html fnv1a-digest join owned)
 (use template fill)
 
 (export build-site output-directory)
@@ -151,10 +148,9 @@
       (fill "caution" (as-str (escape-html landing-caution)))
       (as-str)
       (fill "knave-sample"
-            (as-str (render-markdown (as-str (fenced "knave" knave-code)))))
+            (as-str (code-sample "knave" knave-code)))
       (as-str)
-      (fill "rust-sample"
-            (as-str (in-line-spans (as-str (escape-html rust-code)))))))
+      (fill "rust-sample" (as-str (code-sample "rust" rust-code)))))
 
 (defn landing-markdown (knave-code rust-code)
   (str "# " landing-title "\n\n" landing-pitch "\n\n"
@@ -164,9 +160,6 @@
        "The Rust that `knave emit main.knv` prints for it:\n\n"
        (fenced "rust" rust-code)
        "\n"))
-
-(defn fenced (language code)
-  (str "```" language "\n" code "\n```"))
 
 (defn install-page ()
   (let (source (try (read-file "content/install.md"))

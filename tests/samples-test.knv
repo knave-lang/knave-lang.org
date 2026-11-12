@@ -1,0 +1,15 @@
+(use samples code-sample)
+(use strings contains? starts-with?)
+
+(deftest puts-each-sample-line-in-its-own-span
+  (assert (starts-with?
+            (as-str (code-sample "knave" "(a)\n\n(b)"))
+            "<pre><code class=\"language-knave\"><span class=\"line\">")))
+
+(deftest keeps-a-blank-line-span-between-forms
+  (assert (contains? (as-str (code-sample "knave" "(a)\n\n(b)"))
+                     "\n</span><span class=\"line\">\n</span>")))
+
+(deftest escapes-a-rust-sample
+  (assert (= (code-sample "rust" "a < b")
+             "<pre><code class=\"language-rust\"><span class=\"line\">a &lt; b</span></code></pre>")))

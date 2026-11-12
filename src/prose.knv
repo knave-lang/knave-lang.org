@@ -1,38 +1,9 @@
 (use knave-markdown render-markdown)
-(use strings replace-all)
 
 (export prose)
 
-(def heading-one "<h1 ")
-
-(def titled-heading-one "<h1 class=\"type-title\" ")
-
-(def table-opening "<table>")
-
-(def table-closing "</table>")
-
-(def scroll-opening "<div class=\"table-scroll\">")
-
-(def scroll-closing "</div>")
-
 (defn prose (markdown)
-  (-> (render-markdown markdown)
-      (as-str)
-      (with-title-type)
-      (as-str)
-      (with-scrolling-tables)
-      (as-str)
-      (in-prose)))
-
-(defn with-title-type (html)
-  (replace-all html heading-one titled-heading-one))
-
-(defn with-scrolling-tables (html)
-  (-> (replace-all html table-opening
-                   (as-str (str scroll-opening table-opening)))
-      (as-str)
-      (replace-all table-closing
-                   (as-str (str table-closing scroll-closing)))))
+  (in-prose (as-str (render-markdown markdown))))
 
 (defn in-prose (html)
   (str "<main><div class=\"prose\">" html "</div></main>"))

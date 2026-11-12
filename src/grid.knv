@@ -20,7 +20,8 @@
                     :foot 3
                     :measure-columns 2
                     :field-lines 4))
-  (type-styles (wordmark :lines 4 :size 128) (title :lines 2)))
+  (type-styles (wordmark :lines 4 :size 128)
+               (title :lines 2 :selector ".prose h1")))
 
 (defn write-grid-files (directory)
   (try (map-err (write-checked-grid directory) grid-failure))

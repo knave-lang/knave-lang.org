@@ -1,4 +1,16 @@
-(use files path-in)
+(use files copy-directory-files files-under path-in
+           read-file remove-directory write-index)
+
+(use strings starts-with?)
+
+(def fixture-tree "tests/fixtures/tree")
+
+(def scratch-directory "target/files-test")
+
+(defn fresh-scratch (name)
+  (let (directory (path-in scratch-directory name))
+    (unwrap-ok (remove-directory (as-str directory)))
+    directory))
 
 (deftest joins-a-directory-and-a-name-with-a-slash
   (assert (= (path-in "public" "index.html") "public/index.html")))
@@ -6,3 +18,32 @@
 (deftest keeps-the-slashes-inside-a-nested-name
   (assert (= (path-in "public" "docs/index.html")
              "public/docs/index.html")))
+
+(deftest lists-nested-files-relative-to-the-root
+  (let (paths (unwrap-ok (files-under fixture-tree)))
+    (sort! paths)
+    (assert (= paths
+               (vec (str "nested/inner.txt") (str "top.txt"))))))
+
+(deftest removes-a-missing-directory-without-error
+  (assert (ok? (remove-directory "target/files-test/never-created"))))
+
+(deftest names-the-missing-path-in-a-read-error
+  (let (error (unwrap-err (read-file "tests/fixtures/missing.txt")))
+    (assert (starts-with? (as-str (str error))
+                          "tests/fixtures/missing.txt: "))))
+
+(defn read-back (directory name)
+  (let (path (path-in directory name))
+    (unwrap-ok (read-file (as-str path)))))
+
+(deftest writes-an-index-into-a-new-directory
+  (let (directory (fresh-scratch "index"))
+    (unwrap-ok (write-index (as-str directory) "<p>home</p>"))
+    (assert (= (read-back directory "index.html") "<p>home</p>"))))
+
+(deftest copies-each-file-into-a-new-directory
+  (let (source (path-in fixture-tree "nested")
+        target (fresh-scratch "copy"))
+    (unwrap-ok (copy-directory-files (as-str source) (as-str target)))
+    (assert (= (read-back target "inner.txt") "inner\n"))))

@@ -200,11 +200,20 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 
 .prose pre {
   --line-number-width: 4ch;
+  position: relative;
+  isolation: isolate;
   padding: var(--leading) var(--gutter);
-  background: var(--code-surface);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   counter-reset: line;
+}
+
+.prose pre::before {
+  content: "";
+  position: absolute;
+  inset: var(--_grid-cap-top) 0 calc(var(--leading) - var(--_grid-descender-bottom));
+  z-index: -1;
+  background: var(--code-surface);
 }
 
 .prose pre .line {

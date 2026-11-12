@@ -199,13 +199,11 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 .prose :not(pre) > code { color: var(--bright); }
 
 .prose pre {
-  --line-number-width: 4ch;
   position: relative;
   isolation: isolate;
   padding: var(--leading) var(--gutter);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  counter-reset: line;
 }
 
 .prose pre::before {
@@ -218,25 +216,9 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 
 .prose pre .line {
   display: block;
-  position: relative;
-  padding-left: calc(var(--line-number-width) + var(--hanging-indent));
+  padding-left: var(--hanging-indent);
   text-indent: calc(-1 * var(--hanging-indent));
 }
-
-.prose pre .line::before {
-  counter-increment: line;
-  content: counter(line);
-  position: absolute;
-  left: 0;
-  width: calc(var(--line-number-width) / 2);
-  text-indent: 0;
-  color: var(--dim);
-  text-align: right;
-}
-
-.prose pre .line:only-child { padding-left: var(--hanging-indent); }
-
-.prose pre .line:only-child::before { content: none; }
 
 .copyable { position: relative; }
 
@@ -265,8 +247,6 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 
 .prose th, .prose td { padding: 0 var(--gutter) 0 0; vertical-align: top; }
 
-.result-arrow, .line:has(> .result-arrow), .line:has(> .result-arrow) * { color: var(--dim); }
-
 .site-footer {
   margin-top: calc(2 * var(--leading));
   box-shadow: inset 0 1px 0 var(--rule);
@@ -284,3 +264,5 @@ a:focus-visible, .button:focus-visible { outline: 2px solid var(--pip); outline-
 .definer, .special { color: var(--pip); }
 
 .paren { color: var(--dim); }
+
+.result-arrow, .line:has(> .result-arrow), .line:has(> .result-arrow) * { color: var(--dim); }

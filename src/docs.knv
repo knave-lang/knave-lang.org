@@ -7,7 +7,7 @@
 (use strings after before contains? ends-with? find-from
              join owned replace-all starts-with?)
 
-(export docs-pages site-markdown summary)
+(export docs-pages index-markdown site-markdown summary)
 
 (def generated-directory "target/prelude-docs")
 

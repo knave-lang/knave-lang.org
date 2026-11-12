@@ -74,7 +74,7 @@ if n > 2 { println!("big"); }
   (else "small"))
 ```
 
-`if` always takes both branches, so a one-armed `if` is an error that points to `when`. `cond` wraps each clause in its own list and ends with `(else ...)`, unlike Clojure's flat `cond`.
+`if` always takes both branches, so a one-armed `if` is an error that points to `when`. `cond` wraps each clause in its own list and a last `(else ...)` clause handles every other case, unlike Clojure's flat `cond`. Without `else`, every body must return unit.
 
 ### `match` and patterns
 
@@ -98,7 +98,7 @@ match n { Some(v) => v, None => 0 }
   (match n ((some v) v) (none 0)))
 ```
 
-Each arm is one list: a pattern, then the body. There is no `=>`, and variants are lowercase and unqualified in a pattern, so `(Some v)` is not a pattern. A `match` must cover every variant.
+Each arm is one list: a pattern, then the body. There is no `=>`, and variants are lowercase, so `(Some v)` is not a pattern. A pattern may write the variant alone, `(circle r)`, or with its enum, `(shape/circle r)`. A `match` must cover every variant.
 
 ### Structs and enums
 
@@ -364,7 +364,7 @@ Each Knave error has a code `L` plus four digits. The first two digits name the 
 | `L07xx` | The project file |
 | `L08xx` | Lints |
 
-A code such as `E0515` comes from rustc. Knave maps it back to the source and adds `note: reported by rustc`.
+A code such as `E0515` comes from rustc. Knave maps it back to the source and adds `note: reported by rustc while compiling the generated Rust`.
 
 ### Errors inside a macro call
 
@@ -550,7 +550,21 @@ help: every list uses `(` and `)`
 2 -   (println [1 2 3]))
 2 +   (println (1 2 3]))
   |
+
+error[L0106]: `]` is not part of the syntax
+ --> bad_bracket.knv:2:18
+  |
+2 |   (println [1 2 3]))
+  |                  ^ not allowed here
+  |
+help: every list uses `(` and `)`
+  |
+2 -   (println [1 2 3]))
+2 +   (println [1 2 3)))
+  |
 ```
+
+Fix: `(prn (vec 1 2 3))`. Plain parentheses, `(1 2 3)`, report `L0403` because the first item is called as a function, and `println` reports `L0404` for a vector, which has no `display`.
 
 **`E0515` and other rustc codes.** Some lifetime errors surface only when rustc compiles the output, so they appear on `knave run` or `knave build` and not on `knave check`.
 

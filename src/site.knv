@@ -40,6 +40,10 @@
 (def install-description
   "Install the Knave programming language with Cargo or Nix, then create and run your first project.")
 
+(def knave-language "knave")
+
+(def rust-language "rust")
+
 (defn build-site ()
   (try (remove-directory output-directory))
   (try (copy-directory-files static-directory output-directory))
@@ -148,17 +152,18 @@
       (fill "caution" (as-str (escape-html landing-caution)))
       (as-str)
       (fill "knave-sample"
-            (as-str (code-sample "knave" knave-code)))
+            (as-str (code-sample knave-language knave-code)))
       (as-str)
-      (fill "rust-sample" (as-str (code-sample "rust" rust-code)))))
+      (fill "rust-sample"
+            (as-str (code-sample rust-language rust-code)))))
 
 (defn landing-markdown (knave-code rust-code)
   (str "# " landing-title "\n\n" landing-pitch "\n\n"
        landing-caution "\n\n" "A Knave program:\n\n"
-       (fenced "knave" knave-code)
+       (fenced knave-language knave-code)
        "\n\n"
        "The Rust that `knave emit main.knv` prints for it:\n\n"
-       (fenced "rust" rust-code)
+       (fenced rust-language rust-code)
        "\n"))
 
 (defn install-page ()

@@ -1,14 +1,13 @@
 (use code-layout lay-out-code-blocks)
 (use discovery ->page followed-by page)
 (use files files-under path-in read-file)
-(use markdown/blocks block parse-blocks)
 (use prose prose)
 (use markdown/targets closing-paren rewrite-link-targets)
 
 (use strings after before contains? ends-with? find-from
              join owned replace-all starts-with?)
 
-(export docs-pages site-markdown)
+(export docs-pages site-markdown summary)
 
 (def generated-directory "target/prelude-docs")
 
@@ -19,6 +18,8 @@
 (def same-page "")
 
 (def markdown-extension ".md")
+
+(def summary-line 2)
 
 (def parent-segment "..")
 
@@ -82,14 +83,24 @@
 (defn module-path (module) (str docs-path module "/"))
 
 (defn summary (markdown)
-  (plain-text (as-str (first-paragraph (ref (parse-blocks markdown)) 0))))
+  (plain-text (as-str (first-paragraph markdown))))
 
-(defn first-paragraph (blocks position)
-  (if (>= position (len blocks))
-    (str "")
-    (match (at blocks position)
-      ((paragraph text) (owned (as-str text)))
-      (_ (recur blocks (+ position 1))))))
+(defn first-paragraph (markdown)
+  (let (source-lines (collect (map (lines markdown) owned)))
+    (join (ref (paragraph-from (ref source-lines) summary-line (vec)))
+          " ")))
+
+(defn paragraph-from (source-lines index paragraph)
+  (if (paragraph-continues? source-lines index)
+    (do
+      (push! paragraph
+             (owned (as-str (at source-lines index))))
+      (recur source-lines (+ index 1) paragraph))
+    paragraph))
+
+(defn paragraph-continues? (source-lines index)
+  (and (< index (len source-lines))
+       (not (empty? (trim (as-str (at source-lines index)))))))
 
 (defn plain-text (markdown)
   (-> (without-link-targets markdown 0 (str ""))

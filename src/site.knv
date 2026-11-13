@@ -58,8 +58,8 @@
 
 (defn layout-with-stylesheet-version ()
   (let (layout (try (read-file "templates/layout.html"))
-        stylesheet-path (str static-directory "/style.css")
-        stylesheet (try (read-file (as-str stylesheet-path))))
+        stylesheet (try (read-file (as-str (str static-directory
+                                                "/style.css")))))
     (ok (fill (as-str layout)
               "stylesheet-version"
               (as-str (fnv1a-digest (as-str stylesheet)))))))
@@ -81,10 +81,9 @@
   (fn ((ref page)) (result unit io-error)))
 
 (defn write-markdown-copy (page)
-  (let (copy-path (str output-directory
-                       (markdown-path (as-str (:path page)))))
-    (write-file (as-str copy-path)
-                (as-str (:markdown page)))))
+  (write-file (as-str (str output-directory
+                           (markdown-path (as-str (:path page)))))
+              (as-str (:markdown page))))
 
 (type in-layout
   (fn ((ref str) (ref page)) string))
@@ -106,8 +105,8 @@
                             (as-str (sitemap-entries pages))))
   (try (write-from-template "robots.txt" "sitemap"
                             (as-str (canonical-url "/sitemap.xml"))))
-  (let (header-template (try (read-template "llms-header.md"))
-        header (fill (as-str header-template) "caution" landing-caution))
+  (let (header (fill (as-str (try (read-template "llms-header.md")))
+                     "caution" landing-caution))
     (try (write-llms-file "llms.txt"
                           (as-str header)
                           (as-str (llms-links pages))))
@@ -127,12 +126,11 @@
                   (as-str (fill (as-str template) placeholder value)))))
 
 (defn read-template (file-name)
-  (let (template-path (str "templates/" file-name))
-    (read-file (as-str template-path))))
+  (read-file (as-str (str "templates/" file-name))))
 
 (defn write-output (file-name contents)
-  (let (output-path (path-in output-directory file-name))
-    (write-file (as-str output-path) contents)))
+  (write-file (as-str (path-in output-directory file-name))
+              contents))
 
 (defn landing-page ()
   (let (template (try (read-file "templates/landing.html"))

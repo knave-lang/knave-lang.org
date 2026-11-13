@@ -1,6 +1,9 @@
 (use discovery ->page)
 (use llms llms-full-text llms-index)
-(use strings contains?)
+(use strings contains? starts-with?)
+
+(def site-header
+  "# Knave\n\n> Knave is a small Lisp programming language for humans and agents that infers types and ownership and compiles to readable Rust.\n\nCareful.\n\nThe compiler and its prelude are [on GitHub](https://github.com/knave-lang/knave).")
 
 (defn guide-pages ()
   (vec (->page (str "/guide/")
@@ -14,9 +17,14 @@
             (as-str (llms-index "Careful." (ref (guide-pages))))
             "- [Guide](https://knave-lang.org/guide/index.html.md): How to.")))
 
-(deftest points-the-index-at-the-full-text
-  (assert (contains? (as-str (llms-index "Careful." (ref (guide-pages))))
-                     "(https://knave-lang.org/llms-full.txt)")))
+(deftest opens-the-index-with-the-caution-and-both-pointers
+  (assert (starts-with? (as-str (llms-index "Careful." (ref (guide-pages))))
+                        (as-str (str site-header
+                                     " The [full text](https://knave-lang.org/llms-full.txt) holds the Markdown of every page below, in this order.\n\n## Pages")))))
+
+(deftest opens-the-full-text-with-the-caution-and-the-source-pointer
+  (assert (starts-with? (as-str (llms-full-text "Careful." (ref (guide-pages))))
+                        (as-str (str site-header "\n\n---")))))
 
 (deftest gives-each-page-its-site-url-in-the-full-text
   (assert (contains? (as-str (llms-full-text "Careful." (ref (guide-pages))))

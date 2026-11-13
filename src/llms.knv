@@ -1,0 +1,45 @@
+(use knave-llms-txt ->llms-page ->llms-site llms-full-txt
+                    llms-page llms-txt)
+
+(use discovery canonical-url page)
+
+(export llms-full-text llms-index)
+
+(def site-name "Knave")
+
+(def site-summary
+  "Knave is a small Lisp programming language for humans and agents that infers types and ownership and compiles to readable Rust.")
+
+(def source-pointer
+  "The compiler and its prelude are [on GitHub](https://github.com/knave-lang/knave).")
+
+(defn llms-index (caution pages)
+  (llms-txt (ref (llms-site
+                   (str caution "\n\n" source-pointer " " (full-text-pointer))))
+            (ref (llms-pages pages))))
+
+(defn llms-full-text (caution pages)
+  (llms-full-txt (ref (llms-site (str caution "\n\n" source-pointer)))
+                 (ref (llms-pages pages))))
+
+(defn full-text-pointer ()
+  (str "The [full text]("
+       (canonical-url "/llms-full.txt")
+       ") holds the Markdown of every page below, in this order."))
+
+(defn llms-site (details)
+  (->llms-site :name (str site-name)
+               :summary (str site-summary)
+               :details details))
+
+(defn llms-pages (pages)
+  (collect (map (iter pages) llms-entry)))
+
+(type llms-entry
+  (fn ((ref page)) llms-page))
+
+(defn llms-entry (page)
+  (->llms-page :url (canonical-url (as-str (:path page)))
+               :title (str (:title page))
+               :description (str (:description page))
+               :markdown (str (:markdown page))))

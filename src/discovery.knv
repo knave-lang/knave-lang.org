@@ -1,7 +1,6 @@
-(use strings ends-with? join)
+(use strings join)
 
-(export ->page canonical-url followed-by llms-full-sections
-        llms-links markdown-path page site-origin
+(export ->page canonical-url followed-by page site-origin
         sitemap-entries)
 
 (defstruct page
@@ -17,16 +16,7 @@
 
 (def site-origin "https://knave-lang.org")
 
-(def markdown-extension ".md")
-
-(def directory-markdown-name "index.html.md")
-
 (defn canonical-url (path) (str site-origin path))
-
-(defn markdown-path (path)
-  (if (ends-with? path "/")
-    (str path directory-markdown-name)
-    (str path markdown-extension)))
 
 (defn sitemap-entries (pages)
   (join-lines (map (iter pages) sitemap-entry)))
@@ -39,32 +29,5 @@
        (canonical-url (as-str (:path page)))
        "</loc></url>"))
 
-(defn llms-links (pages)
-  (join-lines (map (iter pages) llms-link)))
-
-(type llms-link
-  (fn ((ref page)) string))
-
-(defn llms-link (page)
-  (str "- ["
-       (:title page)
-       "]("
-       (canonical-url (as-str (markdown-path (as-str (:path page)))))
-       "): "
-       (:description page)))
-
 (defn join-lines (lines)
   (join (ref (collect lines)) "\n"))
-
-(defn llms-full-sections (pages)
-  (join (ref (collect (map (iter pages) llms-full-section)))
-        "\n\n"))
-
-(type llms-full-section
-  (fn ((ref page)) string))
-
-(defn llms-full-section (page)
-  (str "---\nSource: "
-       (canonical-url (as-str (:path page)))
-       "\n\n"
-       (trim (as-str (:markdown page)))))

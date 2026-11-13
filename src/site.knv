@@ -1,6 +1,5 @@
-(use discovery ->page canonical-url followed-by
-               llms-full-sections llms-links markdown-path
-               page sitemap-entries)
+(use discovery ->page canonical-url followed-by page
+               sitemap-entries)
 
 (use files copy-directory-files failure files-under path-in
            read-file remove-directory write-file
@@ -8,6 +7,8 @@
 
 (use docs docs-pages)
 (use grid write-grid-files)
+(use knave-llms-txt markdown-path)
+(use llms llms-full-text llms-index)
 
 (use links ->site-files broken-links html-page
            markdown-page)
@@ -106,20 +107,10 @@
                             (as-str (sitemap-entries pages))))
   (try (write-from-template "robots.txt" "sitemap"
                             (as-str (canonical-url "/sitemap.xml"))))
-  (let (header-template (try (read-template "llms-header.md"))
-        header (fill (as-str header-template) "caution" landing-caution))
-    (try (write-llms-file "llms.txt"
-                          (as-str header)
-                          (as-str (llms-links pages))))
-    (write-llms-file "llms-full.txt"
-                     (as-str header)
-                     (as-str (llms-full-sections pages)))))
-
-(defn write-llms-file (file-name header pages)
-  (let (template (try (read-template file-name))
-        with-header (fill (as-str template) "header" header))
-    (write-output file-name
-                  (as-str (fill (as-str with-header) "pages" pages)))))
+  (try (write-output "llms.txt"
+                     (as-str (llms-index landing-caution pages))))
+  (write-output "llms-full.txt"
+                (as-str (llms-full-text landing-caution pages))))
 
 (defn write-from-template (file-name placeholder value)
   (let (template (try (read-template file-name)))

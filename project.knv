@@ -2,6 +2,8 @@
   (libraries
     (knave-grid :git "https://github.com/KarlHarnois/knave-grid"
                 :rev "3b86e5f8fad790ee4d1a391c1c828abc39147d1d")
+    (knave-llms-txt :git "https://github.com/KarlHarnois/knave-llms-txt"
+                    :rev "91756e9e6580624598a886662cc847f036eb9f24")
     (knave-markdown :git "https://github.com/KarlHarnois/knave-markdown"
                     :rev "74e1d1fc1b0a62942f88106fa01ab05cbcad8500")
     (knave-preview :git "https://github.com/KarlHarnois/knave-preview"

@@ -1,0 +1,23 @@
+(use discovery ->page)
+(use llms llms-full-text llms-index)
+(use strings contains?)
+
+(defn guide-pages ()
+  (vec (->page (str "/guide/")
+               (str "Guide")
+               (str "How to.")
+               (str "")
+               (str "# Guide"))))
+
+(deftest links-each-page-at-its-markdown-copy-on-the-site
+  (assert (contains?
+            (as-str (llms-index "Careful." (ref (guide-pages))))
+            "- [Guide](https://knave-lang.org/guide/index.html.md): How to.")))
+
+(deftest points-the-index-at-the-full-text
+  (assert (contains? (as-str (llms-index "Careful." (ref (guide-pages))))
+                     "(https://knave-lang.org/llms-full.txt)")))
+
+(deftest gives-each-page-its-site-url-in-the-full-text
+  (assert (contains? (as-str (llms-full-text "Careful." (ref (guide-pages))))
+                     "Source: https://knave-lang.org/guide/\n\n# Guide")))

@@ -1,4 +1,3 @@
-(use code-layout lay-out-code-blocks)
 (use discovery ->page followed-by page)
 (use files files-under path-in read-file)
 (use prose prose)
@@ -10,8 +9,6 @@
 (export docs-pages site-markdown summary)
 
 (def generated-directory "target/prelude-docs")
-
-(def snippet-directory "target/prelude-snippets")
 
 (def docs-path "/docs/")
 
@@ -42,7 +39,6 @@
 
 (defn docs-pages ()
   (try (write-prelude-docs generated-directory))
-  (try (lay-out-code-blocks generated-directory snippet-directory))
   (let (sources (try (markdown-sources))
         module-pages (try (module-pages (ref sources) 0 (vec))))
     (ok (with-index-first module-pages))))
@@ -72,8 +68,7 @@
       (recur sources (+ position 1) pages))))
 
 (defn module-page (source)
-  (let (source-path (path-in generated-directory source)
-        markdown (try (read-file (as-str source-path)))
+  (let (markdown (try (read-file (as-str (path-in generated-directory source))))
         module (before source markdown-extension)
         path (module-path module)
         page-markdown (site-markdown (as-str markdown) source same-page)

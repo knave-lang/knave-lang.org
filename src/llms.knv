@@ -15,12 +15,15 @@
 
 (defn llms-index (caution pages)
   (llms-txt (ref (llms-site
-                   (str caution "\n\n" source-pointer " " (full-text-pointer))))
+                   (str (shared-details caution) " " (full-text-pointer))))
             (ref (llms-pages pages))))
 
 (defn llms-full-text (caution pages)
-  (llms-full-txt (ref (llms-site (str caution "\n\n" source-pointer)))
+  (llms-full-txt (ref (llms-site (shared-details caution)))
                  (ref (llms-pages pages))))
+
+(defn shared-details (caution)
+  (str caution "\n\n" source-pointer))
 
 (defn full-text-pointer ()
   (str "The [full text]("

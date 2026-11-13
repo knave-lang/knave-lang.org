@@ -1,6 +1,6 @@
 # Writing Knave with a language model
 
-Language models have read far more Rust than Knave, so a model that writes Knave tends to reach for Rust's syntax and names. This page lists the places where Knave differs from Rust and explains how to read the errors Knave reports, so you and your model can fix code quickly. Every example on this page was checked with Knave 0.14.21.
+Language models have read far more Rust than Knave, so a model that writes Knave tends to reach for Rust's syntax and names. This page lists the places where Knave differs from Rust and explains how to read the errors Knave reports, so you and your model can fix code quickly. Every example on this page was checked with Knave 0.15.0.
 
 ## Idioms that differ from Rust
 
@@ -150,7 +150,7 @@ impl fmt::Display for Point { ... }
 
 (impl shape circle
   (area (c)
-        (* 3.0 (:radius c) (:radius c))))
+    (* 3.0 (:radius c) (:radius c))))
 
 (defstruct point
   :x i64
@@ -592,6 +592,7 @@ Fix: return an owned value, `(clone (:name someone))`.
 - Run `knave check` after each edit. It runs every stage before rustc and builds no Rust.
 - Fix the first error first, because later errors often follow from it.
 - Look up a prelude form with `knave doc <name>`, such as `knave doc cond`.
+- Look up an error code with `knave doc <code>`, such as `knave doc L0501`, which explains the error, shows an example of it and lists fixes.
 - Run `knave types` to see the signatures and borrows the compiler inferred.
 
 ## Names from other languages

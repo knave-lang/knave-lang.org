@@ -1,4 +1,4 @@
-(use strings after find-from leading-count starts-with?)
+(use strings after find-from leading-count)
 
 (export closing-paren link-targets rewrite-link-targets)
 

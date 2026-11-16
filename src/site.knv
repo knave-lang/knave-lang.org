@@ -14,7 +14,7 @@
 
 (use prose prose)
 (use samples code-sample fenced)
-(use strings ends-with? escape-html fnv1a-digest join owned)
+(use strings ends-with? escape-html fnv1a-digest owned)
 (use template fill)
 
 (export build-site output-directory)

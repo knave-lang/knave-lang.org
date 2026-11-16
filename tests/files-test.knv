@@ -1,8 +1,6 @@
 (use files copy-directory-files files-under path-in
            read-file remove-directory write-index)
 
-(use strings starts-with?)
-
 (def fixture-tree "tests/fixtures/tree")
 
 (def scratch-directory "target/files-test")

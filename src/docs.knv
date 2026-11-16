@@ -6,11 +6,13 @@
 (use strings after before ends-with? find-from owned
              replace-all)
 
-(export docs-pages site-markdown summary)
+(export docs-pages index-markdown site-markdown summary)
 
-(def generated-directory "target/prelude-docs")
+(def generated-directory "target/generated-docs")
 
 (def docs-path "/docs/")
+
+(def errors-path "/docs/errors/")
 
 (def same-page "")
 
@@ -26,11 +28,14 @@
 
 (def index-title "Knave documentation")
 
+(def errors-entry
+  "To look up the code that a Knave diagnostic names, read [Diagnostic codes](/docs/errors/).")
+
 (def index-description
   "Reference pages for the modules of the Knave prelude, generated from the compiler's docstrings.")
 
-(def write-prelude-docs
-  (rust "std::process::Command::new(\"knave\").args([\"doc\", \"--write\", \"--prelude\", \"--output\", {0}]).status().and_then(|status| status.success().then_some(()).ok_or_else(|| std::io::Error::other(format!(\"knave doc --write --prelude {{status}}\"))))"
+(def write-generated-docs
+  (rust "std::process::Command::new(\"knave\").args([\"doc\", \"--write\", \"--prelude\", \"--errors\", \"--output\", {0}]).status().and_then(|status| status.success().then_some(()).ok_or_else(|| std::io::Error::other(format!(\"knave doc --write --prelude --errors {{status}}\"))))"
     (fn ((ref str)) (result unit io-error))))
 
 (def directory-of
@@ -38,7 +43,7 @@
     (fn ((ref str)) (ref str))))
 
 (defn docs-pages ()
-  (try (write-prelude-docs generated-directory))
+  (try (write-generated-docs generated-directory))
   (let (sources (try (markdown-sources))
         module-pages (try (module-pages (ref sources) 0 (vec))))
     (ok (with-index-first module-pages))))
@@ -178,8 +183,19 @@
 
 (defn index-markdown (module-pages)
   (str "# Documentation\n\n" index-description "\n\n"
-       (join (ref (collect (map (iter module-pages) index-entry)))
+       errors-entry "\n\n"
+       (join (collect (map (index-listed-pages module-pages) index-entry))
              "\n")))
+
+(defn index-listed-pages (module-pages)
+  (filter (iter module-pages)
+    (fn (module-page) (listed-in-index? module-page))))
+
+(type listed-in-index?
+  (fn ((ref page)) bool))
+
+(defn listed-in-index? (module-page)
+  (not (starts-with? (as-str (:path module-page)) errors-path)))
 
 (type index-entry
   (fn ((ref page)) string))

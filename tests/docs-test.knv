@@ -1,4 +1,5 @@
-(use docs site-markdown summary)
+(use docs index-markdown site-markdown summary)
+(use discovery ->page)
 
 (deftest links-a-sibling-module-page-to-its-site-path
   (assert (= (site-markdown "[char](prelude/text.md#char)"
@@ -58,3 +59,26 @@
 
 (deftest summarizes-only-the-first-of-several-paragraphs
   (assert (= (summary "# m\n\nFirst.\n\nSecond.\n") "First.")))
+
+(deftest links-the-error-explanations-from-the-index
+  (assert (contains? (as-str (index-markdown (ref (vec))))
+                     "](/docs/errors/)")))
+
+(deftest lists-prelude-pages-but-not-error-pages-in-the-index
+  (let (pages (vec (generated-page "/docs/prelude/text/")
+                   (generated-page "/docs/errors/L0510/"))
+        markdown (index-markdown (ref pages)))
+    (assert (contains? (as-str markdown) "](/docs/prelude/text/)"))
+    (assert (not (contains? (as-str markdown) "](/docs/errors/L0510/)")))))
+
+(deftest links-an-error-code-in-the-index-to-its-site-path
+  (assert (= (site-markdown "| [L0510](errors/L0510.md) | local borrow |"
+                            "errors.md" "")
+             "| [L0510](/docs/errors/L0510/) | local borrow |")))
+
+(defn generated-page (path)
+  (->page (str path)
+          (str "title")
+          (str "summary")
+          (str "")
+          (str "")))

@@ -1,5 +1,4 @@
 (use docs index-markdown site-markdown summary)
-(use strings contains?)
 
 (deftest links-a-sibling-module-page-to-its-site-path
   (assert (= (site-markdown "[char](prelude/text.md#char)"

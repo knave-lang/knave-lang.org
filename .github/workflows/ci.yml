@@ -18,6 +18,8 @@ jobs:
         run: nix develop -c knave check
       - name: Check formatting
         run: nix develop -c knave fmt --check
+      - name: Lint
+        run: nix develop -c knave lint
       - name: Run tests
         run: nix develop -c knave test
       - name: Check that the landing sample matches the emitted Rust

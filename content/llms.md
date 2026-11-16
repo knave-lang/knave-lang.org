@@ -1,6 +1,6 @@
 # Writing Knave with a language model
 
-Language models have read far more Rust than Knave, so a model that writes Knave tends to reach for Rust's syntax and names. This page lists the places where Knave differs from Rust and explains how to read the errors Knave reports, so you and your model can fix code quickly. Every example on this page was checked with Knave 0.15.0.
+Language models have read far more Rust than Knave, so a model that writes Knave tends to reach for Rust's syntax and names. This page lists the places where Knave differs from Rust and explains how to read the errors Knave reports, so you and your model can fix code quickly. Every example on this page was checked with Knave 0.16.0.
 
 ## Idioms that differ from Rust
 
@@ -337,6 +337,7 @@ help: a name with a similar spelling exists
 4 -   (let (s (shape::circle 1.0))
 4 +   (let (s (shape/circle 1.0))
   |
+  = note: run `knave doc L0201` for an explanation
 ```
 
 - The first line gives the severity, the code and a plain statement of the fault.
@@ -384,6 +385,7 @@ help: a name with a similar spelling exists
 1 - (defrule shout ((x) (upcase x)))
 1 + (defrule shout ((x) (update x)))
   |
+  = note: run `knave doc L0201` for an explanation
 ```
 
 A call that fits no shape of the macro reports `L0301` with the shape it accepts:
@@ -396,6 +398,7 @@ error[L0301]: no rule of `when` matches this form
   |   ^^^^^^ here
   |
   = help: write it as `(when test body ...)`
+  = note: run `knave doc L0301` for an explanation
 ```
 
 ### Common errors
@@ -418,6 +421,7 @@ help: a name with a similar spelling exists
 3 -     (+= count 1)
 3 +     (+ count 1)
   |
+  = note: run `knave doc L0201` for an explanation
 ```
 
 Fix: `(set! count (+ count 1))`.
@@ -447,6 +451,7 @@ help: clone the value if both places need it
 5 -         kept (keep names))
 5 +         kept (keep (clone names)))
   |
+  = note: run `knave doc L0501` for an explanation
 ```
 
 Fix: clone it as the help shows, or reorder so the last use moves it.
@@ -464,6 +469,8 @@ error[L0401]: mismatched types
   |
 4 |   (let (u (->user "ana"))
   |                   ^^^^^ expected `string`, found `str`
+  |
+  = note: run `knave doc L0401` for an explanation
 ```
 
 Fix: `(->user (str "ana"))`. Numbers do not convert either: `(* width 1.5)` with a width declared `i64` reports ``expected `i64`, found a float``.
@@ -476,6 +483,8 @@ error[L0402]: this function takes 2 arguments but 1 was given
   |
 4 |   (println (area 2)))
   |            ^^^^^^^^ expected 2 arguments
+  |
+  = note: run `knave doc L0402` for an explanation
 ```
 
 **`L0433` non-exhaustive `match`.**
@@ -490,6 +499,7 @@ error[L0433]: non-exhaustive `match`
   |
   = note: missing 1 case: `(rect _ _)`
   = help: add an arm for each missing case
+  = note: run `knave doc L0433` for an explanation
 ```
 
 Fix: add `((rect w h) ...)` or a `_` arm.
@@ -504,6 +514,7 @@ error[L0210]: malformed `if`
   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this does not fit the shape of `if`
   |
   = help: write `(when test body ...)` to run forms only when the test holds
+  = note: run `knave doc L0210` for an explanation
 ```
 
 **`L0208` definition inside a body.**
@@ -516,6 +527,7 @@ error[L0208]: `defn` can only appear at module level
   |   ^^^^^^^^^^^^^^^^^^^^^^^^^ not allowed inside an expression
   |
   = help: use `local` to bind a name inside a body
+  = note: run `knave doc L0208` for an explanation
 ```
 
 Fix: bind the function with `let`, as in `(let (helper (fn (n) (* n 2))) (println (helper 2)))`.
@@ -533,6 +545,7 @@ error[L0514]: this argument is a copy, so changing it changes nothing
   |          ^^^^^^^ this is a copy, not a place
   |
   = help: bind it to a local and pass the local: `(local value (+ 1 2))`
+  = note: run `knave doc L0514` for an explanation
 ```
 
 Fix: bind the value with `let` and pass the name, as in `(let (value (+ 1 2)) (bump! value))`.
@@ -551,6 +564,7 @@ help: every list uses `(` and `)`
 2 -   (println [1 2 3]))
 2 +   (println (1 2 3]))
   |
+  = note: run `knave doc L0106` for an explanation
 
 error[L0106]: `]` is not part of the syntax
  --> bad_bracket.knv:2:18
@@ -563,6 +577,7 @@ help: every list uses `(` and `)`
 2 -   (println [1 2 3]))
 2 +   (println [1 2 3)))
   |
+  = note: run `knave doc L0106` for an explanation
 ```
 
 Fix: `(prn (vec 1 2 3))`. Plain parentheses, `(1 2 3)`, report `L0403` because the first item is called as a function, and `println` reports `L0404` for a vector, which has no `display`.

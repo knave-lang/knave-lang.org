@@ -1,5 +1,4 @@
 (use samples code-sample)
-(use strings contains? starts-with?)
 
 (deftest puts-each-sample-line-in-its-own-span
   (assert (starts-with?

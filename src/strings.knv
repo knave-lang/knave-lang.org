@@ -1,21 +1,13 @@
-(export after before contains? ends-with? escape-html
-        find-from fnv1a-digest join leading-count owned
-        percent-decode replace-all starts-with?)
+(export after before ends-with? escape-html find-from
+        fnv1a-digest leading-count owned percent-decode
+        replace-all)
 
 (def fnv1a-digest
   (rust "{0}.bytes().fold(0xcbf29ce484222325_u64, |hash, byte| (hash ^ u64::from(byte)).wrapping_mul(0x100000001b3)).to_string()"
     (fn ((ref str)) string)))
 
-(def starts-with?
-  (rust "{0}.starts_with({1})"
-    (fn ((ref str) (ref str)) bool)))
-
 (def ends-with?
   (rust "{0}.ends_with({1})"
-    (fn ((ref str) (ref str)) bool)))
-
-(def contains?
-  (rust "{0}.contains({1})"
     (fn ((ref str) (ref str)) bool)))
 
 (def find-from
@@ -26,11 +18,6 @@
 (def replace-all
   (rust "{0}.replace({1}, {2})"
     (fn ((ref str) (ref str) (ref str))
-      string)))
-
-(def join
-  (rust "{0}.join({1})"
-    (fn ((ref (slice string)) (ref str))
       string)))
 
 (def percent-decode

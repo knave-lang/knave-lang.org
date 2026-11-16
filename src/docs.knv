@@ -3,8 +3,8 @@
 (use prose prose)
 (use markdown-links closing-paren rewrite-link-targets)
 
-(use strings after before contains? ends-with? find-from
-             join owned replace-all starts-with?)
+(use strings after before ends-with? find-from owned
+             replace-all)
 
 (export docs-pages site-markdown summary)
 

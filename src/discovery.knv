@@ -1,4 +1,4 @@
-(use strings ends-with? join)
+(use strings ends-with?)
 
 (export ->page canonical-url followed-by llms-full-sections
         llms-links markdown-path page site-origin
@@ -29,7 +29,7 @@
     (str path markdown-extension)))
 
 (defn sitemap-entries (pages)
-  (join-lines (map (iter pages) sitemap-entry)))
+  (join-lines (collect (map (iter pages) sitemap-entry))))
 
 (type sitemap-entry
   (fn ((ref page)) string))
@@ -40,7 +40,7 @@
        "</loc></url>"))
 
 (defn llms-links (pages)
-  (join-lines (map (iter pages) llms-link)))
+  (join-lines (collect (map (iter pages) llms-link))))
 
 (type llms-link
   (fn ((ref page)) string))
@@ -53,8 +53,10 @@
        "): "
        (:description page)))
 
-(defn join-lines (lines)
-  (join (ref (collect lines)) "\n"))
+(type join-lines
+  (fn ((vec string)) string))
+
+(defn join-lines (lines) (join lines "\n"))
 
 (defn llms-full-sections (pages)
   (join (ref (collect (map (iter pages) llms-full-section)))

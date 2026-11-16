@@ -1,5 +1,5 @@
-(use strings after before contains? ends-with? escape-html
-             find-from owned percent-decode starts-with?)
+(use strings after before ends-with? escape-html find-from
+             owned percent-decode)
 
 (use discovery site-origin)
 (use markdown-links link-targets)

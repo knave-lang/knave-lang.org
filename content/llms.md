@@ -1,6 +1,6 @@
 # Writing Knave with a language model
 
-Language models have read far more Rust than Knave, so a model that writes Knave tends to reach for Rust's syntax and names. This page lists the places where Knave differs from Rust and explains how to read the errors Knave reports, so you and your model can fix code quickly. Every example on this page was checked with Knave 0.16.0.
+Language models have read far more Rust than Knave, so a model that writes Knave tends to reach for Rust's syntax and names. This page lists the places where Knave differs from Rust and explains how to read the errors Knave reports, so you and your model can fix code quickly. Every example on this page was checked with Knave 0.17.0.
 
 ## Idioms that differ from Rust
 
@@ -51,6 +51,7 @@ while i < 3 { ... }
 ```knave
 (for-each (range 0 3)
   (fn (i) (println i)))
+
 (println (loop (i 0
                 total 0)
            (if (< i 3)
@@ -68,7 +69,9 @@ if n > 2 { println!("big"); }
 
 ```knave
 (when (> n 2) (println "big"))
+
 (println (if (> n 2) "big" "small"))
+
 (cond
   ((> n 5) "large")
   ((> n 2) "medium")
@@ -85,8 +88,8 @@ match n { Some(v) => v, None => 0 }
 
 ```knave
 (defenum shape
-  (circle f64)
-  (rect f64 f64)
+  (circle float)
+  (rect float float)
   point)
 
 (defn area (s)
@@ -112,12 +115,12 @@ Shape::Circle(1.0)
 
 ```knave
 (defstruct point
-  :x f64
-  :y f64)
+  :x float
+  :y float)
 
 (defenum shape
-  (circle f64)
-  (labeled :text string :size f64)
+  (circle float)
+  (labeled :text string :size float)
   point)
 
 (defn main ()
@@ -143,18 +146,18 @@ impl fmt::Display for Point { ... }
 
 ```knave
 (defstruct circle
-  :radius f64)
+  :radius float)
 
 (deftrait shape
-  (area (fn ((ref self)) f64)))
+  (area (fn ((ref self)) float)))
 
 (impl shape circle
   (area (c)
     (* 3.0 (:radius c) (:radius c))))
 
 (defstruct point
-  :x i64
-  :y i64)
+  :x int
+  :y int)
 
 (display point (p)
   "("
@@ -177,8 +180,8 @@ use crate::geometry::{distance, Point};
 (export ->point distance point)
 
 (defstruct point
-  :x f64
-  :y f64)
+  :x float
+  :y float)
 
 (defn distance (a b)
   (let (dx (- (:x a) (:x b))
@@ -228,7 +231,7 @@ fn half(text: &str) -> Result<i64, ParseIntError> {
 ```knave
 (type half
   (fn ((ref str))
-    (result i64 parse-int-error)))
+    (result int parse-int-error)))
 
 (defn half (text)
   (let (n (try (parse text)))
@@ -257,9 +260,13 @@ println!("{:?}", items);
 
 ```knave
 (println "x = " x)
+
 (print "no newline ")
+
 (prn (vec 1 2 3))
+
 (println (pr-str (some 4)))
+
 (eprintln "to standard error")
 ```
 
@@ -273,19 +280,19 @@ let total: i64 = 13;
 ```
 
 ```knave
-(type double (fn (i64) i64))
+(type double (fn (int) int))
 
 (defn double (x) (* x 2))
 
-(defn triple ((x i64)) (* x 3))
+(defn triple ((x int)) (* x 3))
 
 (defn main ()
-  (let ((total i64) (+ (double 2) (triple 3)))
+  (let ((total int) (+ (double 2) (triple 3)))
     (println total)
     (println (the u8 7))))
 ```
 
-Most code needs no types. To pin one, write a `type` signature, a `(name type)` binder, or `(the type value)`. A type is lowercase and applied in a list: `(vec i64)`, not `Vec<i64>`. `x: i64` is a symbol `x:` followed by `i64`.
+Most code needs no types. To pin one, write a `type` signature, a `(name type)` binder, or `(the type value)`. A type is lowercase and applied in a list: `(vec int)`, not `Vec<i64>`. `x: i64` is a symbol `x:` followed by `i64`.
 
 ### Functions inside functions
 
@@ -473,7 +480,7 @@ error[L0401]: mismatched types
   = note: run `knave doc L0401` for an explanation
 ```
 
-Fix: `(->user (str "ana"))`. Numbers do not convert either: `(* width 1.5)` with a width declared `i64` reports ``expected `i64`, found a float``.
+Fix: `(->user (str "ana"))`. Numbers do not convert either: `(* width 1.5)` with a width declared `int` reports ``expected `int`, found a float``.
 
 **`L0402` wrong argument count.**
 
@@ -526,7 +533,7 @@ error[L0208]: `defn` can only appear at module level
 2 |   (defn helper (n) (* n 2))
   |   ^^^^^^^^^^^^^^^^^^^^^^^^^ not allowed inside an expression
   |
-  = help: use `local` to bind a name inside a body
+  = help: use `let` to bind a name inside a body
   = note: run `knave doc L0208` for an explanation
 ```
 
@@ -544,7 +551,7 @@ error[L0514]: this argument is a copy, so changing it changes nothing
 4 |   (bump! (+ 1 2)))
   |          ^^^^^^^ this is a copy, not a place
   |
-  = help: bind it to a local and pass the local: `(local value (+ 1 2))`
+  = help: bind it and pass the binding: `(let (value (+ 1 2)) ...)`
   = note: run `knave doc L0514` for an explanation
 ```
 

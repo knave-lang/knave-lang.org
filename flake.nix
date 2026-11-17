@@ -2,7 +2,7 @@
   description = "The knave-lang.org website";
 
   inputs = {
-    knave.url = "github:knave-lang/knave/v0.16.0";
+    knave.url = "github:knave-lang/knave/v0.17.0";
     nixpkgs.follows = "knave/nixpkgs";
   };
 

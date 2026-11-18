@@ -70,7 +70,7 @@
     (do
       (push! pages
              (try (module-page (as-str (at sources position)))))
-      (recur sources (+ position 1) pages))))
+      (recur sources (inc position) pages))))
 
 (defn module-page (source)
   (let (markdown (try (read-file (as-str (path-in generated-directory source))))

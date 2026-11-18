@@ -56,7 +56,7 @@
     (let (name (as-str (at names position)))
       (try (copy-file (as-str (path-in source name))
                       (as-str (path-in target name))))
-      (recur source target names (+ position 1)))))
+      (recur source target names (inc position)))))
 
 (defn files-under (root)
   (let (pending (vec (str "")))

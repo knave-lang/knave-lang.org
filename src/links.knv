@@ -76,7 +76,7 @@
     (none (file-listed? site (as-str (target-file site page href))))
     ((some hash)
      (let (target (target-file site page (subs href 0 hash)))
-       (holds-id? site target (after href (+ hash 1)))))))
+       (holds-id? site target (after href (inc hash)))))))
 
 (defn target-file (site page path)
   (if (empty? path)

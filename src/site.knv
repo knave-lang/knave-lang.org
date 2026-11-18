@@ -75,7 +75,7 @@
       (try (write-index (as-str (str output-directory (:path page)))
                         (as-str (in-layout layout page))))
       (try (write-markdown-copy page))
-      (recur layout pages (+ position 1)))))
+      (recur layout pages (inc position)))))
 
 (type write-markdown-copy
   (fn ((ref page)) (result unit io-error)))
@@ -202,4 +202,4 @@
                 (markdown-page (owned path)
                                (try (read-file (as-str full-path))))))
         (else (do)))
-      (recur paths (+ position 1) pages))))
+      (recur paths (inc position) pages))))

@@ -27,3 +27,6 @@ knave new hello
 cd hello
 knave run
 ```
+
+Besides the program, `knave new` writes a starter test, a git repository, a GitHub workflow and an agent skill.
+Pass `--skip-git`, `--skip-github` or `--skip-agent-skill` to leave out the git repository, the workflow or the skill.

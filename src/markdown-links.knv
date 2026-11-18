@@ -42,7 +42,7 @@
     (str stitched (after markdown start))
     (let (span (at spans position))
       (recur markdown spans replacements
-             (+ position 1)
+             (inc position)
              (:end span)
              (str stitched
                   (subs markdown start (:start span))

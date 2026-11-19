@@ -5,7 +5,7 @@ struct Rogue<'a> {
 
 fn scheme(rogue: &Rogue<'_>) -> String {
     let trick = &rogue.tricks[0];
-    format!("{} runs a racket with guile and {}", rogue.name, trick)
+    format!("{} runs a racket with guile and {}", rogue.name, *trick)
 }
 
 fn main() {

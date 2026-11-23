@@ -1,8 +1,9 @@
 (defproject knave-site
+  :knave "0.21.0"
   (libraries
     (knave-grid :git "https://github.com/KarlHarnois/knave-grid"
-                :rev "3b86e5f8fad790ee4d1a391c1c828abc39147d1d")
+                :rev "4501c9670463cd5bd6b18bcc20ebe097970d1299")
     (knave-markdown :git "https://github.com/KarlHarnois/knave-markdown"
-                    :rev "74e1d1fc1b0a62942f88106fa01ab05cbcad8500")
+                    :rev "42f5f018688730f07c1cd9dc520b5ab62a6d59e3")
     (knave-preview :git "https://github.com/KarlHarnois/knave-preview"
-                   :rev "3d759e7f9d2c48ed2119b53839c30a228cebd975")))
+                   :rev "ceb71a2091ab0fab5ce9fda0277b94a9a1bbe5d4")))

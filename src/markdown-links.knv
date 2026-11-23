@@ -3,8 +3,8 @@
 (export closing-paren link-targets rewrite-link-targets)
 
 (defstruct target-span
-  :start usize
-  :end usize)
+  :start int
+  :end int)
 
 (def link-opening "](")
 
@@ -34,7 +34,7 @@
   (fn ((ref str)
        (ref (vec target-span))
        (ref (vec string))
-       usize usize string)
+       int int string)
     string))
 
 (defn stitch (markdown spans replacements position start stitched)

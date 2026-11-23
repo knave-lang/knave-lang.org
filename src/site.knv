@@ -65,7 +65,7 @@
               (as-str (fnv1a-digest (as-str stylesheet)))))))
 
 (type write-pages
-  (fn ((ref str) (ref (vec page)) usize)
+  (fn ((ref str) (ref (vec page)) int)
     (result unit io-error)))
 
 (defn write-pages (layout pages position)

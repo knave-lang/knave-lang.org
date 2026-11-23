@@ -11,9 +11,9 @@
     (fn ((ref str) (ref str)) bool)))
 
 (def find-from
-  (rust "{0}[{2}..].find({1}).map(|offset| offset + {2})"
-    (fn ((ref str) (ref str) usize)
-      (option usize))))
+  (rust "{0}[({2}) as usize..].find({1}).map(|offset| offset as i64 + ({2}))"
+    (fn ((ref str) (ref str) int)
+      (option int))))
 
 (def replace-all
   (rust "{0}.replace({1}, {2})"

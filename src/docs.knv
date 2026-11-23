@@ -61,7 +61,7 @@
   (ends-with? (as-str path) markdown-extension))
 
 (type module-pages
-  (fn ((ref (vec string)) usize (vec page))
+  (fn ((ref (vec string)) int (vec page))
     (result (vec page) io-error)))
 
 (defn module-pages (sources position pages)
